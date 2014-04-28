@@ -7,11 +7,8 @@ Package.on_use(function(api) {
 
   //api.export('LinkedIn');
 
-  api.add_files(
-    ['linkedin_configure.html', 'linkedin_configure.js'],
-    'client');
-
   api.add_files('lib/dbobject.js', ['client', 'server']);
-  api.add_files('linkedin_server.js', 'server');
-  api.add_files('linkedin_client.js', 'client');
+  api.add_files('lib/manager.js', ['client', 'server']);
+  api.add_files('client/manager.js', ['client' ]);
+  api.add_files('server/manager.js', 'server');
 });

@@ -1,0 +1,8 @@
+{
+  "name": "meteor-collection-management",
+  "description": "Meteor Collection Management",
+  "homepage": "https://github.com/whalepath/meteor-collection-management",
+  "author": "Pat Moore (at whalepath)",
+  "version": "0.1",
+  "git": "https://github.com/whalepath/meteor-collection-management.git"
+}
