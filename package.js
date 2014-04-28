@@ -3,7 +3,7 @@ Package.describe({
 });
 
 Package.on_use(function(api) {
-  //api.use('service-configuration', ['client', 'server']);
+  api.use('underscore', ['client', 'server']);
   debugger;
 
   api.export('DbObjectType');
