@@ -5,7 +5,8 @@ Package.describe({
 Package.on_use(function(api) {
   //api.use('service-configuration', ['client', 'server']);
 
-  //api.export('LinkedIn');
+  api.export('DbObjectType');
+  api.export('ManagerType');
 
   api.add_files('lib/dbobject.js', ['client', 'server']);
   api.add_files('lib/manager.js', ['client', 'server']);
