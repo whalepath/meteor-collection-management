@@ -54,6 +54,9 @@ Meteor.startup(function() {
         },
         redirect: function(url, router) {
             router.response.statusCode = 302;
+            if ( url == null ) {
+                url = Meteor.absoluteUrl();
+            }
             // TODO: alter window history so that a 'go back' goes to the previous whalepath page ( not this redirect page )
             // TODO: except if the previous page is a non-whalepath page.
             router.response.setHeader('Location', url);
