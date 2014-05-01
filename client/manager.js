@@ -100,7 +100,7 @@ Meteor.startup(function() {
             };
         }
     });
-    _.extend(ManagerType.prototype, {
+    Object.defineProperties(ManagerType.prototype, {
         userId: {
             'get' : function() {
                 // always safe on client
