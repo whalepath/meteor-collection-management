@@ -24,12 +24,21 @@ Meteor.startup(function() {
             // if it is running on the server - the call will be a direct javascript call.
             if ( trackingEventKey ) {
                 thisManager[meteorCallNameSuffix] = function() {
-                    TrackingManager.track(trackingEventKey);
+                    TrackingManager && TrackingManager.track(trackingEventKey);
                     return Meteor.apply(meteorCallName, arguments);
                 };
             } else {
                 thisManager[meteorCallNameSuffix] = function() {
-                    return Meteor.apply(meteorCallName, arguments);
+                    var args = Array.prototype.slice.call(arguments);
+                    var callback;
+                    if ( args.length > 0) {
+                        if ( typeof args[args.length-1] == "function") {
+                            callback = args.pop();
+                        } else {
+                            callback = null;
+                        }
+                    }
+                    return Meteor.apply(meteorCallName, args, null, callback);
                 };
             }
             // make the underlying Meteor method name available for Meteor libraries that need to know the Meteor call ( like MeteorFile )
