@@ -51,7 +51,10 @@ Meteor.startup(function() {
         },
         /**
          * Creates a method this[meteorTopicSuffix] which will subscribe to the topic with the provided arguments and return the subscribe handle.
-         * Also attaches to the returned topic handle a results() and a oneResult() function.
+         * Also attaches to the returned topic handle these functions:
+         *     results(),
+         *     oneResult(),
+         *     and cursor()
          *
          * Most/All topics are created with manager is created
          *
@@ -85,13 +88,18 @@ Meteor.startup(function() {
                  *  This works by calling the manager's cursor function and passing the same arguments that were passed to the subscribe topic.
                  * @returns {*}
                  */
-                handle.results = function() {
-                    var results = null, resultsCursor;
+                handle.cursor = function() {
+                    var resultsCursor = null;
                     if ( handle.ready() ) {
                         resultsCursor = thatManager.getMeteorTopicCursorFunction(meteorTopicSuffix).apply(thatManager,passedArguments);
-                        if ( resultsCursor != null ) {
-                            results = resultsCursor.fetch();
-                        }
+                    }
+                    return resultsCursor;
+                },
+                handle.results = function() {
+                    var results = null;
+                    var resultsCursor = this.cursor();
+                    if ( resultsCursor != null ) {
+                        results = resultsCursor.fetch();
                     }
                     return results;
                 }
