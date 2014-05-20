@@ -43,10 +43,14 @@ Meteor.startup(function() {
             // insure that this.ready() is called when the no data is returned. (required for spiderable to work)
             var wrappedFn = function() {
                 var returnedValue = topicCursorFunction.apply(this, arguments);
-                if ( returnedValue == null) {
+                if ( returnedValue == null || returnedValue === false) {
                     // required for spiderable to work
                     // see: http://www.meteorpedia.com/read/spiderable
+                    returnedValue = null;
                     this.ready();
+                } else if ( returnedValue === true ) {
+                    // true means we would like to return null *but* the ready method was already called
+                    returnedValue = null;
                 }
                 return returnedValue;
             }
