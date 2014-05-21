@@ -7,8 +7,10 @@ Package.on_use(function(api) {
 
   api.export('DbObjectType');
   api.export('ManagerType');
+  api.export('Enums');
 
   api.add_files('lib/underscoreExtensions.js', ['client', 'server']);
+  api.add_files('lib/enums.js', ['client', 'server']);
   api.add_files('lib/dbobject.js', ['client', 'server']);
   api.add_files('lib/manager.js', ['client', 'server']);
   api.add_files('client/manager.js', ['client' ]);
