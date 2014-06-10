@@ -1,0 +1,1 @@
+Collection manager abstraction for Meteor.
