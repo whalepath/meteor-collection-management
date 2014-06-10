@@ -47,13 +47,14 @@ Tinytest.add('Meteor Collection Management - DbObject - fromJsonValue', function
 
 
 TestCollectionTypeComplex = DbObjectType.createSubClass('testCollectionComplex',
-    {
-        refField : {
-            reference: true,
-            writable: true
+    [
+        {
+            refField : {
+                reference: true
+            }
         },
-        normalField : null
-    },
+        'normalField'
+    ],
     'testCollectionTableNameComplex');
 
 Tinytest.add('Meteor Collection Management - DbObject - Reference fields', function(test) {
@@ -73,4 +74,8 @@ Tinytest.add('Meteor Collection Management - DbObject - Reference fields', funct
     var t2 = TestCollectionTypeComplex.databaseTable.findOneByRefField(refValue);
     test.isTrue(t2, 'Value by reference field was not found.');
     test.equal(t2._id, t._id, 'Wrong entry found.');
+
+    //Verify ref field is writable even though it wasn't explicitly requested.
+    t.refField = 'new value';
+    test.equal(t.refField, 'new value', 'refField is not writable (but should be).')
 });
