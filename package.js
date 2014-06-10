@@ -19,5 +19,5 @@ Package.on_use(function(api) {
 
 Package.on_test(function(api) {
     api.use(['meteor-collection-management', 'tinytest', 'test-helpers']);
-    api.add_files('tests/meteor-collection-management-test.js', ['client', 'server']);
+    api.add_files('tests/dbobject-test.js', ['client', 'server']);
 })
