@@ -1,9 +1,11 @@
+var TEST_COLLECTION_TABLE_NAME = 'testCollectionTableName';
+
 TestCollectionType = DbObjectType.createSubClass('testCollection',
     [
         'field1',
         'field2'
     ],
-    'testCollection');
+    TEST_COLLECTION_TABLE_NAME);
 
 Tinytest.add('Meteor Collection Management - DbObject - _save', function(test) {
     var t = new TestCollectionType({field1:'value1', field2:'value2'});
@@ -13,7 +15,6 @@ Tinytest.add('Meteor Collection Management - DbObject - _save', function(test) {
     t._id = 'override';
     test.equal(t._id, id_value, '_id field is not immutable!');
 });
-
 
 Tinytest.add('Meteor Collection Management - DbObject - databaseTable', function(test) {
     test.isTrue(TestCollectionType.databaseTable, 'Meteor collection wasn\'t initialized.');
@@ -42,4 +43,34 @@ Tinytest.add('Meteor Collection Management - DbObject - toJsonValue', function(t
 
 Tinytest.add('Meteor Collection Management - DbObject - fromJsonValue', function(test) {
 //TODO
+});
+
+
+TestCollectionTypeComplex = DbObjectType.createSubClass('testCollectionComplex',
+    {
+        refField : {
+            reference: true,
+            writable: true
+        },
+        normalField : null
+    },
+    'testCollectionTableNameComplex');
+
+Tinytest.add('Meteor Collection Management - DbObject - Reference fields', function(test) {
+    test.isTrue(TestCollectionTypeComplex.databaseTable.findOneByRefField, 'Reference field findOneBy selector wasn\'t created.');
+    test.isTrue(TestCollectionTypeComplex.databaseTable.findByRefField, 'Reference field findBy selector wasn\'t created.');
+    test.isFalse(TestCollectionTypeComplex.databaseTable.findByNormalField, 'Selector for normal field was created!');
+
+    var d = new Date();
+    var n = d.getMilliseconds();
+    var refValue = 'refValue' + n;
+    var normalValue = 'normal' + refValue;
+
+    var t = new TestCollectionTypeComplex();
+    t.refField = refValue;
+    t.normalField = normalValue;
+    t._save();
+    var t2 = TestCollectionTypeComplex.databaseTable.findOneByRefField(refValue);
+    test.isTrue(t2, 'Value by reference field was not found.');
+    test.equal(t2._id, t._id, 'Wrong entry found.');
 });
