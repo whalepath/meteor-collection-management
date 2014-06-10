@@ -16,3 +16,8 @@ Package.on_use(function(api) {
   api.add_files('client/manager.js', ['client' ]);
   api.add_files('server/manager.js', 'server');
 });
+
+Package.on_test(function(api) {
+    api.use(['meteor-collection-management', 'tinytest', 'test-helpers']);
+    api.add_files('tests/meteor-collection-management-test.js', ['client', 'server']);
+})
