@@ -36,7 +36,7 @@ Meteor.startup(function() {
                     // TODO: make 'TrackingManager' less wp specific : maybe a lookup/property etc.
                     TrackingManager && TrackingManager.track(trackingEventKey);
                 }
-                thatManager.log("calling "+meteorCallName");
+                thatManager.log("calling "+meteorCallName);
                 return Meteor.apply(meteorCallName, args, null, callback);
             };
             // make the underlying Meteor method name available for Meteor libraries that need to know the Meteor call ( like MeteorFile )
