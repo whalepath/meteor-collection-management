@@ -91,7 +91,7 @@ if (Meteor.isServer) {
     t._save();
 
     var MongoClient = Npm.require('mongodb').MongoClient;
-    MongoClient.connect(process.env.MONGO_URL, Meteor.bindEnvironment(function(err, db) {
+    MongoClient.connect(process.env.MONGO_URL, function(err, db) {
         if(err) throw err;
         Tinytest.addAsync('Meteor Collection Management - DbObject - Indexes', function(test, done) {
             var table = IndexedCollection.databaseTable;
@@ -103,7 +103,7 @@ if (Meteor.isServer) {
             }));
         });
 //        db.close();
-    }));
+    });
 }
 
 
