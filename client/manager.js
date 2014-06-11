@@ -6,7 +6,7 @@ Meteor.startup(function() {
          * @param meteorCallDefinition
          */
         createMeteorCallMethod : function(meteorCallDefinition) {
-            var thisManager = this;
+            var thatManager = this;
             var trackingEventKey;
             if ( typeof(meteorCallDefinition) == "undefined" || meteorCallDefinition ==null) {
                 return;
@@ -22,27 +22,25 @@ Meteor.startup(function() {
             // Create the client function that will call the server-side function with the same name.
             // This allows code to be location agnostic: if the outside code is running on the client: the Meteor call will happen,
             // if it is running on the server - the call will be a direct javascript call.
-            if ( trackingEventKey ) {
-                thisManager[meteorCallNameSuffix] = function() {
-                    TrackingManager && TrackingManager.track(trackingEventKey);
-                    return Meteor.apply(meteorCallName, arguments);
-                };
-            } else {
-                thisManager[meteorCallNameSuffix] = function() {
-                    var args = Array.prototype.slice.call(arguments);
-                    var callback;
-                    if ( args.length > 0) {
-                        if ( typeof args[args.length-1] == "function") {
-                            callback = args.pop();
-                        } else {
-                            callback = null;
-                        }
+            thatManager[meteorCallNameSuffix] = function() {
+                var args = Array.prototype.slice.call(arguments);
+                var callback;
+                if ( args.length > 0) {
+                    if ( typeof args[args.length-1] == "function") {
+                        callback = args.pop();
+                    } else {
+                        callback = null;
                     }
-                    return Meteor.apply(meteorCallName, args, null, callback);
-                };
-            }
+                }
+                if ( trackingEventKey ) {
+                    // TODO: make 'TrackingManager' less wp specific : maybe a lookup/property etc.
+                    TrackingManager && TrackingManager.track(trackingEventKey);
+                }
+                thatManager.log("calling "+meteorCallName");
+                return Meteor.apply(meteorCallName, args, null, callback);
+            };
             // make the underlying Meteor method name available for Meteor libraries that need to know the Meteor call ( like MeteorFile )
-            Object.defineProperties(thisManager[meteorCallNameSuffix], {
+            Object.defineProperties(thatManager[meteorCallNameSuffix], {
                 meteorCallName : {
                     value : meteorCallName,
                     writable : false
@@ -81,7 +79,7 @@ Meteor.startup(function() {
                 var args = Array.prototype.slice.call(arguments, 0);
                 args.unshift(topicName);
                 var handle = Meteor.subscribe.apply(Meteor,args);
-                console.log("subscribing to "+topicName);
+                thatManager.log("subscribing to "+topicName);
 
                 /**
                  *  create a results() function that will return an array of the results.
