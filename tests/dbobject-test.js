@@ -79,3 +79,32 @@ Tinytest.add('Meteor Collection Management - DbObject - Reference fields', funct
     t.refField = 'new value';
     test.equal(t.refField, 'new value', 'refField is not writable (but should be).')
 });
+
+if (Meteor.isServer) {
+    IndexedCollection = DbObjectType.createSubClass('indexedCollection', [
+           'normalField',
+           {'indexedField' : {indexed: true}},
+           {'refField' : {reference: true}}
+        ],
+    'indexedCollectionTableName');
+    var t = new IndexedCollection({normalField:'value'});
+    t._save();
+
+    var MongoClient = Npm.require('mongodb').MongoClient;
+    MongoClient.connect(process.env.MONGO_URL, Meteor.bindEnvironment(function(err, db) {
+        if(err) throw err;
+        Tinytest.addAsync('Meteor Collection Management - DbObject - Indexes', function(test, done) {
+            var table = IndexedCollection.databaseTable;
+            var collection = db.collection('indexedCollectionTableName');
+            collection.indexes( Meteor.bindEnvironment(function(err, indexes) {
+              if(err) throw err;
+              console.log(indexes);
+              test.equal(3, indexes.length, 'indexedCollectionTableName must have 3 indexes: _id, indexedField and refField');
+              done();
+            }));
+        });
+//        db.close();
+    }));
+}
+
+
