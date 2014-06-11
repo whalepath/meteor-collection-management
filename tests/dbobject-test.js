@@ -98,7 +98,6 @@ if (Meteor.isServer) {
             var collection = db.collection('indexedCollectionTableName');
             collection.indexes( Meteor.bindEnvironment(function(err, indexes) {
               if(err) throw err;
-              console.log(indexes);
               test.equal(3, indexes.length, 'indexedCollectionTableName must have 3 indexes: _id, indexedField and refField');
               done();
             }));
