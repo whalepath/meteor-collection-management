@@ -1,8 +1,9 @@
 Meteor.startup(function() {
     _.extend(ManagerType.prototype, {
         /**
-         * Create the Meteor stubs for the client.
+         * Create the Meteor call stubs for the client.
          * Defines this[meteorCallDefinition] to the call function.
+         * To handle return results, the *last* argument should be a callback function ( function(error, results) )
          * @param meteorCallDefinition
          */
         createMeteorCallMethod : function(meteorCallDefinition) {
@@ -24,6 +25,7 @@ Meteor.startup(function() {
             // if it is running on the server - the call will be a direct javascript call.
             thatManager[meteorCallNameSuffix] = function() {
                 var args = Array.prototype.slice.call(arguments);
+                // look for callback function that will be called with the result the server returns.
                 var callback;
                 if ( args.length > 0) {
                     if ( typeof args[args.length-1] == "function") {
