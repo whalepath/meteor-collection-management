@@ -37,13 +37,13 @@ Tinytest.add('Meteor Collection Management - DbObject - databaseTable', function
 });
 
 
-Tinytest.add('Meteor Collection Management - DbObject - toJsonValue', function(test) {
+//Tinytest.add('Meteor Collection Management - DbObject - toJsonValue', function(test) {
 //TODO
-});
+//});
 
-Tinytest.add('Meteor Collection Management - DbObject - fromJsonValue', function(test) {
+//Tinytest.add('Meteor Collection Management - DbObject - fromJsonValue', function(test) {
 //TODO
-});
+//});
 
 
 TestCollectionTypeComplex = DbObjectType.createSubClass('testCollectionComplex',
