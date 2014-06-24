@@ -22,4 +22,5 @@ Tinytest.add('Meteor Collection Management - enums - display', function(test) {
 Tinytest.add('Meteor Collection Management - enums - array', function(test) {
     var enumsArray = testEnum.toArray(['one','three']);
     test.equal(enumsArray, [testEnum.one, testEnum.three]);
+    test.equal(enumsArray.toString(), 'ONE,THREE');
 });
