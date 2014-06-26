@@ -66,8 +66,6 @@ Tinytest.add('Meteor Collection Management - DbObject - Reference fields', funct
     test.isTrue(TestCollectionTypeComplex.databaseTable.findOneByRefField, 'Reference field findOneBy selector wasn\'t created.');
     test.isTrue(TestCollectionTypeComplex.databaseTable.findByRefField, 'Reference field findBy selector wasn\'t created.');
     test.isFalse(TestCollectionTypeComplex.databaseTable.findByNormalField, 'Selector for normal field was created!');
-    test.equal(TestCollectionTypeComplex.databaseTable.findByRefField.propertyName, 'refField', 'Reference selector property name is not correct.');
-    test.equal(TestCollectionTypeComplex.databaseTable.findByRefField2.propertyName, 'refField2', 'Reference selector property name is not correct.');
     var d = new Date();
     var n = d.getMilliseconds();
     var refValue = 'refValue' + n;
@@ -81,6 +79,8 @@ Tinytest.add('Meteor Collection Management - DbObject - Reference fields', funct
     test.isTrue(t2, 'Value by reference field was not found.');
     test.equal(t2._id, t._id, 'Wrong entry found.');
 
+    var t3 = TestCollectionTypeComplex.databaseTable.findByRefField(refValue);
+    test.isTrue(t3 != null && t3.count() > 0, 'Malformed cursor returned');
     //Verify ref field is writable even though it wasn't explicitly requested.
     t.refField = 'new value';
     test.equal(t.refField, 'new value', 'refField is not writable (but should be).')
