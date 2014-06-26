@@ -51,7 +51,12 @@ TestCollectionTypeComplex = DbObjectType.createSubClass('testCollectionComplex',
         {
             refField : {
                 reference: true
+            },
+
+            refField2 : {
+                reference: true
             }
+
         },
         'normalField'
     ],
@@ -61,7 +66,8 @@ Tinytest.add('Meteor Collection Management - DbObject - Reference fields', funct
     test.isTrue(TestCollectionTypeComplex.databaseTable.findOneByRefField, 'Reference field findOneBy selector wasn\'t created.');
     test.isTrue(TestCollectionTypeComplex.databaseTable.findByRefField, 'Reference field findBy selector wasn\'t created.');
     test.isFalse(TestCollectionTypeComplex.databaseTable.findByNormalField, 'Selector for normal field was created!');
-
+    test.equal(TestCollectionTypeComplex.databaseTable.findByRefField.propertyName, 'refField', 'Reference selector property name is not correct.');
+    test.equal(TestCollectionTypeComplex.databaseTable.findByRefField2.propertyName, 'refField2', 'Reference selector property name is not correct.');
     var d = new Date();
     var n = d.getMilliseconds();
     var refValue = 'refValue' + n;
