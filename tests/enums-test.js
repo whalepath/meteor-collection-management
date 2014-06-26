@@ -24,3 +24,7 @@ Tinytest.add('Meteor Collection Management - enums - array', function(test) {
     test.equal(enumsArray, [testEnum.one, testEnum.three]);
     test.equal(enumsArray.toString(), 'ONE,THREE');
 });
+
+Tinytest.add('Meteor Collection Management - enums - auto dbCode', function(test) {
+   test.equal(testEnum.one.dbCode, 'one', 'Default DbCode was not initialized.');
+});
