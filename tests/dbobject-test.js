@@ -36,7 +36,6 @@ Tinytest.add('Meteor Collection Management - DbObject - databaseTable', function
     test.isTrue(t.equals(t2), 'Fetched object doesn\'t equal to saved: ' + t2 );
 });
 
-
 //Tinytest.add('Meteor Collection Management - DbObject - toJsonValue', function(test) {
 //TODO
 //});
@@ -55,10 +54,22 @@ TestCollectionTypeComplex = DbObjectType.createSubClass('testCollectionComplex',
 
             refField2 : {
                 reference: true
+            },
+            aDate: {
+                'get': function() {
+                    return new Date();
+                }
             }
 
         },
-        'normalField'
+        'normalField',
+        'anArrayOfIds',
+        'anotherCollectionsId',
+        {
+            securedField: {
+                security: true
+            }
+        }
     ],
     'testCollectionTableNameComplex');
 
@@ -112,4 +123,26 @@ if (Meteor.isServer) {
     });
 }
 
+Tinytest.add('Meteor Collection Management - DbObject - safeCopying from client', function(test) {
+    test.equal(['aDate', 'normalField'], TestCollectionTypeComplex.prototype.propertyNamesClientCanSet);    
+    var g = new TestCollectionTypeComplex();
+    var clientObject = 
+        {id:'bad',
+         refField : 'bad',
+         refField2 : 'bad',
+         aDate: 'good',
+         'normalField': 'good',
+         'anArrayOfIds': 'bad',
+        'anotherCollectionsId':'bad',
+        securedField: 'bad'
+        };
+    g.extendClient(clientObject);
+    _.each(TestCollectionTypeComplex.propertyNames, function(propertyName) {
+        if ( _.contains(TestCollectionTypeComplex.prototype.propertyNamesClientCanSet, propertyName)) {
+            test.equal('good', g[propertyName]);
+        } else {
+            test.isFalse(propertyName in g);
+        }
+    });
+});
 
