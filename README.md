@@ -8,3 +8,9 @@ TODO add proper description.
 To run tests locally run following: 
 
 ```meteor test-packages ./```
+
+## to understand
+* look in lib/manager.js
+* find ManagerType.createSubClass
+
+
