@@ -75,6 +75,21 @@ Meteor.startup(function() {
         createTopic : function(meteorTopicSuffix) {
             var thatManager = this;
             var topicName = this.getMeteorTopicName(meteorTopicSuffix);
+            var topicCursorFunction = thatManager.getMeteorTopicCursorFunction(meteorTopicSuffix, true);
+            if ( topicCursorFunction == null) {
+                thatManager.log(meteorTopicSuffix+": supplying default custom client topic function");
+                var topicTableName = thatManager.getMeteorTopicTableName(meteorTopicSuffix);
+                // no cursor function on client, means a hand-crafter topic with self.added() and such calls.
+                //
+                // create the receiving collection on the client side (with a unique name)
+                thatManager[topicTableName] = new Meteor.Collection(topicTableName);
+                // create the expected cursor function - that does no selection.
+                thatManager[meteorTopicSuffix+'Cursor'] = topicCursorFunction = function() {
+                    // note: no selection criteria because the server will only return the needed results.
+                    var results = thatManager[topicTableName].find();
+                    return results;
+                }
+            }
             // creates the stub subscribe method
             this[meteorTopicSuffix] = function() {
                 var passedArguments = Array.prototype.slice.call(arguments, 0);
@@ -91,7 +106,7 @@ Meteor.startup(function() {
                 handle.cursor = function() {
                     var resultsCursor = null;
                     if ( handle.ready() ) {
-                        resultsCursor = thatManager.getMeteorTopicCursorFunction(meteorTopicSuffix).apply(thatManager,passedArguments);
+                        resultsCursor = topicCursorFunction.apply(thatManager,passedArguments);
                     }
                     return resultsCursor;
                 },

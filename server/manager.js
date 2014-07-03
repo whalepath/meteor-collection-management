@@ -29,19 +29,45 @@ Meteor.startup(function() {
             Meteor.methods(methods);
         },
         /**
+         * Creates a Meteor topic with Meteor.publish()
          * Meteor.publish/subscribe has a useful 'this' so we want to make the manager available via another route.
+         * 
+         * This function is called from the ManagerType constructor.
+         * 
+         * Access the topic name, topic cursor function, and thatManager in the cursor function:
+         *   this.topicCursorFunction.thatManager
+         *   this.topicCursorFunction.topicName
+         *
+         *       properties are available.
+         *
+         * 
          * @param meteorTopicSuffix
          */
         createTopic : function(meteorTopicSuffix) {
             var thatManager = this;
             var topicName = this.getMeteorTopicName(meteorTopicSuffix);
-            console.log("Creating topic: "+topicName);
+            thatManager.log("Creating topic: "+topicName);
             var topicCursorFunction = thatManager.getMeteorTopicCursorFunction(meteorTopicSuffix);
             // make the current manager available on cursor when doing publish subscribe.
-            topicCursorFunction.thatManager = thatManager;
+            Object.defineProperties(topicCursorFunction, {
+                thatManager: {
+                    writable: false,
+                    value: thatManager
+                },
+                topicName: {
+                    writable: false,
+                    value: topicName
+                },
+                meteorTopicSuffix : {
+                    writable: false,
+                    value: meteorTopicSuffix
+                }
+            });
 
             // insure that this.ready() is called when the no data is returned. (required for spiderable to work)
             var wrappedFn = function() {
+                // Question: this should be o.k. because we don't have the cursor (this) reused. (not certain about last statement)
+                this.topicCursorFunction = topicCursorFunction;
                 var returnedValue = topicCursorFunction.apply(this, arguments);
                 if ( returnedValue == null || returnedValue === false) {
                     // required for spiderable to work
