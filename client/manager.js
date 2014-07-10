@@ -50,13 +50,13 @@ Meteor.startup(function() {
             });
         },
         /**
-         * Creates a method this[meteorTopicSuffix] which will subscribe to the topic with the provided arguments and return the subscribe handle.
-         * Also attaches to the returned topic handle these functions:
+         * Creates a method this[meteorTopicSuffix] which will subscribe to the meteorTopic with the provided arguments and return the subscribe handle.
+         * Also attaches to the returned meteorTopic handle these functions:
          *     results(),
          *     oneResult(),
          *     and cursor()
          *
-         * Most/All topics are created with manager is created
+         * Most/All meteorTopics are created with manager is created
          *
          * Example:
          *
@@ -74,27 +74,42 @@ Meteor.startup(function() {
          */
         createTopic : function(meteorTopicSuffix) {
             var thatManager = this;
-            var topicName = this.getMeteorTopicName(meteorTopicSuffix);
+            var meteorTopicName = this.getMeteorTopicName(meteorTopicSuffix);
+            var meteorTopicCursorFunction = thatManager.getMeteorTopicCursorFunction(meteorTopicSuffix, true);
+            if ( meteorTopicCursorFunction == null) {
+                thatManager.log(meteorTopicName+": supplying default custom client meteorTopic function");
+                var meteorTopicTableName = thatManager.getMeteorTopicTableName(meteorTopicSuffix);
+                // no cursor function on client, means a hand-crafter meteorTopic with self.added() and such calls.
+                //
+                // create the receiving collection on the client side (with a unique name)
+                thatManager[meteorTopicTableName] = new Meteor.Collection(meteorTopicTableName);
+                // create the expected cursor function - that does no selection.
+                thatManager[meteorTopicSuffix+'Cursor'] = meteorTopicCursorFunction = function() {
+                    // note: no selection criteria because the server will only return the needed results.
+                    var results = thatManager[meteorTopicTableName].find();
+                    return results;
+                }
+            }
             // creates the stub subscribe method
             this[meteorTopicSuffix] = function() {
                 var passedArguments = Array.prototype.slice.call(arguments, 0);
                 var args = Array.prototype.slice.call(arguments, 0);
-                args.unshift(topicName);
+                args.unshift(meteorTopicName);
                 var handle = Meteor.subscribe.apply(Meteor,args);
-                thatManager.log("subscribing to "+topicName);
+                thatManager.log("subscribing to "+meteorTopicName);
 
                 /**
                  *  create a results() function that will return an array of the results.
-                 *  This works by calling the manager's cursor function and passing the same arguments that were passed to the subscribe topic.
+                 *  This works by calling the manager's cursor function and passing the same arguments that were passed to the subscribe meteorTopic.
                  * @returns {*}
                  */
                 handle.cursor = function() {
                     var resultsCursor = null;
                     if ( handle.ready() ) {
-                        resultsCursor = thatManager.getMeteorTopicCursorFunction(meteorTopicSuffix).apply(thatManager,passedArguments);
+                        resultsCursor = meteorTopicCursorFunction.apply(thatManager,passedArguments);
                     }
                     return resultsCursor;
-                },
+                };
                 handle.results = function() {
                     var results = null;
                     var resultsCursor = this.cursor();
@@ -102,7 +117,7 @@ Meteor.startup(function() {
                         results = resultsCursor.fetch();
                     }
                     return results;
-                }
+                };
                 // function that returns only a single result ( if the results are ready)
                 handle.oneResult = function() {
                     var results = this.results();

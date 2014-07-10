@@ -29,20 +29,48 @@ Meteor.startup(function() {
             Meteor.methods(methods);
         },
         /**
-         * Meteor.publish/subscribe has a useful 'this' so we want to make the manager available via another route.
+         * Creates a Meteor topic with Meteor.publish()
+         * Topic is named manager's callPrefix+'_topic_'+meteorTopicSuffix ( see this.getMeteorTopicName() )
+         * Meteor.publish/subscribe has a useful 'this': access the meteorTopic name, meteorTopic cursor function, and thatManager in the cursor function:
+         *   this.meteorTopicCursorFunction.thatManager - the manager that created this meteorTopic
+         *   this.meteorTopicCursorFunction.meteorTopicName - the full meteorTopic name
+         *   this.meteorTopicCursorFunction.meteorTopicSuffix - the full meteorTopic name
+         *   this.meteorTopicCursorFunction.meteorTopicTableName
+         *
+         * This function is called from the ManagerType constructor.
          * @param meteorTopicSuffix
          */
         createTopic : function(meteorTopicSuffix) {
             var thatManager = this;
-            var topicName = this.getMeteorTopicName(meteorTopicSuffix);
-            console.log("Creating topic: "+topicName);
-            var topicCursorFunction = thatManager.getMeteorTopicCursorFunction(meteorTopicSuffix);
+            var meteorTopicName = this.getMeteorTopicName(meteorTopicSuffix);
+            var meteorTopicTableName = thatManager.getMeteorTopicTableName(meteorTopicSuffix);
+            thatManager.log("Creating meteorTopic: "+meteorTopicName);
+            var meteorTopicCursorFunction = thatManager.getMeteorTopicCursorFunction(meteorTopicSuffix);
             // make the current manager available on cursor when doing publish subscribe.
-            topicCursorFunction.thatManager = thatManager;
+            Object.defineProperties(meteorTopicCursorFunction, {
+                thatManager: {
+                    writable: false,
+                    value: thatManager
+                },
+                meteorTopicName: {
+                    writable: false,
+                    value: meteorTopicName
+                },
+                meteorTopicSuffix : {
+                    writable: false,
+                    value: meteorTopicSuffix
+                },
+                meteorTopicTableName: {
+                    writable: false,
+                    value: meteorTopicTableName
+                },
+            });
 
             // insure that this.ready() is called when the no data is returned. (required for spiderable to work)
             var wrappedFn = function() {
-                var returnedValue = topicCursorFunction.apply(this, arguments);
+                // Question: this should be o.k. because we don't have the cursor (this) reused. (not certain that the topic cursor is not reused)
+                this.meteorTopicCursorFunction = meteorTopicCursorFunction;
+                var returnedValue = meteorTopicCursorFunction.apply(this, arguments);
                 if ( returnedValue == null || returnedValue === false) {
                     // required for spiderable to work
                     // see: http://www.meteorpedia.com/read/spiderable
@@ -54,7 +82,7 @@ Meteor.startup(function() {
                 }
                 return returnedValue;
             }
-            Meteor.publish(topicName, wrappedFn);
+            Meteor.publish(meteorTopicName, wrappedFn);
         },
         redirect: function(url, router) {
             router.response.statusCode = 302;
@@ -72,7 +100,7 @@ Meteor.startup(function() {
                 // 26 mar 2014 mimics the meteor check in Meteor.userId() to avoid exception being thrown
                 var currentInvocation = DDP._CurrentInvocation.get();
                 if ( currentInvocation) {
-                    return Meteor.userId;
+                    return Meteor.userId();
                 } else {
                     return null;
                 }
