@@ -30,6 +30,7 @@ Meteor.startup(function() {
         },
         /**
          * Creates a Meteor topic with Meteor.publish()
+         *
          * Topic is named manager's callPrefix+'_topic_'+meteorTopicSuffix ( see this.getMeteorTopicName() )
          * Meteor.publish/subscribe has a useful 'this': access the meteorTopic name, meteorTopic cursor function, and thatManager in the cursor function:
          *   this.meteorTopicCursorFunction.thatManager - the manager that created this meteorTopic
@@ -95,6 +96,10 @@ Meteor.startup(function() {
         }
     });
     Object.defineProperties(ManagerType.prototype, {
+        /**
+         * This is a property so that code in a cursor can look like code elsewhere in the manager code.
+         * (see doc.Meteor.com about this.userId in publish/subscribe functions )
+         */
         userId : {
             get : function() {
                 // 26 mar 2014 mimics the meteor check in Meteor.userId() to avoid exception being thrown
