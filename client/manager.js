@@ -133,8 +133,12 @@ Meteor.startup(function() {
                 return handle;
             };
             // TODO: make this return the results.
-            // TODO: print warning about using this method.
-            this[meteorTopicSuffix] = this[meteorTopicSuffix+'Handle'];
+            this[meteorTopicSuffix] = function() {
+                var args = Array.prototype.slice.call(arguments, 0);
+                thatManager.log(meteorTopicSuffix+': (WARNING) called instead of '+meteorTopicSuffix+'Handle');
+                var handle = thatManager[meteorTopicSuffix+'Handle'].apply(thatManager, args);
+                return handle;
+            }
 
         }
     });
