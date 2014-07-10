@@ -4,6 +4,14 @@ Collection manager abstraction for Meteor.
 
 TODO add proper description.
 
+# What Meteor Collection Management (MCM) is for
+
+## Problems MCM solves
+* TODO: fill out
+
+## Problems MCM should solve
+* TODO: fill out
+
 ##To maintainers
 To run tests locally run following: 
 
