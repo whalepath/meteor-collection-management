@@ -90,8 +90,10 @@ Meteor.startup(function() {
                     return results;
                 }
             }
+            // TODO: for some subscriptions ( i.e. currentHuman ) no arguments - the handle should be saved on the manager so that we don't have
+            // multiple subscribes/unsubscribes
             // creates the stub subscribe method
-            this[meteorTopicSuffix] = function() {
+            this[meteorTopicSuffix+'Handle'] = function() {
                 var passedArguments = Array.prototype.slice.call(arguments, 0);
                 var args = Array.prototype.slice.call(arguments, 0);
                 args.unshift(meteorTopicName);
@@ -130,6 +132,10 @@ Meteor.startup(function() {
 
                 return handle;
             };
+            // TODO: make this return the results.
+            // TODO: print warning about using this method.
+            this[meteorTopicSuffix] = this[meteorTopicSuffix+'Handle'];
+
         }
     });
     Object.defineProperties(ManagerType.prototype, {

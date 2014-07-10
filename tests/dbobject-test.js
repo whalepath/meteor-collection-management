@@ -126,17 +126,16 @@ if (Meteor.isServer) {
 Tinytest.add('Meteor Collection Management - DbObject - safeCopying from client', function(test) {
     test.equal(['aDate', 'normalField'], TestCollectionTypeComplex.prototype.propertyNamesClientCanSet);    
     var g = new TestCollectionTypeComplex();
-    // Why are some of these fields quoted?
-    var clientObject = 
-        {id:'bad',
+    var clientObject = {
+         id:'bad',
          refField : 'bad',
          refField2 : 'bad',
          aDate: 'good',
-         'normalField': 'good',
-         'anArrayOfIds': 'bad',
-        'anotherCollectionsId':'bad',
-        securedField: 'bad'
-        };
+         normalField: 'good',
+         anArrayOfIds: 'bad',
+         anotherCollectionsId:'bad',
+         securedField: 'bad'
+    };
     g.extendClient(clientObject);
     _.each(TestCollectionTypeComplex.propertyNames, function(propertyName) {
         if ( _.contains(TestCollectionTypeComplex.prototype.propertyNamesClientCanSet, propertyName)) {
