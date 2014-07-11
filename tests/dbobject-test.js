@@ -123,6 +123,13 @@ if (Meteor.isServer) {
     });
 }
 
+// TODO: Since we found a bug in createSubClass's population of
+// propertyNamesClientCanSet, we may want to do more complicated
+// testing of it, since it's pretty important.
+Tinytest.add('Meteor Collection Management - DbObject - createSubClass setting propertyNamesClientCanSet', function(test) {
+    test.equal(['normalField'], TestCollectionTypeComplex.prototype.propertyNamesClientCanSet);
+});
+
 // TODO: DMR 11 July 2014 something wrong with this test
 Tinytest.add('Meteor Collection Management - DbObject - safeCopying from client', function(test) {
     // This is a bug (test should not pass). We define 'aDate' as not
