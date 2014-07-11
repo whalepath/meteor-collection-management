@@ -165,17 +165,12 @@ TestSettablePropertiesType = DbObjectType.createSubClass('testSettableProperties
 Tinytest.add('Meteor Collection Management - DbObject - createSubClass setting propertyNamesClientCanSet', function(test) {
     test.equal(['normalField'], TestCollectionTypeComplex.prototype.propertyNamesClientCanSet);
 
-    // TODO: Confirm that these are actually the fields the client can set.
     test.equal(TestSettablePropertiesType.prototype.propertyNamesClientCanSet,
                ["fieldSet","fieldSetGet","notSecuredField","emptyField"]
               );
 });
 
-// TODO: DMR 11 July 2014 something wrong with this test
 Tinytest.add('Meteor Collection Management - DbObject - safeCopying from client', function(test) {
-    // This is a bug (test should not pass). We define 'aDate' as not
-    // writable (i.e. with only a get), but createSubClass sets
-    // 'aDate' in propertyNamesClientCanSet.
     test.equal(['normalField'], TestCollectionTypeComplex.prototype.propertyNamesClientCanSet);
     var g = new TestCollectionTypeComplex();
     var clientObject = {
