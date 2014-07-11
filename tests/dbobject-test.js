@@ -123,11 +123,52 @@ if (Meteor.isServer) {
     });
 }
 
+TestSettablePropertiesType = DbObjectType.createSubClass('testSettableProperties',
+    [
+        {
+            refField : {
+                reference: true
+            },
+            fieldGet: {
+                'get': function() {
+                    return new Date();
+                }
+            },
+            fieldSet: {
+                'set': function() {
+                    // something
+                }
+            },
+            fieldSetGet: {
+                'get': function() {
+                    return new Date();
+                },
+                'set': function(value) {
+                    this.fieldSetGet = value+1;
+                }
+            },
+            securedField: {
+                security: true
+            },
+            notSecuredField: {
+                security: false
+            },
+            emptyField: {}
+        }
+    ],
+    'testSettablePropertiesTableName');
+
+
 // TODO: Since we found a bug in createSubClass's population of
 // propertyNamesClientCanSet, we may want to do more complicated
 // testing of it, since it's pretty important.
 Tinytest.add('Meteor Collection Management - DbObject - createSubClass setting propertyNamesClientCanSet', function(test) {
     test.equal(['normalField'], TestCollectionTypeComplex.prototype.propertyNamesClientCanSet);
+
+    // TODO: Confirm that these are actually the fields the client can set.
+    test.equal(TestSettablePropertiesType.prototype.propertyNamesClientCanSet,
+               ["fieldSet","fieldSetGet","notSecuredField","emptyField"]
+              );
 });
 
 // TODO: DMR 11 July 2014 something wrong with this test
