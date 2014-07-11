@@ -123,6 +123,7 @@ if (Meteor.isServer) {
     });
 }
 
+// TODO: DMR 11 July 2014 something wrong with this test
 Tinytest.add('Meteor Collection Management - DbObject - safeCopying from client', function(test) {
     test.equal(['aDate', 'normalField'], TestCollectionTypeComplex.prototype.propertyNamesClientCanSet);    
     var g = new TestCollectionTypeComplex();
