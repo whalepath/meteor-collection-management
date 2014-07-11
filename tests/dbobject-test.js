@@ -125,8 +125,9 @@ if (Meteor.isServer) {
 
 // TODO: DMR 11 July 2014 something wrong with this test
 Tinytest.add('Meteor Collection Management - DbObject - safeCopying from client', function(test) {
-    // This passes even though aDate is not writable (defined with
-    // only a get). Is this an error? An error in createSubClass?
+    // This is a bug (test should not pass). We define 'aDate' as not
+    // writable (i.e. with only a get), but createSubClass sets
+    // 'aDate' in propertyNamesClientCanSet.
     test.equal(['aDate', 'normalField'], TestCollectionTypeComplex.prototype.propertyNamesClientCanSet);    
     var g = new TestCollectionTypeComplex();
     var clientObject = {
