@@ -1,12 +1,14 @@
 var testEnum = new Enums.Enum({
     one: {
-        displayName: 'ONE'
+        displayName: 'ONE',
     },
     two: {
-        displayName: 'TWO'
+        displayName: 'TWO',
+        dbCode: '_two'
     },
     three: {
-        displayName: 'THREE'
+        displayName: 'THREE',
+        dbCode: '_three'
     }
 });
 
@@ -26,5 +28,8 @@ Tinytest.add('Meteor Collection Management - enums - array', function(test) {
 });
 
 Tinytest.add('Meteor Collection Management - enums - auto dbCode', function(test) {
-   test.equal(testEnum.one.dbCode, 'one', 'Default DbCode was not initialized.');
+    test.equal(testEnum.one.dbCode, 'one', 'Default DbCode was not initialized.');
+    test.equal(testEnum.three.dbCode, '_three', 'Default DbCode was not initialized.');
+    test.equal(testEnum.enumOf('_three'), testEnum.three);
+    test.equal(testEnum.enumOf('one'), testEnum.one);
 });
