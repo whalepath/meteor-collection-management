@@ -75,15 +75,36 @@ Meteor.startup(function() {
                 if ( returnedValue == null || returnedValue === false) {
                     // required for spiderable to work
                     // see: http://www.meteorpedia.com/read/spiderable
-                    returnedValue = null;
+                    returnedValue = void(0);
                     this.ready();
                 } else if ( returnedValue === true ) {
                     // true means we would like to return null *but* the ready method was already called
-                    returnedValue = null;
+                    returnedValue = void(0);
                 }
                 return returnedValue;
             }
             Meteor.publish(meteorTopicName, wrappedFn);
+
+            /**
+             * create the server-side only function to get the results from the cursor.
+             * name
+             */
+            thatManager[meteorTopicSuffix] = function() {
+                var cursor = meteorTopicCursorFunction.apply(thatManager, arguments);
+                if (cursor != null ) {
+                    return cursor.fetch();
+                } else {
+                    return void(0);
+                }
+            };
+            thatManager[meteorTopicSuffix+'One'] = function() {
+                var cursor = meteorTopicCursorFunction.apply(thatManager, arguments);
+                if (cursor != null ) {
+                    return cursor.fetch()[0];
+                } else {
+                    return void(0);
+                }
+            };
         },
         redirect: function(url, router) {
             router.response.statusCode = 302;
