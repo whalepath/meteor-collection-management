@@ -39,6 +39,10 @@ Meteor.startup(function() {
          *   this.meteorTopicCursorFunction.meteorTopicTableName
          *
          * This function is called from the ManagerType constructor.
+         *
+         * Also create for server side use:
+         *    meteorTopicSuffix = to fetch all
+         *    meteorTopicSuffixOne = to fetch one
          * @param meteorTopicSuffix
          */
         createTopic : function(meteorTopicSuffix) {
@@ -87,24 +91,28 @@ Meteor.startup(function() {
 
             /**
              * create the server-side only function to get the results from the cursor.
-             * name
+             * <meteorTopicSuffix> as the name.
              */
-            thatManager[meteorTopicSuffix] = function() {
-                var cursor = meteorTopicCursorFunction.apply(thatManager, arguments);
-                if (cursor != null ) {
-                    return cursor.fetch();
-                } else {
-                    return void(0);
-                }
-            };
-            thatManager[meteorTopicSuffix+'One'] = function() {
-                var cursor = meteorTopicCursorFunction.apply(thatManager, arguments);
-                if (cursor != null ) {
-                    return cursor.fetch()[0];
-                } else {
-                    return void(0);
-                }
-            };
+            if ( typeof thatManager[meteorTopicSuffix] === 'undefined') {
+                thatManager[meteorTopicSuffix] = function () {
+                    var cursor = meteorTopicCursorFunction.apply(thatManager, arguments);
+                    if (cursor != null) {
+                        return cursor.fetch();
+                    } else {
+                        return void(0);
+                    }
+                };
+            }
+            if ( typeof thatManager[meteorTopicSuffix+'One'] === 'undefined') {
+                thatManager[meteorTopicSuffix + 'One'] = function () {
+                    var cursor = meteorTopicCursorFunction.apply(thatManager, arguments);
+                    if (cursor != null) {
+                        return cursor.fetch()[0];
+                    } else {
+                        return void(0);
+                    }
+                };
+            }
         },
         redirect: function(url, router) {
             router.response.statusCode = 302;
