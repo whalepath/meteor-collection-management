@@ -242,6 +242,8 @@ Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted thin
     test.equal(g.normalField0, 'good');
     test.equal(g.normalField1, 'good');
 
+    // this represents an object we sent to the client, which is
+    // coming back with modifications.
     var clientObject1 = {
         _id: g._id,
         normalField0: 'better',
@@ -272,5 +274,30 @@ Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted thin
 
     // TODO(dmr) test insert with forced values.
 
-    // TODO(dmr) also think about more tests in general
+    // test null values.
+    var original = g.normalField0;
+    g.upsertFromUntrusted(null, null, null);
+    test.equal(g.normalField0, original);
+    test.equal(TestUntrustedType.databaseTable.find().count(), 1);
+
+    // test undefined too.
+    g.upsertFromUntrusted(undefined, undefined, undefined);
+    test.equal(g.normalField0, original);
+    test.equal(TestUntrustedType.databaseTable.find().count(), 1);
+
+    g.upsertFromUntrusted(null, null, {normalField0: 'forced'});
+    test.equal(g.normalField0, original);
+    test.equal(TestUntrustedType.databaseTable.find().count(), 1);
+
+    g.upsertFromUntrusted(null, clientObject0, null);
+    test.equal(g.normalField0, original);
+    test.equal(TestUntrustedType.databaseTable.find().count(), 1);
+
+    // We can force values even if no client object is supplied.
+    g.upsertFromUntrusted(null, clientObject0, {normalField0: 'forced'});
+    test.equal(g.normalField0, 'forced');
+    test.equal(TestUntrustedType.databaseTable.find().count(), 1);
+
+    // TODO(dmr) test that we don't update multiple objects if
+    // multiple objects match the lookup (we can't, but test anyway).
 });
