@@ -39,6 +39,10 @@ Meteor.startup(function() {
          *   this.meteorTopicCursorFunction.meteorTopicTableName
          *
          * This function is called from the ManagerType constructor.
+         *
+         * Also create for server side use:
+         *    meteorTopicSuffix = to fetch all
+         *    meteorTopicSuffixOne = to fetch one
          * @param meteorTopicSuffix
          */
         createTopic : function(meteorTopicSuffix) {
@@ -75,15 +79,40 @@ Meteor.startup(function() {
                 if ( returnedValue == null || returnedValue === false) {
                     // required for spiderable to work
                     // see: http://www.meteorpedia.com/read/spiderable
-                    returnedValue = null;
+                    returnedValue = void(0);
                     this.ready();
                 } else if ( returnedValue === true ) {
                     // true means we would like to return null *but* the ready method was already called
-                    returnedValue = null;
+                    returnedValue = void(0);
                 }
                 return returnedValue;
             }
             Meteor.publish(meteorTopicName, wrappedFn);
+
+            /**
+             * create the server-side only function to get the results from the cursor.
+             * <meteorTopicSuffix> as the name.
+             */
+            if ( typeof thatManager[meteorTopicSuffix] === 'undefined') {
+                thatManager[meteorTopicSuffix] = function () {
+                    var cursor = meteorTopicCursorFunction.apply(thatManager, arguments);
+                    if (cursor != null) {
+                        return cursor.fetch();
+                    } else {
+                        return void(0);
+                    }
+                };
+            }
+            if ( typeof thatManager[meteorTopicSuffix+'One'] === 'undefined') {
+                thatManager[meteorTopicSuffix + 'One'] = function () {
+                    var cursor = meteorTopicCursorFunction.apply(thatManager, arguments);
+                    if (cursor != null) {
+                        return cursor.fetch()[0];
+                    } else {
+                        return void(0);
+                    }
+                };
+            }
         },
         redirect: function(url, router) {
             router.response.statusCode = 302;
