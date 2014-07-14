@@ -73,6 +73,19 @@ TestCollectionTypeComplex = DbObjectType.createSubClass('testCollectionComplex',
     ],
     'testCollectionTableNameComplex');
 
+// TODO(dmr) this test had transient failure a couple of times during
+// development of extendClientWithForcedValues. Check whether there
+// were relevant changes, or if this is just a buggy/brittle test.
+//
+// I don't think there were any relevant changes and detected no
+// pattern in the failures. So I think it's buggy/brittle.
+//
+// Message:
+// - ok (4 times)
+// - fail — string_equal - message Wrong entry found. - expected
+// Yt4aNmoPzSShSmhZw
+// - actual
+// pgqbT4Tmb6W4re9MB
 Tinytest.add('Meteor Collection Management - DbObject - Reference fields', function(test) {
     test.isTrue(TestCollectionTypeComplex.databaseTable.findOneByRefField, 'Reference field findOneBy selector wasn\'t created.');
     test.isTrue(TestCollectionTypeComplex.databaseTable.findByRefField, 'Reference field findBy selector wasn\'t created.');
