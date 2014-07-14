@@ -194,3 +194,70 @@ Tinytest.add('Meteor Collection Management - DbObject - safeCopying from client'
     });
 });
 
+TestUntrustedType = DbObjectType.createSubClass(
+    'testUntrusted',
+    [
+        'normalField0',
+        'normalField1'
+    ],
+    'testUntrustedTableName'
+);
+
+
+Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted thing0', function(test) {
+    // This test assumes we start with a clean db. Is this a mistake?
+    // Should we redesign so we don't depend on the db being clean?
+    //
+    // Hack to clean db, so leftover objects don't ruin the test.
+    if ( Meteor.isServer )
+        TestUntrustedType.databaseTable.remove({});
+
+    var g = new TestUntrustedType();
+    var clientObject0 = {
+        normalField0: 'good',
+        normalField1: 'good'
+    };
+
+    // check that g thing doesn't exist in db
+    test.equal(TestUntrustedType.databaseTable.find().count(), 0);
+
+    // check upsert inserts
+    g.upsertFromUntrusted(clientObject0);
+    test.equal(TestUntrustedType.databaseTable.find().count(), 1);
+
+    // check upsert sets
+    test.equal(g.normalField0, 'good');
+    test.equal(g.normalField1, 'good');
+
+    var clientObject1 = {
+        _id: g._id,
+        normalField0: 'better',
+        normalField1: 'good'
+    };
+
+    g.upsertFromUntrusted(clientObject1);
+    test.equal(TestUntrustedType.databaseTable.find().count(), 1);
+    test.equal(g.normalField0, 'better');
+    test.equal(g.normalField1, 'good');
+
+    // Test with lookup
+    var clientObject2 = {
+        normalField0: 'better',
+        normalField1: 'good'
+    };
+
+    g.upsertFromUntrusted(clientObject0, clientObject2);
+    test.equal(g.normalField0, 'good');
+    test.equal(g.normalField1, 'good');
+    test.equal(TestUntrustedType.databaseTable.find().count(), 1);
+
+    // Test with forced values
+    g.upsertFromUntrusted(clientObject1, null, {normalField0: 'forced'});
+    test.equal(g.normalField0, 'good');
+    test.equal(g.normalField1, 'good');
+    test.equal(TestUntrustedType.databaseTable.find().count(), 1);
+
+    // TODO(dmr) test insert with forced values.
+
+    // TODO(dmr) also think about more tests in general
+});
