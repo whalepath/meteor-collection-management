@@ -225,7 +225,7 @@ Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted thin
     if ( Meteor.isServer )
         TestUntrustedType.databaseTable.remove({});
 
-    var g = new TestUntrustedType();
+    var g;
     var clientObject0 = {
         normalField0: 'good',
         normalField1: 'good'
@@ -235,7 +235,7 @@ Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted thin
     test.equal(TestUntrustedType.databaseTable.find().count(), 0);
 
     // check upsert inserts
-    g.upsertFromUntrusted(clientObject0);
+    g = TestUntrustedType.upsertFromUntrusted(clientObject0);
     test.equal(TestUntrustedType.databaseTable.find().count(), 1);
 
     // check upsert sets
@@ -250,7 +250,7 @@ Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted thin
         normalField1: 'good'
     };
 
-    g.upsertFromUntrusted(clientObject1);
+    g = TestUntrustedType.upsertFromUntrusted(clientObject1);
     test.equal(TestUntrustedType.databaseTable.find().count(), 1);
     test.equal(g.normalField0, 'better');
     test.equal(g.normalField1, 'good');
@@ -261,42 +261,69 @@ Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted thin
         normalField1: 'good'
     };
 
-    g.upsertFromUntrusted(clientObject0, clientObject2);
+    g = TestUntrustedType.upsertFromUntrusted(clientObject0, clientObject2);
     test.equal(g.normalField0, 'good');
     test.equal(g.normalField1, 'good');
     test.equal(TestUntrustedType.databaseTable.find().count(), 1);
 
-    // Test with forced values
-    g.upsertFromUntrusted(clientObject1, null, {normalField0: 'forced'});
+    // Test update with forced values
+    g = TestUntrustedType.upsertFromUntrusted(clientObject1, null, {normalField0: 'forced'});
     test.equal(g.normalField0, 'good');
     test.equal(g.normalField1, 'good');
     test.equal(TestUntrustedType.databaseTable.find().count(), 1);
 
-    // TODO(dmr) test insert with forced values.
+    // Test insert with forced values.
+    g = TestUntrustedType.upsertFromUntrusted(clientObject0, null, {normalField0: 'forced'});
+    test.equal(TestUntrustedType.databaseTable.find().count(), 2);
+    test.equal(g.normalField0, 'forced');
+    test.equal(g.normalField1, 'good');
 
     // test null values.
-    var original = g.normalField0;
-    g.upsertFromUntrusted(null, null, null);
-    test.equal(g.normalField0, original);
-    test.equal(TestUntrustedType.databaseTable.find().count(), 1);
+    var h = TestUntrustedType.databaseTable.findOne({_id: { $ne: g._id } });
+    var gOriginal = g.normalField0;
+    var hOriginal = h.normalField0;
 
-    // test undefined too.
-    g.upsertFromUntrusted(undefined, undefined, undefined);
-    test.equal(g.normalField0, original);
-    test.equal(TestUntrustedType.databaseTable.find().count(), 1);
+    // Nothing should happen.
+    TestUntrustedType.upsertFromUntrusted(null, null, null);
+    g = TestUntrustedType.databaseTable.findOne({_id: g._id });
+    h = TestUntrustedType.databaseTable.findOne({_id: h._id });
+    test.equal(g.normalField0, gOriginal);
+    test.equal(h.normalField0, hOriginal);
+    test.equal(TestUntrustedType.databaseTable.find().count(), 2);
 
-    g.upsertFromUntrusted(null, null, {normalField0: 'forced'});
-    test.equal(g.normalField0, original);
-    test.equal(TestUntrustedType.databaseTable.find().count(), 1);
+    // Nothing should happen when we switch null to undefined.
+    TestUntrustedType.upsertFromUntrusted(undefined, undefined, undefined);
+    g = TestUntrustedType.databaseTable.findOne({_id: g._id });
+    h = TestUntrustedType.databaseTable.findOne({_id: h._id });
+    test.equal(g.normalField0, gOriginal);
+    test.equal(h.normalField0, hOriginal);
+    test.equal(TestUntrustedType.databaseTable.find().count(), 2);
 
-    g.upsertFromUntrusted(null, clientObject0, null);
-    test.equal(g.normalField0, original);
-    test.equal(TestUntrustedType.databaseTable.find().count(), 1);
+    // TODO(dmr) descr
+    var msg = 'null, null, forced';
+    TestUntrustedType.upsertFromUntrusted(null, null, {normalField0: 'forced'});
+    g = TestUntrustedType.databaseTable.findOne({_id: g._id });
+    h = TestUntrustedType.databaseTable.findOne({_id: h._id });
+    test.equal(g.normalField0, gOriginal, msg);
+    test.equal(h.normalField0, hOriginal, msg);
+    test.equal(TestUntrustedType.databaseTable.find().count(), 2, msg);
+
+    msg = 'null, query, null';
+    TestUntrustedType.upsertFromUntrusted(null, clientObject0, null);
+    g = TestUntrustedType.databaseTable.findOne({_id: g._id });
+    h = TestUntrustedType.databaseTable.findOne({_id: h._id });
+    test.equal(g.normalField0, gOriginal, msg);
+    test.equal(h.normalField0, hOriginal, msg);
+    test.equal(TestUntrustedType.databaseTable.find().count(), 2, msg);
 
     // We can force values even if no client object is supplied.
-    g.upsertFromUntrusted(null, clientObject0, {normalField0: 'forced'});
-    test.equal(g.normalField0, 'forced');
-    test.equal(TestUntrustedType.databaseTable.find().count(), 1);
+    msg = 'null, lookup, forced';
+    TestUntrustedType.upsertFromUntrusted(null, clientObject0, {normalField0: 'forced'});
+    g = TestUntrustedType.databaseTable.findOne({_id: g._id });
+    h = TestUntrustedType.databaseTable.findOne({_id: h._id });
+    test.equal(g.normalField0, 'forced', msg);
+    test.equal(h.normalField0, hOriginal, msg);
+    test.equal(TestUntrustedType.databaseTable.find().count(), 2);
 
     // TODO(dmr) test that we don't update multiple objects if
     // multiple objects match the lookup (we can't, but test anyway).
