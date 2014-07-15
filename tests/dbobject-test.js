@@ -308,3 +308,23 @@ Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted thin
     // TODO(dmr) test that we don't update multiple objects if
     // multiple objects match the lookup (we can't, but test anyway).
 });
+
+RequiredFieldsType = DbObjectType.createSubClass('testCollectionWithRequiredFields',
+    [
+        {'field1' : {required: true}},
+
+        'field2'
+    ],
+    'testCollectionWithRequiredFieldsTable');
+
+Tinytest.add('Meteor Collection Management - DbObject - required fields', function(test) {
+    var t = new RequiredFieldsType({field2:'value2'});
+    var failed = false;
+    try {
+        t.checkSelf();
+    } catch(e) {
+        failed = true;
+        test.isTrue(e.message.indexOf('field1') > -1, 'Looks like self check did not find unset field1.');
+    }
+    test.isTrue(failed, 'checkKeys did not fail with unset required property.');
+});
