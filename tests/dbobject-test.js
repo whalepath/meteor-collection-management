@@ -224,7 +224,7 @@ TestUntrustedType = DbObjectType.createSubClass(
 );
 
 
-Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted thing0', function(test) {
+Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted classmethod', function(test) {
     // This test assumes we start with a clean db. Is this a mistake?
     // Should we redesign so we don't depend on the db being clean?
     //
@@ -242,7 +242,7 @@ Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted thin
     test.equal(TestUntrustedType.databaseTable.find().count(), 0);
 
     // check upsert inserts
-    g = TestUntrustedType.upsertFromUntrusted(clientObject0);
+    g = TestUntrustedType.prototype.upsertFromUntrusted(clientObject0);
     test.equal(TestUntrustedType.databaseTable.find().count(), 1);
 
     // check upsert sets
@@ -257,7 +257,7 @@ Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted thin
         normalField1: 'good'
     };
 
-    g = TestUntrustedType.upsertFromUntrusted(clientObject1);
+    g = TestUntrustedType.prototype.upsertFromUntrusted(clientObject1);
     test.equal(TestUntrustedType.databaseTable.find().count(), 1);
     test.equal(g.normalField0, 'better');
     test.equal(g.normalField1, 'good');
@@ -268,19 +268,19 @@ Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted thin
         normalField1: 'good'
     };
 
-    g = TestUntrustedType.upsertFromUntrusted(clientObject0, clientObject2);
+    g = TestUntrustedType.prototype.upsertFromUntrusted(clientObject0, clientObject2);
     test.equal(g.normalField0, 'good');
     test.equal(g.normalField1, 'good');
     test.equal(TestUntrustedType.databaseTable.find().count(), 1);
 
     // Test update with forced values
-    g = TestUntrustedType.upsertFromUntrusted(clientObject1, null, {normalField0: 'forced'});
+    g = TestUntrustedType.prototype.upsertFromUntrusted(clientObject1, null, {normalField0: 'forced'});
     test.equal(g.normalField0, 'good');
     test.equal(g.normalField1, 'good');
     test.equal(TestUntrustedType.databaseTable.find().count(), 1);
 
     // Test insert with forced values.
-    g = TestUntrustedType.upsertFromUntrusted(clientObject0, null, {normalField0: 'forced'});
+    g = TestUntrustedType.prototype.upsertFromUntrusted(clientObject0, null, {normalField0: 'forced'});
     test.equal(TestUntrustedType.databaseTable.find().count(), 2);
     test.equal(g.normalField0, 'forced');
     test.equal(g.normalField1, 'good');
@@ -291,7 +291,7 @@ Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted thin
     var hOriginal = h.normalField0;
 
     // Nothing should happen.
-    TestUntrustedType.upsertFromUntrusted(null, null, null);
+    TestUntrustedType.prototype.upsertFromUntrusted(null, null, null);
     g = TestUntrustedType.databaseTable.findOne({_id: g._id });
     h = TestUntrustedType.databaseTable.findOne({_id: h._id });
     test.equal(g.normalField0, gOriginal);
@@ -299,7 +299,7 @@ Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted thin
     test.equal(TestUntrustedType.databaseTable.find().count(), 2);
 
     // Nothing should happen when we switch null to undefined.
-    TestUntrustedType.upsertFromUntrusted(undefined, undefined, undefined);
+    TestUntrustedType.prototype.upsertFromUntrusted(undefined, undefined, undefined);
     g = TestUntrustedType.databaseTable.findOne({_id: g._id });
     h = TestUntrustedType.databaseTable.findOne({_id: h._id });
     test.equal(g.normalField0, gOriginal);
@@ -308,7 +308,7 @@ Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted thin
 
     // TODO(dmr) descr
     var msg = 'null, null, forced';
-    TestUntrustedType.upsertFromUntrusted(null, null, {normalField0: 'forced'});
+    TestUntrustedType.prototype.upsertFromUntrusted(null, null, {normalField0: 'forced'});
     g = TestUntrustedType.databaseTable.findOne({_id: g._id });
     h = TestUntrustedType.databaseTable.findOne({_id: h._id });
     test.equal(g.normalField0, gOriginal, msg);
@@ -316,7 +316,7 @@ Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted thin
     test.equal(TestUntrustedType.databaseTable.find().count(), 2, msg);
 
     msg = 'null, query, null';
-    TestUntrustedType.upsertFromUntrusted(null, clientObject0, null);
+    TestUntrustedType.prototype.upsertFromUntrusted(null, clientObject0, null);
     g = TestUntrustedType.databaseTable.findOne({_id: g._id });
     h = TestUntrustedType.databaseTable.findOne({_id: h._id });
     test.equal(g.normalField0, gOriginal, msg);
@@ -325,7 +325,7 @@ Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted thin
 
     // We can force values even if no client object is supplied.
     msg = 'null, lookup, forced';
-    TestUntrustedType.upsertFromUntrusted(null, clientObject0, {normalField0: 'forced'});
+    TestUntrustedType.prototype.upsertFromUntrusted(null, clientObject0, {normalField0: 'forced'});
     g = TestUntrustedType.databaseTable.findOne({_id: g._id });
     h = TestUntrustedType.databaseTable.findOne({_id: h._id });
     test.equal(g.normalField0, 'forced', msg);
@@ -334,6 +334,31 @@ Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted thin
 
     // TODO(dmr) test that we don't update multiple objects if
     // multiple objects match the lookup (we can't, but test anyway).
+});
+
+Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted instance method', function(test) {
+    var msg;
+    if ( Meteor.isServer )
+        TestUntrustedType.databaseTable.remove({});
+
+    var g;
+    var clientObject0 = {
+        normalField0: 'zomg',
+        normalField1: 'zomg'
+    };
+
+    // REDUNDANT
+    // check that g thing doesn't exist in db
+    test.equal(TestUntrustedType.databaseTable.find(clientObject0).count(), 0);
+
+    // check upsert inserts
+    g = TestUntrustedType.prototype.upsertFromUntrusted(clientObject0);
+    // REDUNDANT
+    test.equal(TestUntrustedType.databaseTable.find(clientObject0).count(), 1);
+
+    msg = 'update with instance method.'
+    g.upsertFromUntrusted({normalField0: 'bbqz'});
+    test.equal(g.normalField0, 'bbqz', msg);
 });
 
 RequiredFieldsType = DbObjectType.createSubClass('testCollectionWithRequiredFields',
