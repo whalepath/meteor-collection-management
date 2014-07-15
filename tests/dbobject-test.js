@@ -114,7 +114,14 @@ if (Meteor.isServer) {
     IndexedCollection = DbObjectType.createSubClass('indexedCollection', [
            'normalField',
            {'indexedField' : {indexed: true}},
-           {'refField' : {reference: true}}
+           {'refField' : {reference: true}},
+           // test case 'by default' reference parameters
+           'userId',
+           'fooIds',
+           // 'id' ending should not be flagged as an id ( because words can end in 'id' )
+           'notanid',
+           'nottheids',
+           'valid'
         ],
     'indexedCollectionTableName');
     var t = new IndexedCollection({normalField:'value'});
@@ -128,7 +135,7 @@ if (Meteor.isServer) {
             var collection = db.collection('indexedCollectionTableName');
             collection.indexes( Meteor.bindEnvironment(function(err, indexes) {
               if(err) throw err;
-              test.equal(3, indexes.length, 'indexedCollectionTableName must have 3 indexes: _id, indexedField and refField');
+              test.equal(5, indexes.length, 'indexedCollectionTableName must have 3 indexes: _id, indexedField, refField, userId, and fooIds');
               done();
             }));
         });
