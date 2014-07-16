@@ -136,7 +136,6 @@ Meteor.startup(function() {
             this[meteorTopicSuffix] = function() {
                 var args = Array.prototype.slice.call(arguments, 0);
                 thatManager.log(meteorTopicSuffix+': (WARNING) called instead of '+meteorTopicSuffix+'Handle');
-                debugger;
                 var handle = thatManager[meteorTopicSuffix+'Handle'].apply(thatManager, args);
                 return handle;
             }
