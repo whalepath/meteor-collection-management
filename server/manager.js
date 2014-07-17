@@ -89,12 +89,13 @@ Meteor.startup(function() {
             }
             Meteor.publish(meteorTopicName, wrappedFn);
 
+            var meteorTopicSuffixCapitalized = meteorTopicSuffix.substring(0,1).toUpperCase() + meteorTopicSuffix.substring(1);
             /**
              * create the server-side only function to get the results from the cursor.
-             * <meteorTopicSuffix> as the name.
+             * find + <meteorTopicSuffix> as the name.
              */
-            if ( typeof thatManager[meteorTopicSuffix] === 'undefined') {
-                thatManager[meteorTopicSuffix] = function () {
+            if ( typeof thatManager['find'+meteorTopicSuffixCapitalized] === 'undefined') {
+                thatManager['find'+meteorTopicSuffixCapitalized] = function () {
                     var cursor = meteorTopicCursorFunction.apply(thatManager, arguments);
                     if (cursor != null) {
                         return cursor.fetch();
@@ -103,8 +104,11 @@ Meteor.startup(function() {
                     }
                 };
             }
-            if ( typeof thatManager[meteorTopicSuffix+'One'] === 'undefined') {
-                thatManager[meteorTopicSuffix + 'One'] = function () {
+            /**
+             * findOne + <meteorTopicSuffix> as the name.
+             */
+            if ( typeof thatManager['findOne'+meteorTopicSuffixCapitalized] === 'undefined') {
+                thatManager['findOne'+meteorTopicSuffixCapitalized] = function () {
                     var cursor = meteorTopicCursorFunction.apply(thatManager, arguments);
                     if (cursor != null) {
                         return cursor.fetch()[0];
