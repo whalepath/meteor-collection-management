@@ -103,17 +103,17 @@ Meteor.startup(function() {
                 /**
                  *  create a results() function that will return an array of the results.
                  *  This works by calling the manager's cursor function and passing the same arguments that were passed to the subscribe meteorTopic.
-                 * @returns {*}
+                 * @returns undefined if the handle is not ready.
                  */
                 handle.cursor = function() {
-                    var resultsCursor = null;
+                    var resultsCursor = void(0);
                     if ( handle.ready() ) {
                         resultsCursor = meteorTopicCursorFunction.apply(thatManager,passedArguments);
                     }
                     return resultsCursor;
                 };
                 handle.results = function() {
-                    var results = null;
+                    var results = void(0);
                     var resultsCursor = this.cursor();
                     if ( resultsCursor != null ) {
                         results = resultsCursor.fetch();
