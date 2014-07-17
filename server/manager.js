@@ -75,6 +75,8 @@ Meteor.startup(function() {
             var wrappedFn = function() {
                 // Question: this should be o.k. because we don't have the cursor (this) reused. (not certain that the topic cursor is not reused)
                 this.meteorTopicCursorFunction = meteorTopicCursorFunction;
+                // so that this.thatManager always return the thatManager on both the client and the server.
+                this.thatManager = thatManager;
                 var returnedValue = meteorTopicCursorFunction.apply(this, arguments);
                 if ( returnedValue == null || returnedValue === false) {
                     // required for spiderable to work
