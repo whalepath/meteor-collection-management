@@ -93,11 +93,18 @@ Meteor.startup(function() {
 
             var meteorTopicSuffixCapitalized = meteorTopicSuffix.substring(0,1).toUpperCase() + meteorTopicSuffix.substring(1);
             /**
-             * create the server-side only function to get the results from the cursor.
+             * create the server-side only functions for when we want to use this query on the server
              * find + <meteorTopicSuffix> as the name.
              */
             if ( typeof thatManager['find'+meteorTopicSuffixCapitalized] === 'undefined') {
-                thatManager['find'+meteorTopicSuffixCapitalized] = function () {
+                thatManager['find' + meteorTopicSuffixCapitalized] = function () {
+                    var cursor = meteorTopicCursorFunction.apply(thatManager, arguments);
+                    return cursor;
+                }
+            }
+            // mirror of findFetch on client-side
+            if ( typeof thatManager['findFetch'+meteorTopicSuffixCapitalized] === 'undefined') {
+                thatManager['findFetch'+meteorTopicSuffixCapitalized] = function () {
                     var cursor = meteorTopicCursorFunction.apply(thatManager, arguments);
                     if (cursor != null) {
                         return cursor.fetch();

@@ -105,25 +105,31 @@ Meteor.startup(function() {
                  *  This works by calling the manager's cursor function and passing the same arguments that were passed to the subscribe meteorTopic.
                  * @returns undefined if the handle is not ready.
                  */
-                handle.cursor = function() {
+                handle.find = handle.cursor = function() {
                     var resultsCursor = void(0);
                     if ( handle.ready() ) {
                         resultsCursor = meteorTopicCursorFunction.apply(thatManager,passedArguments);
                     }
                     return resultsCursor;
                 };
-                handle.results = function() {
+                handle.findFetch = handle.results = function() {
                     var results = void(0);
-                    var resultsCursor = this.cursor();
+                    var resultsCursor = this.find();
                     if ( resultsCursor != null ) {
                         results = resultsCursor.fetch();
                     }
                     return results;
                 };
-                // function that returns only a single result ( if the results are ready)
-                handle.oneResult = function() {
-                    var results = this.results();
-                    if ( results && results.length ) {
+                /**
+                 * function that returns only a single result ( if the results are ready)
+                 * @type {oneResult}
+                 */
+                handle.findOne = handle.oneResult = function() {
+                    var results = this.findFetch();
+                    if ( results === undefined) {
+                        return void(0);
+                    }
+                    if (_.isArray(results) && results.length ) {
                         return results[0];
                     } else {
                         return null;
