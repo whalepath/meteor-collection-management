@@ -99,10 +99,16 @@ Meteor.startup(function() {
             // multiple subscribes/unsubscribes
             // creates the stub subscribe method
             this[meteorTopicSuffix+'Handle'] = function() {
-                var passedArguments = Array.prototype.slice.call(arguments, 0);
                 var args = Array.prototype.slice.call(arguments, 0);
                 args.unshift(meteorTopicName);
                 var handle = Meteor.subscribe.apply(Meteor,args);
+
+                var passedArguments = Array.prototype.slice.call(arguments, 0);
+                var lastPassedArgument = passedArguments && passedArguments.length > 0?passedArguments[passedArguments.length-1]:null;
+                if ( lastPassedArgument && (typeof lastPassedArgument == 'function' || typeof lastPassedArgument.onReady === 'function' || typeof lastPassedArgument.onError === 'function') {
+                    // a onready or onError handlers - remove from arguments that will be passed to the cursor function
+                    passedArguments.pop();
+                }
                 thatManager.log("subscribing to "+meteorTopicName);
 
                 /**
