@@ -50,11 +50,16 @@ Meteor.startup(function() {
             });
         },
         /**
-         * Creates a method this[meteorTopicSuffix] which will subscribe to the meteorTopic with the provided arguments and return the subscribe handle.
+         * Creates a function this[meteorTopicSuffix+'Handle'].
+         *
+         * this[meteorTopicSuffix+'Handle'](<Meteor-subscribe-arguments>) will take its arguments, add the correct meteor topic name to the
+         * beginning, and passed the new argument array to the Meteor.subscribe method
+         *
+         * The handle returned by Meteor.subscribe
          * Also attaches to the returned meteorTopic handle these functions:
-         *     results(),
-         *     oneResult(),
-         *     and cursor()
+         *     findFetch(),
+         *     findOne(),
+         *     and findcursor()
          *
          * Most/All meteorTopics are created with manager is created
          *
@@ -66,9 +71,9 @@ Meteor.startup(function() {
          *
          * AssetManager.reportPresentations function to be created.
          *
-         * var subscribeHandle = AssetManager.reportPresentations('34'); // subscribe passing '34' to the server for subscription.
-         * subscribeHandle.results(); // return when subscribeHandle.ready() == true call AssetManager.reportPresentationsCursor('34').fetch();
-         * subscribeHandle.oneResult(); // return when subscribeHandle.ready() == true call AssetManager.reportPresentationsCursor('34').fetch()[0];
+         * var subscribeHandle = AssetManager.reportPresentationsHandle('34'); // subscribe passing '34' to the server for subscription.
+         * subscribeHandle.findFetch(); // return when subscribeHandle.ready() == true call AssetManager.reportPresentationsCursor('34').fetch();
+         * subscribeHandle.findOne(); // return when subscribeHandle.ready() == true call AssetManager.reportPresentationsCursor('34').fetch()[0];
          *
          * @param meteorTopicSuffix
          */
@@ -122,7 +127,7 @@ Meteor.startup(function() {
                 };
                 /**
                  * function that returns only a single result ( if the results are ready)
-                 * @type {oneResult}
+                 * @returns
                  */
                 handle.findOne = handle.oneResult = function() {
                     var results = this.findFetch();
