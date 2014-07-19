@@ -105,7 +105,7 @@ Meteor.startup(function() {
 
                 var passedArguments = Array.prototype.slice.call(arguments, 0);
                 var lastPassedArgument = passedArguments && passedArguments.length > 0?passedArguments[passedArguments.length-1]:null;
-                if ( lastPassedArgument && (typeof lastPassedArgument == 'function' || typeof lastPassedArgument.onReady === 'function' || typeof lastPassedArgument.onError === 'function') {
+                if ( lastPassedArgument && (typeof lastPassedArgument == 'function' || typeof lastPassedArgument.onReady === 'function' || typeof lastPassedArgument.onError === 'function')) {
                     // a onready or onError handlers - remove from arguments that will be passed to the cursor function
                     passedArguments.pop();
                 }
