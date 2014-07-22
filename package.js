@@ -25,4 +25,4 @@ Package.on_test(function(api) {
     api.use(['meteor-collection-management', 'tinytest', 'test-helpers']);
     api.add_files('tests/dbobject-test.js', ['client', 'server']);
     api.add_files('tests/enums-test.js', ['client', 'server']);
-})
+});
