@@ -156,7 +156,7 @@ Meteor.startup(function() {
                 var handle = thatManager[meteorTopicSuffix+'Handle'].apply(thatManager, args);
                 return handle;
             }
-
+            thatManager._defineFindFunctionsForTopic(meteorTopicSuffix);
         }
     });
     Object.defineProperties(ManagerType.prototype, {

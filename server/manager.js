@@ -90,42 +90,7 @@ Meteor.startup(function() {
                 return returnedValue;
             }
             Meteor.publish(meteorTopicName, wrappedFn);
-
-            var meteorTopicSuffixCapitalized = meteorTopicSuffix.substring(0,1).toUpperCase() + meteorTopicSuffix.substring(1);
-            /**
-             * create the server-side only functions for when we want to use this query on the server
-             * find + <meteorTopicSuffix> as the name.
-             */
-            if ( typeof thatManager['find'+meteorTopicSuffixCapitalized] === 'undefined') {
-                thatManager['find' + meteorTopicSuffixCapitalized] = function () {
-                    var cursor = meteorTopicCursorFunction.apply(thatManager, arguments);
-                    return cursor;
-                }
-            }
-            // mirror of findFetch on client-side
-            if ( typeof thatManager['findFetch'+meteorTopicSuffixCapitalized] === 'undefined') {
-                thatManager['findFetch'+meteorTopicSuffixCapitalized] = function () {
-                    var cursor = meteorTopicCursorFunction.apply(thatManager, arguments);
-                    if (cursor != null) {
-                        return cursor.fetch();
-                    } else {
-                        return void(0);
-                    }
-                };
-            }
-            /**
-             * findOne + <meteorTopicSuffix> as the name.
-             */
-            if ( typeof thatManager['findOne'+meteorTopicSuffixCapitalized] === 'undefined') {
-                thatManager['findOne'+meteorTopicSuffixCapitalized] = function () {
-                    var cursor = meteorTopicCursorFunction.apply(thatManager, arguments);
-                    if (cursor != null) {
-                        return cursor.fetch()[0];
-                    } else {
-                        return void(0);
-                    }
-                };
-            }
+            thatManager._defineFindFunctionsForTopic(meteorTopicSuffix);
         },
         redirect: function(url, router) {
             router.response.statusCode = 302;
