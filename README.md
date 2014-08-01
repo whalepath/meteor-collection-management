@@ -23,3 +23,6 @@ To run tests locally run following:
 
 ## TODO: how to do testing on the client/ server/ manager code?
 
+
+
+Note: meteor-package-paths ( https://www.npmjs.org/package/meteor-package-paths ) is useful to maintain the package file list.

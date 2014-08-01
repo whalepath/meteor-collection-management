@@ -20,7 +20,7 @@ Package.on_use(function(api) {
 
 Package.on_test(function(api) {
     Npm.depends({
-      mongodb: "1.4.1"
+      mongodb: "1.4.8"
     });
     api.use(['meteor-collection-management', 'tinytest', 'test-helpers']);
     api.add_files('tests/dbobject-test.js', ['client', 'server']);
