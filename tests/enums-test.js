@@ -1,4 +1,4 @@
-var testEnum = new Enums.Enum({
+var TestingEnumFake = new Enums.Enum({
     one: {
         displayName: 'ONE',
     },
@@ -13,23 +13,32 @@ var testEnum = new Enums.Enum({
 });
 
 Tinytest.add('Meteor Collection Management - enums - equals', function(test) {
-    test.equal(testEnum.one, testEnum.enumOf('one'));
-    test.equal(testEnum.one === testEnum.enumOf('one'), true);
+    test.equal(TestingEnumFake.one, TestingEnumFake.enumOf('one'));
+    test.equal(TestingEnumFake.one === TestingEnumFake.enumOf('one'), true);
 });
 
 Tinytest.add('Meteor Collection Management - enums - display', function(test) {
-    test.equal(testEnum.one.displayName, 'ONE');
+    test.equal(TestingEnumFake.one.displayName, 'ONE');
 });
 
 Tinytest.add('Meteor Collection Management - enums - array', function(test) {
-    var enumsArray = testEnum.toArray(['one','three']);
-    test.equal(enumsArray, [testEnum.one, testEnum.three]);
+    var enumsArray = TestingEnumFake.toArray(['one','three']);
+    test.equal(enumsArray, [TestingEnumFake.one, TestingEnumFake.three]);
     test.equal(enumsArray.toString(), 'ONE,THREE');
 });
 
 Tinytest.add('Meteor Collection Management - enums - auto dbCode', function(test) {
-    test.equal(testEnum.one.dbCode, 'one', 'Default DbCode was not initialized.');
-    test.equal(testEnum.three.dbCode, '_three', 'Default DbCode was not initialized.');
-    test.equal(testEnum.enumOf('_three'), testEnum.three);
-    test.equal(testEnum.enumOf('one'), testEnum.one);
+    test.equal(TestingEnumFake.one.dbCode, 'one', 'Default DbCode was not initialized.');
+    test.equal(TestingEnumFake.three.dbCode, '_three', 'DbCode was not initialized.');
+    test.equal(TestingEnumFake.enumOf('_three'), TestingEnumFake.three);
+    test.equal(TestingEnumFake.enumOf('one'), TestingEnumFake.one);
+});
+
+Tinytest.add('Meteor Collection Management - enums - toJSONValue/fromJSONValue', function(test) {
+    test.equal(TestingEnumFake.one.toJSONValue(), 'one', 'Default DbCode was not initialized.');
+    test.equal(TestingEnumFake.three.toJSONValue(), '_three', 'DbCode was not initialized.');
+    var jsonArray = TestingEnumFake.toJSONValue([TestingEnumFake.three, TestingEnumFake.one]);
+    test.equal(jsonArray,
+        ['_three', 'one'],
+        'Not handling array.');
 });
