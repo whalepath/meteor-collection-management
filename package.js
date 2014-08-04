@@ -19,9 +19,6 @@ Package.on_use(function(api) {
 });
 
 Package.on_test(function(api) {
-    Npm.depends({
-      mongodb: "1.4.8"
-    });
     api.use(['meteor-collection-management', 'tinytest', 'test-helpers']);
     api.add_files('tests/dbobject-test.js', ['client', 'server']);
     api.add_files('tests/enums-test.js', ['client', 'server']);

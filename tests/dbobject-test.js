@@ -127,19 +127,17 @@ if (Meteor.isServer) {
     var t = new IndexedCollection({normalField:'value'});
     t._save();
 
-    var MongoClient = Npm.require('mongodb').MongoClient;
-    MongoClient.connect(process.env.MONGO_URL, function(err, db) {
-        if(err) throw err;
-        Tinytest.addAsync('Meteor Collection Management - DbObject - Indexes', function(test, done) {
-            var table = IndexedCollection.databaseTable;
-            var collection = db.collection('indexedCollectionTableName');
-            collection.indexes( Meteor.bindEnvironment(function(err, indexes) {
-              if(err) throw err;
-              test.equal(5, indexes.length, 'indexedCollectionTableName must have 3 indexes: _id, indexedField, refField, userId, and fooIds');
-              done();
-            }));
-        });
-//        db.close();
+    Tinytest.addAsync('Meteor Collection Management - DbObject - Indexes', function(test, done) {
+        var table = IndexedCollection.databaseTable;
+        var collection = table.getMongoDbCollection();
+
+        collection.indexes( Meteor.bindEnvironment(function(err, indexes) {
+            if(err) {
+                throw err;
+            }
+            test.equal(5, indexes.length, 'indexedCollectionTableName must have 3 indexes: _id, indexedField, refField, userId, and fooIds');
+            done();
+        }));
     });
 }
 
@@ -183,15 +181,15 @@ TestSettablePropertiesType = DbObjectType.createSubClass('testSettableProperties
 // propertyNamesClientCanSet, we may want to do more complicated
 // testing of it, since it's pretty important.
 Tinytest.add('Meteor Collection Management - DbObject - createSubClass setting propertyNamesClientCanSet', function(test) {
-    test.equal(['normalField'], TestCollectionTypeComplex.prototype.propertyNamesClientCanSet);
+    test.equal(TestCollectionTypeComplex.prototype.propertyNamesClientCanSet, ['normalField']);
 
     test.equal(TestSettablePropertiesType.prototype.propertyNamesClientCanSet,
-               ["fieldSet","fieldSetGet","notSecuredField","emptyField"]
-              );
+       ["fieldSet","fieldSetGet","notSecuredField","emptyField"]
+    );
 });
 
 Tinytest.add('Meteor Collection Management - DbObject - safeCopying from client', function(test) {
-    test.equal(['normalField'], TestCollectionTypeComplex.prototype.propertyNamesClientCanSet);
+    test.equal(TestCollectionTypeComplex.prototype.propertyNamesClientCanSet, ['normalField']);
     var g = new TestCollectionTypeComplex();
     var clientObject = {
          id:'bad',
