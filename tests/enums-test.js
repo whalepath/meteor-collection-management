@@ -12,6 +12,11 @@ var TestingEnumFake = new Enums.Enum({
     }
 });
 
+Tinytest.add('Meteor Collection Management - enums - keys', function(test) {
+    var keys = _.keys(TestingEnumFake);
+    test.equal(keys,[TestingEnumFake.one.name, TestingEnumFake.two.name, TestingEnumFake.three.name]);
+});
+
 Tinytest.add('Meteor Collection Management - enums - equals', function(test) {
     test.equal(TestingEnumFake.one, TestingEnumFake.enumOf('one'));
     test.equal(TestingEnumFake.one === TestingEnumFake.enumOf('one'), true);
