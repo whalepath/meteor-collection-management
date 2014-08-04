@@ -36,15 +36,6 @@ Tinytest.add('Meteor Collection Management - DbObject - databaseTable', function
     test.isTrue(t.equals(t2), 'Fetched object doesn\'t equal to saved: ' + t2 );
 });
 
-//Tinytest.add('Meteor Collection Management - DbObject - toJsonValue', function(test) {
-//TODO
-//});
-
-//Tinytest.add('Meteor Collection Management - DbObject - fromJsonValue', function(test) {
-//TODO
-//});
-
-
 TestCollectionTypeComplex = DbObjectType.createSubClass('testCollectionComplex',
     [
         {
@@ -60,7 +51,6 @@ TestCollectionTypeComplex = DbObjectType.createSubClass('testCollectionComplex',
                     return new Date();
                 }
             }
-
         },
         'normalField',
         'anArrayOfIds',
