@@ -84,7 +84,8 @@ Meteor.startup(function() {
             if ( meteorTopicCursorFunction == null) {
                 thatManager.log(meteorTopicName+": supplying default custom client meteorTopic function");
                 var meteorTopicTableName = thatManager.getMeteorTopicTableName(meteorTopicSuffix);
-                // no cursor function on client, means a hand-crafter meteorTopic with self.added() and such calls.
+                // no cursor function on client, means a hand-crafted meteorTopic with self.added()
+                // and such calls.
                 //
                 // create the receiving collection on the client side (with a unique name)
                 thatManager[meteorTopicTableName] = new Meteor.Collection(meteorTopicTableName);
@@ -95,8 +96,9 @@ Meteor.startup(function() {
                     return results;
                 }
             }
-            // TODO: for some subscriptions ( i.e. currentHuman ) no arguments - the handle should be saved on the manager so that we don't have
-            // multiple subscribes/unsubscribes
+            // TODO: for some subscriptions ( i.e. currentHuman ) no arguments - the handle
+            // should be saved on the manager so that we don't have multiple subscribes/unsubscribes
+            //
             // creates the stub subscribe method
             this[meteorTopicSuffix+'Handle'] = function() {
                 var args = Array.prototype.slice.call(arguments, 0);
