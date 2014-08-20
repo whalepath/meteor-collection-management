@@ -91,10 +91,11 @@ Meteor.startup(function() {
                 thatManager[meteorTopicTableName] = new Meteor.Collection(meteorTopicTableName);
                 // create the expected cursor function - that does no selection.
                 thatManager[meteorTopicSuffix+'Cursor'] = meteorTopicCursorFunction = function() {
-                    // note: no selection criteria because the server will only return the needed results.
+                    // note: no selection criteria because the server will only return the needed
+                    // results.
                     var results = thatManager[meteorTopicTableName].find();
                     return results;
-                }
+                };
             }
             // TODO: for some subscriptions ( i.e. currentHuman ) no arguments - the handle
             // should be saved on the manager so that we don't have multiple subscribes/unsubscribes
@@ -106,9 +107,14 @@ Meteor.startup(function() {
                 var handle = Meteor.subscribe.apply(Meteor,args);
 
                 var passedArguments = Array.prototype.slice.call(arguments, 0);
-                var lastPassedArgument = passedArguments && passedArguments.length > 0?passedArguments[passedArguments.length-1]:null;
-                if ( lastPassedArgument && (typeof lastPassedArgument == 'function' || typeof lastPassedArgument.onReady === 'function' || typeof lastPassedArgument.onError === 'function')) {
-                    // a onready or onError handlers - remove from arguments that will be passed to the cursor function
+                var lastPassedArgument = passedArguments
+                        && passedArguments.length > 0?passedArguments[passedArguments.length-1]:null;
+                if ( lastPassedArgument
+                     && (typeof lastPassedArgument == 'function'
+                         || typeof lastPassedArgument.onReady === 'function'
+                         || typeof lastPassedArgument.onError === 'function')) {
+                    // a onready or onError handlers - remove from arguments that will be passed to
+                    // the cursor function
                     passedArguments.pop();
                 }
                 thatManager.log("subscribing to "+meteorTopicName);
