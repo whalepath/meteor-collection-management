@@ -284,22 +284,34 @@ Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted clas
     test.equal(TestUntrustedType.databaseTable.find().count(), 1);
 
     // Test update with forced values
-    g = TestUntrustedType.prototype.upsertFromUntrusted(clientObject1, null, {normalField0: 'forced'});
-    test.equal(g.normalField0, 'good');
-    test.equal(g.normalField1, 'good');
+    var msg = 'basic forced values update';
+    g = TestUntrustedType.prototype.upsertFromUntrusted(
+        clientObject1,
+        null,
+        {forcedValues: {normalField0: 'forced'}}
+    );
+    test.equal(g.normalField0, 'good', msg);
+    test.equal(g.normalField1, 'good', msg);
     test.equal(TestUntrustedType.databaseTable.find().count(), 1);
 
     // Test insert with forced values.
-    g = TestUntrustedType.prototype.upsertFromUntrusted(clientObject0, null, {normalField0: 'forced'});
+    msg = 'basic forced values insert';
+    g = TestUntrustedType.prototype.upsertFromUntrusted(
+        clientObject0,
+        null,
+        {forcedValues: {normalField0: 'forced'}}
+    );
     test.equal(TestUntrustedType.databaseTable.find().count(), 2);
-    test.equal(g.normalField0, 'forced');
-    test.equal(g.normalField1, 'good');
+    test.equal(g.normalField0, 'forced', msg);
+    test.equal(g.normalField1, 'good', msg);
 
     // test null values.
     var h = TestUntrustedType.databaseTable.findOne({_id: { $ne: g._id } });
     var gOriginal = g.normalField0;
     var hOriginal = h.normalField0;
 
+    // TODO(dmr, 2014-08-19): To test the behavior this was originally testing, this should have
+    // arguments=[null, null, {forcedValues: null}]
     // Nothing should happen.
     TestUntrustedType.prototype.upsertFromUntrusted(null, null, null);
     g = TestUntrustedType.databaseTable.findOne({_id: g._id });
@@ -308,6 +320,8 @@ Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted clas
     test.equal(h.normalField0, hOriginal);
     test.equal(TestUntrustedType.databaseTable.find().count(), 2);
 
+    // TODO(dmr, 2014-08-19): To test the behavior this was originally testing, this should have
+    // arguments=[undefined, undefined, {forcedValues: undefined}]
     // Nothing should happen when we switch null to undefined.
     TestUntrustedType.prototype.upsertFromUntrusted(undefined, undefined, undefined);
     g = TestUntrustedType.databaseTable.findOne({_id: g._id });
@@ -317,8 +331,12 @@ Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted clas
     test.equal(TestUntrustedType.databaseTable.find().count(), 2);
 
     // TODO(dmr) descr
-    var msg = 'null, null, forced';
-    TestUntrustedType.prototype.upsertFromUntrusted(null, null, {normalField0: 'forced'});
+    msg = 'null, null, forced';
+    TestUntrustedType.prototype.upsertFromUntrusted(
+        null,
+        null,
+        {forcedValues: {normalField0: 'forced'}}
+    );
     g = TestUntrustedType.databaseTable.findOne({_id: g._id });
     h = TestUntrustedType.databaseTable.findOne({_id: h._id });
     test.equal(g.normalField0, gOriginal, msg);
@@ -335,7 +353,11 @@ Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted clas
 
     // We can force values even if no client object is supplied.
     msg = 'null, lookup, forced';
-    TestUntrustedType.prototype.upsertFromUntrusted(null, clientObject0, {normalField0: 'forced'});
+    TestUntrustedType.prototype.upsertFromUntrusted(
+        null,
+        clientObject0,
+        {forcedValues: {normalField0: 'forced'}}
+    );
     g = TestUntrustedType.databaseTable.findOne({_id: g._id });
     h = TestUntrustedType.databaseTable.findOne({_id: h._id });
     test.equal(g.normalField0, 'forced', msg);
