@@ -82,11 +82,14 @@ Meteor.startup(function() {
             var meteorTopicName = this.getMeteorTopicName(meteorTopicSuffix);
             var meteorTopicCursorFunction = thatManager.getMeteorTopicCursorFunction(meteorTopicSuffix, true);
             if ( meteorTopicCursorFunction == null) {
-                thatManager.log(meteorTopicName+": supplying default custom client meteorTopic function");
-                var meteorTopicTableName = thatManager.getMeteorTopicTableName(meteorTopicSuffix);
-                // no cursor function on client, means a hand-crafter meteorTopic with self.added() and such calls.
-                //
+                // client has no 'Cursor' function defined. This happens when the server side has a
+                // non-standard topic. For example, a topic that is created with manually with : http://docs.meteor.com/#publish_added
+                // see http://docs.meteor.com/#publishandsubscribe for more info.
+
+                // no cursor function on client, means a hand-crafted meteorTopic with self.added() and such calls.
                 // create the receiving collection on the client side (with a unique name)
+                var meteorTopicTableName = thatManager.getMeteorTopicTableName(meteorTopicSuffix);
+                thatManager.log(meteorTopicName+": supplying default custom client meteorTopic function, temporary databaseTable is named:"+meteorTopicTableName);
                 thatManager[meteorTopicTableName] = new Meteor.Collection(meteorTopicTableName);
                 // create the expected cursor function - that does no selection.
                 thatManager[meteorTopicSuffix+'Cursor'] = meteorTopicCursorFunction = function() {
