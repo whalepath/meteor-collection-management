@@ -47,3 +47,21 @@ Tinytest.add('Meteor Collection Management - enums - toJSONValue/fromJSONValue',
         ['_three', 'one'],
         'Not handling array.');
 });
+
+/**
+ * case where the enum was not properly serialized to the dbCode.
+ * This happens if the enum was serialized by code that was not aware of how the enum should be serialized.
+ * In this case we end up with a object with the same properties but it is not a symbol.
+ */
+Tinytest.add('Meteor Collection Management - enums - accidently serialized', function(test) {
+    debugger;
+    var accidentalClone = {};
+    _.each(TestingEnumFake.one, function(element, key){
+        accidentalClone[key] = element;
+    });
+    var testingEnumFakeValue = TestingEnumFake.toJSONValue(accidentalClone);
+    test.equal(TestingEnumFake.one.toJSONValue(), testingEnumFakeValue, 'accidental serialization case was not handled');
+    var testingEnumFakeEnum = TestingEnumFake.fromJSONValue(accidentalClone);
+    test.equal(TestingEnumFake.one, testingEnumFakeEnum, 'accidental serialization case was not handled');
+});
+
