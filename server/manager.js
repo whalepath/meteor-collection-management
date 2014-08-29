@@ -2,12 +2,14 @@ Meteor.startup(function() {
     _.extend(ManagerType.prototype, {
         /**
          * create the Meteor.method hook:
-         * Meteor.method({ <managers_prefix>+meteorCallDefinition : function that will invoke the manager stubName function with this set to the manager instance );
+         * Meteor.method({ <managers_prefix>+meteorCallDefinition : function that will invoke the
+         * manager stubName function with this set to the manager instance );
          * @param meteorCallDefinition
          */
         createMeteorCallMethod : function(meteorCallDefinition) {
             var that = this;
             var trackingEventKey;
+            var meteorCallNameSuffix;
             if ( typeof(meteorCallDefinition) == "undefined" || meteorCallDefinition == null) {
                 return;
             } else if ( typeof(meteorCallDefinition) === "object") {
@@ -18,15 +20,48 @@ Meteor.startup(function() {
                 meteorCallNameSuffix = meteorCallDefinition;
             }
             var callName = this.getMeteorCallName(meteorCallNameSuffix);
-
             var methods = {};
-            // make sure that the subclass manager is bound as the 'this' parameter when the Meteor method is called.
+            // make sure that the subclass manager is bound as the 'this' parameter when the Meteor
+            // method is called.
             if ( typeof(that[meteorCallNameSuffix]) !== "function") {
                 // TODO: display better
                 throw new Meteor.Error(500, that.toString() +"."+meteorCallNameSuffix+" is not a function");
             }
-            methods[callName] = that[meteorCallNameSuffix].bind(that);
+            var method = that[meteorCallNameSuffix].bind(that);
+            var permittedRoles = that[meteorCallNameSuffix].permittedRoles;
+            if (permittedRoles) {
+                var wrappedMethod = this._wrapMethodWithPermittedRoles(
+                    method,
+                    permittedRoles,
+                    callName
+                );
+                methods[callName] = wrappedMethod;
+            } else {
+                // TODO(dmr, 2014-08-28) check e.g. Meteor.settings.methodPermissionsRequired and
+                // crash if true.
+                //
+                // actually just crash
+                // throw new Error("No permittedRoles defined for " + callName);
+                methods[callName] = method;
+            }
             Meteor.methods(methods);
+        },
+
+        /**
+         * adds permissions
+         * @param method the method
+         * @param permittedRoles array of roles
+         */
+        _wrapMethodWithPermittedRoles: function(method, permittedRoles, callName) {
+            var that = this;
+            var wrappedMethod = function() {
+                if (Roles.userIsInRole(Meteor.user(), permittedRoles)) {
+                    method.apply(that, arguments);
+                } else {
+                    throw new Meteor.Error(403, "Current user not permitted to call " + callName);
+                }
+            };
+            return wrappedMethod;
         },
         /**
          * Creates a Meteor topic with Meteor.publish()
