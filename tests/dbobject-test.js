@@ -120,10 +120,11 @@ Tinytest.add('Meteor Collection Management - DbObject - Reference fields', funct
     t.normalField = normalValue;
     console.log("there");
     t._save();
+    console.log("there2");
     var t2 = TestCollectionTypeComplex.databaseTable.findOneByRefField(refValue);
+    console.log("there3");
     test.isTrue(t2, 'Value by reference field was not found.');
     test.equal(t2._id, t._id, 'Wrong entry found.');
-    console.log("there2");
 
     var t3 = TestCollectionTypeComplex.databaseTable.findByRefField(refValue);
     test.isTrue(t3 != null && t3.count() > 0, 'Malformed cursor returned');
