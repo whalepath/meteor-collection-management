@@ -110,7 +110,12 @@ Tinytest.add('Meteor Collection Management - DbObject - Reference fields', funct
     var normalValue = 'normal' + refValue;
 
     var t = new TestCollectionTypeComplex();
-    t.refField = refValue;
+    try {
+        t.refField = refValue;
+    } catch(e) {
+        // some javascript interpreters will throw a TypeError when trying to set a field with only a 'get'
+        test.equal(e instanceof TypeError, true);
+    }
     t.normalField = normalValue;
     t._save();
     var t2 = TestCollectionTypeComplex.databaseTable.findOneByRefField(refValue);
