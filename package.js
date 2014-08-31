@@ -1,8 +1,9 @@
 Package.describe({
-  summary: "Collection management to the database"
+  summary: "Collection management to the database",
+  version: '1.0.0'
 });
 
-Package.on_use(function(api) {
+Package.onUse(function(api) {
   api.use('underscore', ['client', 'server']);
 
   api.export('DbObjectType');
@@ -18,7 +19,7 @@ Package.on_use(function(api) {
   api.add_files('server/manager.js', 'server');
 });
 
-Package.on_test(function(api) {
+Package.onTest(function(api) {
     api.use(['meteor-collection-management', 'tinytest', 'test-helpers']);
     api.add_files('tests/dbobject-test.js', ['client', 'server']);
     api.add_files('tests/enums-test.js', ['client', 'server']);
