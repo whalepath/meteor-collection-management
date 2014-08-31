@@ -120,8 +120,13 @@ Tinytest.add('Meteor Collection Management - DbObject - Reference fields', funct
     var t3 = TestCollectionTypeComplex.databaseTable.findByRefField(refValue);
     test.isTrue(t3 != null && t3.count() > 0, 'Malformed cursor returned');
     //Verify ref field is writable even though it wasn't explicitly requested.
-    t.refField = 'new value';
-    test.equal(t.refField, 'new value', 'refField is not writable (but should be).')
+    try {
+        t.refField = 'new value';
+        test.equal(t.refField, 'new value', 'refField is not writable (but should be).')
+    } catch(e) {
+        // some javascript interpreters will throw a TypeError when trying to set a field with only a 'get'
+        test.equal(e instanceof TypeError, true);
+    }
 });
 
 
