@@ -248,6 +248,31 @@ TestUntrustedType = DbObjectType.createSubClass(
     'testUntrustedTableName'
 );
 
+Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted classmethod error conditions', function(test) {
+    try {
+        TestUntrustedType.prototype.upsertFromUntrusted(null, null, null);
+        test.equal(false, true);
+    }catch( e) {
+        test.equal(e instanceof Meteor.Error, true);
+    }
+    try {
+        TestUntrustedType.prototype.upsertFromUntrusted(undefined, undefined, undefined);
+        test.equal(false, true);
+    }catch( e) {
+        test.equal(e instanceof Meteor.Error, true);
+    }
+
+    try {
+        TestUntrustedType.prototype.upsertFromUntrusted(
+            null,
+            null,
+            {forcedValues: {normalField0: 'forced'}}
+        );
+        test.equal(false, true);
+    }catch( e) {
+        test.equal(e instanceof Meteor.Error, true);
+    }
+});
 
 Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted classmethod', function(test) {
     // This test assumes we start with a clean db. Is this a mistake?
@@ -325,20 +350,12 @@ Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted clas
     var gOriginal = g.normalField0;
     var hOriginal = h.normalField0;
 
-    // TODO(dmr, 2014-08-19): To test the behavior this was originally testing, this should have
-    // arguments=[null, null, {forcedValues: null}]
-    // Nothing should happen.
-    TestUntrustedType.prototype.upsertFromUntrusted(null, null, null);
     g = TestUntrustedType.databaseTable.findOne({_id: g._id });
     h = TestUntrustedType.databaseTable.findOne({_id: h._id });
     test.equal(g.normalField0, gOriginal);
     test.equal(h.normalField0, hOriginal);
     test.equal(TestUntrustedType.databaseTable.find().count(), 2);
 
-    // TODO(dmr, 2014-08-19): To test the behavior this was originally testing, this should have
-    // arguments=[undefined, undefined, {forcedValues: undefined}]
-    // Nothing should happen when we switch null to undefined.
-    TestUntrustedType.prototype.upsertFromUntrusted(undefined, undefined, undefined);
     g = TestUntrustedType.databaseTable.findOne({_id: g._id });
     h = TestUntrustedType.databaseTable.findOne({_id: h._id });
     test.equal(g.normalField0, gOriginal);
@@ -347,11 +364,6 @@ Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted clas
 
     // TODO(dmr) descr
     msg = 'null, null, forced';
-    TestUntrustedType.prototype.upsertFromUntrusted(
-        null,
-        null,
-        {forcedValues: {normalField0: 'forced'}}
-    );
     g = TestUntrustedType.databaseTable.findOne({_id: g._id });
     h = TestUntrustedType.databaseTable.findOne({_id: h._id });
     test.equal(g.normalField0, gOriginal, msg);
