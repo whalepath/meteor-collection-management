@@ -1,5 +1,5 @@
 var TEST_COLLECTION_TABLE_NAME = 'testCollectionTableName';
-
+var EJSON = Package.ejson.EJSON;
 TestCollectionType = DbObjectType.createSubClass('testCollection',
     [
         'field1',

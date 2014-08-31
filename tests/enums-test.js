@@ -1,3 +1,4 @@
+var EJSON = Package.ejson.EJSON;
 var TestingEnumFake = new Enums.Enum({
     one: {
         displayName: 'ONE',
