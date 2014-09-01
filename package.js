@@ -1,6 +1,6 @@
 Package.describe({
   summary: "Collection management to the database",
-  version: '1.0.0'
+  version: '1.0.1'
 });
 
 Package.onUse(function(api) {
