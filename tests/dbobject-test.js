@@ -128,13 +128,7 @@ Tinytest.add('Meteor Collection Management - DbObject - Reference fields', funct
      at onGlobalMessage (http://localhost:10015/packages/meteor.js?47d1d2b71177463dc159606cf930e44b9e3337f6:319)
      */
     console.log("there2");
-    try {
         var t2 = TestCollectionTypeComplex.databaseTable.findOneByRefField(refValue);
-    }catch (e) {
-        // some javascript interpreters will throw a TypeError when trying to set a field with only a 'get'
-        console.log(e);
-    }
-    console.log("there3");
     test.isTrue(t2, 'Value by reference field was not found.');
     test.equal(t2._id, t._id, 'Wrong entry found.');
 
