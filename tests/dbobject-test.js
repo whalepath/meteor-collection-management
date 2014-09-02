@@ -113,39 +113,20 @@ Tinytest.add('Meteor Collection Management - DbObject - Reference fields', funct
     t.refField = refValue;
     t.normalField = normalValue;
     t._save();
-    /**
-     * there2
-     TypeError: setting a property that has only a getter
-     there3
-     C: tinytest - Meteor Collection Management - DbObject - Reference fields : !!!!!!!!! FAIL !!!!!!!!!!!
-     TypeError: 'undefined' is not an object (evaluating 't2._id')
-     at http://localhost:10015/packages/local-test:meteor-collection-management.js?265b07c6f03e63f78ba3bfe0de30603efd22d2e8:178
-     at http://localhost:10015/packages/tinytest.js?daebbb4b86a93d1bd389c770e23cf061a9180dde:632
-     at http://localhost:10015/packages/tinytest.js?daebbb4b86a93d1bd389c770e23cf061a9180dde:413
-     at http://localhost:10015/packages/meteor.js?47d1d2b71177463dc159606cf930e44b9e3337f6:803
-     at http://localhost:10015/packages/meteor.js?47d1d2b71177463dc159606cf930e44b9e3337f6:382
-     at http://localhost:10015/packages/meteor.js?47d1d2b71177463dc159606cf930e44b9e3337f6:831
-     at onGlobalMessage (http://localhost:10015/packages/meteor.js?47d1d2b71177463dc159606cf930e44b9e3337f6:319)
-     */
-    console.log("there2");
-        var t2 = TestCollectionTypeComplex.databaseTable.findOneByRefField(refValue);
+    var t2 = TestCollectionTypeComplex.databaseTable.findOneByRefField(refValue);
     test.isTrue(t2, 'Value by reference field was not found.');
     test.equal(t2._id, t._id, 'Wrong entry found.');
 
     var t3 = TestCollectionTypeComplex.databaseTable.findByRefField(refValue);
     test.isTrue(t3 != null && t3.count() > 0, 'Malformed cursor returned');
     //Verify ref field is writable even though it wasn't explicitly requested.
-    try {
-        t.refField = 'new value';
-        test.equal(t.refField, 'new value', 'refField is not writable (but should be).')
-    } catch(e) {
-        // some javascript interpreters will throw a TypeError when trying to set a field with only a 'get'
-//        test.isTrue(e instanceof TypeError, true);
-    }
+    t.refField = 'new value';
+    test.equal(t.refField, 'new value', 'refField is not writable (but should be).')
 });
 
 
 Tinytest.add('Meteor Collection Management - DbObject - to/fromJsonValue', function(test) {
+    debugger;
     var complex = new TestCollectionTypeComplex({
         sampleForTestEnum0: SampleForTestEnum.one.dbCode,
         sampleForTestEnum1: SampleForTestEnum.one.dbCode,
@@ -154,6 +135,10 @@ Tinytest.add('Meteor Collection Management - DbObject - to/fromJsonValue', funct
     var json = complex.toJSONValue();
     test.equal(json.sampleForTestEnum0, SampleForTestEnum.one.dbCode);
     test.equal(json.sampleForTestEnum1, SampleForTestEnum.one.dbCode);
+
+    var minJson = complex.toJSONValue(['sampleForTestEnum0']);
+    test.equal(minJson.sampleForTestEnum0, SampleForTestEnum.one.dbCode);
+    test.equal(_.keys(minJson).length, 1);
 });
 
 if (Meteor.isServer) {

@@ -1,6 +1,7 @@
 Package.describe({
-  summary: "Collection management to the database",
-  version: '1.0.1'
+  summary: "Meteor Collection Management",
+  version: "1.0.2",
+  git: "https://github.com/whalepath/meteor-collection-management.git"
 });
 
 Package.onUse(function(api) {
@@ -10,17 +11,17 @@ Package.onUse(function(api) {
   api.export('ManagerType');
   api.export('Enums');
 
-  api.add_files('lib/underscoreExtensions.js', ['client', 'server']);
-  api.add_files('lib/enums.js', ['client', 'server']);
-  api.add_files('lib/dbobject.js', ['client', 'server']);
-  api.add_files('lib/manager.js', ['client', 'server']);
-  api.add_files('lib/phantomjsCompat.js', 'client');
-  api.add_files('client/manager.js', ['client' ]);
-  api.add_files('server/manager.js', 'server');
+  api.addFiles('lib/underscoreExtensions.js', ['client', 'server']);
+  api.addFiles('lib/enums.js', ['client', 'server']);
+  api.addFiles('lib/dbobject.js', ['client', 'server']);
+  api.addFiles('lib/manager.js', ['client', 'server']);
+  api.addFiles('lib/phantomjsCompat.js', 'client');
+  api.addFiles('client/manager.js', ['client' ]);
+  api.addFiles('server/manager.js', 'server');
 });
 
 Package.onTest(function(api) {
     api.use(['meteor-collection-management', 'tinytest', 'test-helpers']);
-    api.add_files('tests/dbobject-test.js', ['client', 'server']);
-    api.add_files('tests/enums-test.js', ['client', 'server']);
+    api.addFiles('tests/dbobject-test.js', ['client', 'server']);
+    api.addFiles('tests/enums-test.js', ['client', 'server']);
 });
