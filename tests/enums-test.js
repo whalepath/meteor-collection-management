@@ -13,6 +13,14 @@ var TestingEnumFake = new Enums.Enum({
     }
 });
 
+Tinytest.add('Meteor Collection Management - enums - simple', function(test) {
+    debugger;
+    return;
+    // TODO: Fix to handle this.
+    var simpleEnum0 = new Enums.Enum(['ff', 'bb']);
+    var simpleEnum1 = new Enums.Enum('ff', 'bb');
+});
+
 Tinytest.add('Meteor Collection Management - enums - keys', function(test) {
     var keys = _.keys(TestingEnumFake);
     test.equal(keys,[TestingEnumFake.one.name, TestingEnumFake.two.name, TestingEnumFake.three.name]);

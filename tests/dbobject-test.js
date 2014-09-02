@@ -126,7 +126,6 @@ Tinytest.add('Meteor Collection Management - DbObject - Reference fields', funct
 
 
 Tinytest.add('Meteor Collection Management - DbObject - to/fromJsonValue', function(test) {
-    debugger;
     var complex = new TestCollectionTypeComplex({
         sampleForTestEnum0: SampleForTestEnum.one.dbCode,
         sampleForTestEnum1: SampleForTestEnum.one.dbCode,
