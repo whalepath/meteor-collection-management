@@ -2,7 +2,6 @@
 // this works but can we use a global hook that for a given route does a universal lookup.
 if ( Router != null) {
     Template.prototype.data = function() {
-        debugger;
         var initializeData = this.route.options.initializeData;
         if ( initializeData ) {
             var initialData;
@@ -36,7 +35,6 @@ if ( Router != null) {
         }
     }
     Template.prototype.waitOn = function() {
-        debugger;
         var initializeData = this.route.options.initializeData;
         if ( initializeData ) {
             var initialData;
