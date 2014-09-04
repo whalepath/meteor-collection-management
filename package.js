@@ -1,26 +1,28 @@
 Package.describe({
-  summary: "Meteor Collection Management",
-  version: "1.0.2",
-  git: "https://github.com/whalepath/meteor-collection-management.git"
+    summary: "Meteor Collection Management",
+    version: "1.0.3",
+    git: "https://github.com/whalepath/meteor-collection-management.git"
 });
 
-Package.onUse(function(api) {
-  api.use('underscore', ['client', 'server']);
+Package.onUse(function (api) {
+    api.use('underscore', ['client', 'server']);
+    api.use('iron:router', ['client']);
 
-  api.export('DbObjectType');
-  api.export('ManagerType');
-  api.export('Enums');
+    api.export('DbObjectType');
+    api.export('ManagerType');
+    api.export('Enums');
 
-  api.addFiles('lib/underscoreExtensions.js', ['client', 'server']);
-  api.addFiles('lib/enums.js', ['client', 'server']);
-  api.addFiles('lib/dbobject.js', ['client', 'server']);
-  api.addFiles('lib/manager.js', ['client', 'server']);
-  api.addFiles('lib/phantomjsCompat.js', 'client');
-  api.addFiles('client/manager.js', ['client' ]);
-  api.addFiles('server/manager.js', 'server');
+    api.addFiles('lib/underscoreExtensions.js', ['client', 'server']);
+    api.addFiles('lib/enums.js', ['client', 'server']);
+    api.addFiles('lib/dbobject.js', ['client', 'server']);
+    api.addFiles('lib/manager.js', ['client', 'server']);
+    api.addFiles('client/phantomjsCompat.js', 'client');
+    api.addFiles('client/ironRouterExtensions.js', ['client']);
+    api.addFiles('client/manager.js', ['client' ]);
+    api.addFiles('server/manager.js', 'server');
 });
 
-Package.onTest(function(api) {
+Package.onTest(function (api) {
     api.use(['meteor-collection-management', 'tinytest', 'test-helpers']);
     api.addFiles('tests/dbobject-test.js', ['client', 'server']);
     api.addFiles('tests/enums-test.js', ['client', 'server']);

@@ -10,14 +10,13 @@ Meteor.startup(function() {
             var that = this;
             var trackingEventKey;
             var meteorCallNameSuffix;
-            if ( typeof(meteorCallDefinition) == "undefined" || meteorCallDefinition == null) {
+            if ( meteorCallDefinition == null) {
                 return;
-            } else if ( typeof(meteorCallDefinition) === "object") {
+            } else if ( typeof(meteorCallDefinition) === "string") {
+                meteorCallNameSuffix = meteorCallDefinition;
+            } else {
                 meteorCallNameSuffix = meteorCallDefinition.callName;
                 trackingEventKey = meteorCallDefinition.trackingEventKey;
-            } else {
-                // assumed meteorCallDefinition is string
-                meteorCallNameSuffix = meteorCallDefinition;
             }
             var callName = this.getMeteorCallName(meteorCallNameSuffix);
             var methods = {};
@@ -54,14 +53,18 @@ Meteor.startup(function() {
          */
         _wrapMethodWithPermittedRoles: function(method, permittedRoles, callName) {
             var that = this;
-            var wrappedMethod = function() {
-                if (Roles.userIsInRole(Meteor.user(), permittedRoles)) {
-                    method.apply(that, arguments);
-                } else {
-                    throw new Meteor.Error(403, "Current user not permitted to call " + callName);
-                }
-            };
-            return wrappedMethod;
+            if ( Roles ) {
+                var wrappedMethod = function () {
+                    if (Roles.userIsInRole(Meteor.user(), permittedRoles)) {
+                        method.apply(that, arguments);
+                    } else {
+                        throw new Meteor.Error(403, "Current user not permitted to call " + callName);
+                    }
+                };
+                return wrappedMethod;
+            } else {
+                return method;
+            }
         },
         /**
          * Creates a Meteor topic with Meteor.publish()
@@ -149,7 +152,8 @@ Meteor.startup(function() {
                 if ( currentInvocation) {
                     return Meteor.userId();
                 } else {
-                    return null;
+                    // return undefined so we can tell difference between "no logged on user" and "we don't know"
+                    return void(0);
                 }
             }
         }
