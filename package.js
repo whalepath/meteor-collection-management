@@ -7,6 +7,7 @@ Package.describe({
 Package.onUse(function (api) {
     api.use('underscore', ['client', 'server']);
     api.use('iron:router', ['client']);
+    api.use('templating', ['client']);
 
     api.export('DbObjectType');
     api.export('ManagerType');
