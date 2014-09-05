@@ -29,13 +29,19 @@ if ( Router != null) {
             }
             var result = {};
             _.each(initialData, function(handleObj, key) {
-                if (handleObj.data) {
-                    result[key] = handleObj.data;
-                } else {
-                    if (handleObj.handle == null) {
-                        result[key] = handleObj.handle;
-                    } else {
+                if (handleObj.handle) {
+                    if(typeof handleObj.handle.ready === 'function') {
                         result[key] = handleObj.handle[handleObj.method]();
+                    } else {
+                        // handleObj is just data and inexplicably has a key 'handle'
+                        result[key] = handleObj;
+                    }
+                } else {
+                    if(typeof handleObj.ready === 'function') {
+                        result[key] = handleObj['findFetch']();
+                    } else {
+                        // handleObj is just data
+                        result[key] = handleObj;
                     }
                 }
             });
@@ -61,7 +67,12 @@ if ( Router != null) {
             }
             var result = [];
             _.each(initialData, function(handleObj, key) {
-                var handle = handleObj.handle;
+                var handle;
+                if(handleObj.handle) {
+                    handle = handleObj.handle;
+                } else {
+                    handle = handleObj;
+                }
                 if ( handle && typeof handle.ready === 'function') {
                     result.push(handle);
                 }
