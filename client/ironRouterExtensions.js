@@ -28,28 +28,20 @@ if ( Router != null) {
                 initialData = initializeData;
             }
             var result = {};
-            _.each(initialData, function(handle, key) {
-                var resultKey;
-                var resultFnName;
-                if ( key.length > 3 && key.substring(key.length-3,key.length) === 'One') {
-                    resultKey = key.substring(0, key.length - 3);
-                    resultFnName = 'findOne';
+            _.each(initialData, function(handleObj, key) {
+                if (handleObj.data) {
+                    result[key] = handleObj.data;
                 } else {
-                    resultKey = key;
-                    resultFnName = 'findFetch';
-                }
-                if ( handle == null) {
-                    result[resultKey] = handle;
-                } else if ( typeof handle[resultFnName] ==='function') {
-                    result[ resultKey ] = handle[resultFnName]();
-                } else {
-                    // straight data - not from a cursor
-                    result[ resultKey ] = handle[resultFnName];
+                    if (handleObj.handle == null) {
+                        result[key] = handleObj.handle;
+                    } else {
+                        result[key] = handleObj.handle[handleObj.method]();
+                    }
                 }
             });
             return result;
         }
-    }
+    };
     Template.prototype.waitOn = function() {
         var initializeData;
         if ( this.route != null) {
@@ -68,14 +60,15 @@ if ( Router != null) {
                 initialData = initializeData;
             }
             var result = [];
-            _.each(initialData, function(handle, key) {
+            _.each(initialData, function(handleObj, key) {
+                var handle = handleObj.handle;
                 if ( handle && typeof handle.ready === 'function') {
                     result.push(handle);
                 }
             });
             return result;
         }
-    }
+    };
 
     // TODO: This does not work because no routes are defined at this moment
     // need to see if we can hook the route creation.
@@ -86,7 +79,8 @@ if ( Router != null) {
         if ( template ) {
             _.each(['waitOn', 'data', 'initializeData'], function (action) {
                 // if a route does not have a function use the Template's function
-                // maybe in future merge Router.xx() and Template.xx() so that the results are combined?
+                // maybe in future merge Router.xx() and Template.xx() so that the results are
+                // combined?
                 if (typeof route.options[action] === 'undefined') {
                     route.options[action] = template[action];
                 }
