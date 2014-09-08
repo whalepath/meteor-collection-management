@@ -14,7 +14,6 @@ var TestingEnumFake = new Enums.Enum({
 });
 
 Tinytest.add('Meteor Collection Management - enums - simple', function(test) {
-    debugger;
     return;
     // TODO: Fix to handle this.
     var simpleEnum0 = new Enums.Enum(['ff', 'bb']);
