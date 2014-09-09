@@ -27,23 +27,37 @@ if ( Router != null) {
             }
             var result = {};
             _.each(initialData, function(handleObj, key) {
-                if ( handleObj == null ) {
-                    // null or undefined
-                    result[key] = handleObj;
-                } else if (handleObj.handle) {
-                    if(typeof handleObj.handle.ready === 'function') {
-                        result[key] = handleObj.handle[handleObj.method]();
-                    } else {
-                        // handleObj is just data and inexplicably has a key 'handle'
-                        result[key] = handleObj;
+                var isHandleAndMethod = 'handle' in handleObj && 'method' in handleObj;
+                var recipientObj = isHandleAndMethod? handleObj.handle : handleObj;
+                if ( recipientObj == null ) {
+                    // null or undefined handleObj or handle.handleObj is null or undefined
+                    result[key] = recipientObj;
+                } else if ( isHandleAndMethod ) {
+                    switch(typeof handleObj.method) {
+                    case 'undefined':
+                        throw new Meteor.Error(500, "For key=" + key + ": 'method' is undefined in handleObj");
+                        break;
+                    case 'string':
+                        if (typeof recipientObj[handleObj.method] === 'function') {
+                            result[key] = recipientObj[handleObj.method]();
+                        } else {
+                            throw new Meteor.Error(500, "For key=" + key + ": 'method'=" + handleObj.method + " is not a function on recipientObj");
+                        }
+                        break;
+                    case 'function':
+                        result[key] = handleObj.method.call(recipientObj);
+                        break;
+                    default:
+                        throw new Meteor(500, "For key=" + key + ": 'method' is " + typeof handleObj.method + " in handleObj");
+                        break;
                     }
+                } else if ( key.length > 3 && key.substring(key.length-3, key.length) == 'One' && typeof recipientObj.findOne === 'function') {
+                    result[key] = result[key.substring(0, key.length - 3)] = recipientObj.findOne();
+                } else if(typeof recipientObj.findFetch === 'function') {
+                    result[key] = recipientObj.findFetch();
                 } else {
-                    if(typeof handleObj.ready === 'function') {
-                        result[key] = handleObj['findFetch']();
-                    } else {
-                        // handleObj is just data
-                        result[key] = handleObj;
-                    }
+                    // handleObj is just data
+                    result[key] = handleObj;
                 }
             });
             return result;
