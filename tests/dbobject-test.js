@@ -78,7 +78,6 @@ var TestCollectionTypeComplex = DbObjectType.createSubClass('testCollectionCompl
             sampleForTestEnum1: {
                 jsonHelper: SampleForTestEnum
             },
-            // cannot test this because SampleForTestEnum is not globally visible but it does work in practice.
             sampleForTestEnum2: {
                 jsonHelper: 'SampleForTestEnum'
             }
