@@ -444,3 +444,27 @@ Tinytest.add('Meteor Collection Management - DbObject - required fields', functi
     }
     test.isTrue(failed, 'checkKeys did not fail with unset required property.');
 });
+
+var TestEnumType = DbObjectType.createSubClass('testEnumType',
+    [
+        {
+            x: {
+                jsonHelper: SampleForTestEnum
+            }
+        }
+    ],
+    'testEnumTable'
+);
+
+Tinytest.add('MCM - DbObject - jsonHelper', function(test) {
+    var te = new TestEnumType();
+    te.x = SampleForTestEnum.one.dbCode;
+    te._save();
+
+    test.equal(SampleForTestEnum.one.dbCode, te.x, 'before save');
+    var rte = TestEnumType.databaseTable.findOneById(te.id);
+    test.notEqual(null, rte.x, 'retrieved != null');
+    test.notEqual(undefined, rte.x, 'retrieved != undefined');
+    test.notEqual(SampleForTestEnum.one.dbCode, rte.x, 'retrieved is not dbCode');
+    test.equal(SampleForTestEnum.one, rte.x, 'retrieved is enum obj');
+});
