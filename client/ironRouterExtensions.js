@@ -5,8 +5,6 @@ if ( Router != null) {
      * A standard data() that will be called by the Router code to get the template's data.
      * This function will be used by the Router code.
      *
-     *
-     *
      * @returns {{}}
      */
     Template.prototype.data = function() {
@@ -15,8 +13,8 @@ if ( Router != null) {
             //we are being called by the iron:router code
             initializeData = this.route.options.initializeData;
         } else {
-            // TODO : how to get the template instance?
-            initializeData = null;
+            // template helper functions are on the template itself
+            initializeData = this.initializeData;
         }
 
         if ( initializeData ) {
@@ -57,8 +55,8 @@ if ( Router != null) {
             //we are being called by the iron:router code
             initializeData = this.route.options.initializeData;
         } else {
-            // TODO : how to get the template instance?
-            initializeData = null;
+            // template helper functions are on the template itself
+            initializeData = this.initializeData;
         }
         if ( initializeData ) {
             var initialData;
@@ -84,21 +82,24 @@ if ( Router != null) {
         }
     };
 
-    // TODO: This does not work because no routes are defined at this moment
-    // need to see if we can hook the route creation.
-    _.each(Router.routes, function (route) {
-        var templateName = route.router.convertTemplateName(route.name);
-        var template = Template[templateName];
-        // not all routes have templates...
-        if ( template ) {
-            _.each(['waitOn', 'data', 'initializeData'], function (action) {
-                // if a route does not have a function use the Template's function
-                // maybe in future merge Router.xx() and Template.xx() so that the results are
-                // combined?
-                if (typeof route.options[action] === 'undefined') {
-                    route.options[action] = template[action];
-                }
-            });
-        }
-    });
+    // HACK : Need to put method some place else: different name space?
+    Template.prototype._initializeRoutes = function() {
+        // TODO: This does not work because no routes are defined at this moment
+        // need to see if we can hook the route creation.
+        _.each(Router.routes, function (route) {
+            var templateName = route.router.convertTemplateName(route.name);
+            var template = Template[templateName];
+            // not all routes have templates...
+            if (template) {
+                _.each(['waitOn', 'data', 'initializeData'], function (action) {
+                    // if a route does not have a function use the Template's function
+                    // maybe in future merge Router.xx() and Template.xx() so that the results are
+                    // combined?
+                    if (typeof route.options[action] === 'undefined') {
+                        route.options[action] = template[action];
+                    }
+                });
+            }
+        });
+    }
 }
