@@ -12,6 +12,8 @@ Package.onUse(function (api) {
     api.export('DbObjectType');
     api.export('ManagerType');
     api.export('Enums');
+    api.export('one');
+    api.export('many');
 
     api.addFiles('lib/underscoreExtensions.js', ['client', 'server']);
     api.addFiles('lib/enums.js', ['client', 'server']);
