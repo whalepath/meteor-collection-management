@@ -49,6 +49,13 @@ SampleForTestEnum = new Enums.Enum({
         dbCode: 'good'
     }
 });
+// only needed for testing to make sure that SampleForTestEnum is attached to the global
+// NOTE: do not call with an actual object.
+function __toGlobal(key, value) {
+    this[key] = value;
+}
+__toGlobal('SampleForTestEnum', SampleForTestEnum);
+
 var TestCollectionTypeComplex = DbObjectType.createSubClass('testCollectionComplex',
     [
         {
@@ -71,11 +78,9 @@ var TestCollectionTypeComplex = DbObjectType.createSubClass('testCollectionCompl
             sampleForTestEnum1: {
                 jsonHelper: SampleForTestEnum
             },
-            // cannot test this because SampleForTestEnum is not globally visible but it does work
-            // in practice.
-//            sampleForTestEnum2: {
-//                jsonHelper: 'SampleForTestEnum'
-//            }
+            sampleForTestEnum2: {
+                jsonHelper: 'SampleForTestEnum'
+            }
         },
         'normalField',
         'anArrayOfIds',
@@ -135,6 +140,7 @@ Tinytest.add('Meteor Collection Management - DbObject - to/fromJsonValue', funct
     var json = complex.toJSONValue();
     test.equal(json.sampleForTestEnum0, SampleForTestEnum.one.dbCode);
     test.equal(json.sampleForTestEnum1, SampleForTestEnum.one.dbCode);
+    test.equal(json.sampleForTestEnum2, SampleForTestEnum.one.dbCode);
 
     var minJson = complex.toJSONValue(['sampleForTestEnum0']);
     test.equal(minJson.sampleForTestEnum0, SampleForTestEnum.one.dbCode);
@@ -212,7 +218,7 @@ TestSettablePropertiesType = DbObjectType.createSubClass('testSettableProperties
 // propertyNamesClientCanSet, we may want to do more complicated
 // testing of it, since it's pretty important.
 Tinytest.add('Meteor Collection Management - DbObject - createSubClass setting propertyNamesClientCanSet', function(test) {
-    test.equal(TestCollectionTypeComplex.prototype.propertyNamesClientCanSet, ['sampleForTestEnum0','sampleForTestEnum1','normalField']);
+    test.equal(TestCollectionTypeComplex.prototype.propertyNamesClientCanSet, ['sampleForTestEnum0','sampleForTestEnum1','sampleForTestEnum2','normalField']);
 
     test.equal(TestSettablePropertiesType.prototype.propertyNamesClientCanSet,
        ["fieldSet","fieldSetGet","notSecuredField","emptyField"]
@@ -232,7 +238,8 @@ Tinytest.add('Meteor Collection Management - DbObject - safeCopying from client'
          securedField: 'bad',
          createdAt: 'bad',
         sampleForTestEnum0 : 'good',
-        sampleForTestEnum1 : 'good'
+        sampleForTestEnum1 : 'good',
+        sampleForTestEnum2 : 'good'
     };
     g.extendClient(clientObject);
     _.each(TestCollectionTypeComplex.prototype.propertyNames, function(propertyName) {
