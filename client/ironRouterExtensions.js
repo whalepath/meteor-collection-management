@@ -29,7 +29,10 @@ if ( Router != null) {
             }
             var result = {};
             _.each(initialData, function(handleObj, key) {
-                if (handleObj.handle) {
+                if ( handleObj == null ) {
+                    // null or undefined
+                    result[key] = handleObj;
+                } else if (handleObj.handle) {
                     if(typeof handleObj.handle.ready === 'function') {
                         result[key] = handleObj.handle[handleObj.method]();
                     } else {
