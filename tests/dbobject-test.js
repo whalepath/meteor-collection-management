@@ -458,10 +458,10 @@ var TestEnumType = DbObjectType.createSubClass('testEnumType',
 
 Tinytest.add('MCM - DbObject - jsonHelper', function(test) {
     var te = new TestEnumType();
-    te.x = SampleForTestEnum.one.dbCode;
+    te.x = SampleForTestEnum.one;
     te._save();
 
-    test.equal(SampleForTestEnum.one.dbCode, te.x, 'before save');
+    test.equal(SampleForTestEnum.one, te.x, 'before save');
     var rte = TestEnumType.databaseTable.findOneById(te.id);
     test.notEqual(null, rte.x, 'retrieved != null');
     test.notEqual(undefined, rte.x, 'retrieved != undefined');
