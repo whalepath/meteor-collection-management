@@ -116,4 +116,19 @@ if ( Router != null) {
             }
         });
     }
+
+    // Use these methods in initializeData
+    one = function(handle) {
+        return {
+            handle: handle,
+            method: 'findOne'
+        };
+    };
+    // Use these methods in initializeData
+    many = function(handle) {
+        return {
+            handle: handle,
+            method: 'findFetch'
+        };
+    };
 }
