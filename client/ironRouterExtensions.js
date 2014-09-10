@@ -27,7 +27,13 @@ if ( Router != null) {
             }
             var result = {};
             _.each(initialData, function(handleObj, key) {
-                var isHandleAndMethod = 'handle' in handleObj && 'method' in handleObj;
+                var isHandleAndMethod;
+                try {
+                    isHandleAndMethod = handleObj != null && 'handle' in handleObj && 'method' in handleObj;
+                } catch(e) {
+                    // string or something else
+                    isHandleAndMethod = false;
+                }
                 var recipientObj = isHandleAndMethod? handleObj.handle : handleObj;
                 if ( recipientObj == null ) {
                     // null or undefined handleObj or handle.handleObj is null or undefined
