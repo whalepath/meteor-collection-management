@@ -5,6 +5,7 @@ Package.describe({
 });
 
 Package.onUse(function (api) {
+    api.use('ejson', ['client', 'server']);
     api.use('underscore', ['client', 'server']);
     api.use('iron:router', ['client']);
     api.use('templating', ['client']);
