@@ -119,7 +119,7 @@ Meteor.startup(function() {
                     // the cursor function
                     passedArguments.pop();
                 }
-                thatManager.debug("subscribing to "+meteorTopicName);
+                thatManager.log("subscribing to "+meteorTopicName);
 
                 /**
                  *  create a results() function that will return an array of the results.
