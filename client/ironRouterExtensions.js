@@ -95,7 +95,7 @@ if ( Router != null) {
                 } else if ( isOneKey ) {
                     result[key] = result[key.substring(0, key.length - 3)] = oneFn.call(recipientObj);
                 } else {
-                    result[key] = manyFn.call(recipentObj);
+                    result[key] = manyFn.call(recipientObj);
                 }
             });
             return result;
