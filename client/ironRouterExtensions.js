@@ -1,6 +1,37 @@
 // TODO: put in a pull request to iron-router
 // this works but can we use a global hook that for a given route does a universal lookup.
 if ( Router != null) {
+    function oneFn() {
+        var result;
+        if (typeof this.findOne === 'function' ) {
+            // mcm handles
+            result = this.findOne();
+        } else if ( typeof this.fetch === 'function') {
+            // Mongo cursor
+            result = this.fetch();
+            if ( result instanceof Array ) {
+                result = result[0];
+            }
+        } else {
+//            throw new Meteor.Error(500, "No findOne() or fetch() on supplied 'this'");
+            result = this;
+        }
+        return result;
+    }
+    function manyFn() {
+        var result;
+        if (typeof this.findFetch === 'function' ) {
+            // mcm handles
+            result = this.findFetch();
+        } else if ( typeof this.fetch === 'function') {
+            // Mongo cursor
+            result = this.fetch();
+        } else {
+//            throw new Meteor.Error(500, "No findFetch() or fetch() on supplied 'this'");
+            result = this;
+        }
+        return result;
+    }
     /**
      * A standard data() that will be called by the Router code to get the template's data.
      * This function will be used by the Router code.
@@ -35,9 +66,13 @@ if ( Router != null) {
                     isHandleAndMethod = false;
                 }
                 var recipientObj = isHandleAndMethod? handleObj.handle : handleObj;
+                var isOneKey = key.length > 3 && key.substring(key.length-3, key.length) == 'One';
                 if ( recipientObj == null ) {
                     // null or undefined handleObj or handle.handleObj is null or undefined
                     result[key] = recipientObj;
+                    if ( isOneKey ) {
+                        result[key.substring(0, key.length - 3)] = recipientObj;
+                    }
                 } else if ( isHandleAndMethod ) {
                     switch(typeof handleObj.method) {
                     case 'undefined':
@@ -57,13 +92,10 @@ if ( Router != null) {
                         throw new Meteor(500, "For key=" + key + ": 'method' is " + typeof handleObj.method + " in handleObj");
                         break;
                     }
-                } else if ( key.length > 3 && key.substring(key.length-3, key.length) == 'One' && typeof recipientObj.findOne === 'function') {
-                    result[key] = result[key.substring(0, key.length - 3)] = recipientObj.findOne();
-                } else if(typeof recipientObj.findFetch === 'function') {
-                    result[key] = recipientObj.findFetch();
+                } else if ( isOneKey ) {
+                    result[key] = result[key.substring(0, key.length - 3)] = oneFn.call(recipientObj);
                 } else {
-                    // handleObj is just data
-                    result[key] = handleObj;
+                    result[key] = manyFn.call(recipentObj);
                 }
             });
             return result;
@@ -127,41 +159,14 @@ if ( Router != null) {
     one = function(handle) {
         return {
             handle: handle,
-            method: function() {
-                var result;
-                if (typeof this.findOne === 'function' ) {
-                    // mcm handles
-                    result = this.findOne();
-                } else if ( typeof this.fetch === 'function') {
-                    // Mongo cursor
-                    result = this.fetch();
-                    if ( result instanceof Array ) {
-                        result = result[0];
-                    }
-                } else {
-                    throw new Meteor.Error(500, "No findOne() or fetch() on supplied function");
-                }
-                return result;
-            }
+            method: oneFn
         };
     };
     // Use these methods in initializeData
     many = function(handle) {
         return {
             handle: handle,
-            method: function() {
-                var result;
-                if (typeof this.findFetch === 'function' ) {
-                    // mcm handles
-                    result = this.findFetch();
-                } else if ( typeof this.fetch === 'function') {
-                    // Mongo cursor
-                    result = this.fetch();
-                } else {
-                    throw new Meteor.Error(500, "No findFetch() or fetch() on supplied function");
-                }
-                return result;
-            }
+            method: manyFn
         };
     };
 }
