@@ -127,14 +127,41 @@ if ( Router != null) {
     one = function(handle) {
         return {
             handle: handle,
-            method: 'findOne'
+            method: function() {
+                var result;
+                if (typeof this.findOne === 'function' ) {
+                    // mcm handles
+                    result = this.findOne();
+                } else if ( typeof this.fetch === 'function') {
+                    // Mongo cursor
+                    result = this.fetch();
+                    if ( typeof result === 'array') {
+                        result = result[0];
+                    }
+                } else {
+                    throw new Meteor.Error(500, "No findOne() or fetch() on supplied function)
+                }
+                return result;
+            }
         };
     };
     // Use these methods in initializeData
     many = function(handle) {
         return {
             handle: handle,
-            method: 'findFetch'
+            method: function() {
+                var result;
+                if (typeof this.findFetch === 'function' ) {
+                    // mcm handles
+                    result = this.findFetch();
+                } else if ( typeof this.fetch === 'function') {
+                    // Mongo cursor
+                    result = this.fetch();
+                } else {
+                    throw new Meteor.Error(500, "No findFetch() or fetch() on supplied function)
+                }
+                return result;
+            }
         };
     };
 }
