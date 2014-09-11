@@ -139,7 +139,7 @@ if ( Router != null) {
                         result = result[0];
                     }
                 } else {
-                    throw new Meteor.Error(500, "No findOne() or fetch() on supplied function)
+                    throw new Meteor.Error(500, "No findOne() or fetch() on supplied function");
                 }
                 return result;
             }
@@ -158,7 +158,7 @@ if ( Router != null) {
                     // Mongo cursor
                     result = this.fetch();
                 } else {
-                    throw new Meteor.Error(500, "No findFetch() or fetch() on supplied function)
+                    throw new Meteor.Error(500, "No findFetch() or fetch() on supplied function");
                 }
                 return result;
             }
