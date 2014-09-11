@@ -135,7 +135,7 @@ if ( Router != null) {
                 } else if ( typeof this.fetch === 'function') {
                     // Mongo cursor
                     result = this.fetch();
-                    if ( typeof result === 'array') {
+                    if ( result instanceof Array ) {
                         result = result[0];
                     }
                 } else {
