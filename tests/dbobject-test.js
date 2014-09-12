@@ -475,3 +475,124 @@ Tinytest.add('MCM - DbObject - jsonHelper', function(test) {
     test.notEqual(SampleForTestEnum.one.dbCode, rte.x, 'retrieved is not dbCode');
     test.equal(SampleForTestEnum.one, rte.x, 'retrieved is enum obj');
 });
+
+TestOrType = DbObjectType.createSubClass('testOrCollection',
+    [
+        'a',
+        'b'
+    ],
+    'testOrCollection'
+);
+
+
+//Tinytest.add('MCM - DbObject - no or collision', function(test) {
+Tinytest.add('Meteor Collection Management - DbObject - no or collision', function(test) {
+    if (Meteor.isServer) {
+        TestOrType.databaseTable.remove({});
+    }
+
+    if (TestOrType.databaseTable._originalFind) {
+        console.log('unpatching find');
+        TestOrType.databaseTable.find = TestOrType.databaseTable._originalFind.bind(
+            TestOrType.databaseTable
+        );
+    }
+
+    var x0 = new TestOrType({
+        a: 1,
+        b: 2
+    });
+
+    var x1 = new TestOrType({
+        a: 3,
+        b: 4
+    });
+
+    var x2 = new TestOrType({
+        a: 5,
+        b: 6
+    });
+
+
+    x0._save();
+    x1._save();
+    x2._save();
+
+    test.equal(TestOrType.databaseTable.find().count(), 3, '3 objs');
+
+    var selector = {
+        $or: [ { a: 1 }, { a: 3 } ]
+    };
+
+    test.equal(TestOrType.databaseTable.find(selector).count(), 2, 'single or');
+
+    var selector1 = {
+        $or: [
+            { a: 1 }, { a: 3 },
+            { b: 2 }, { b: 6 }
+        ]
+    };
+
+    test.equal(TestOrType.databaseTable.find(selector1).count(), 3, 'one big or');
+
+    var selector2 = {
+        $and: [
+            {
+                $or: [ { a: 1 }, { a: 3 } ]
+            },
+            {
+                $or: [ { b: 2 }, { b: 6 } ]
+            }
+        ]
+    };
+
+    test.equal(TestOrType.databaseTable.find(selector2).count(), 1, 'and 2 ors');
+
+    var selector3 = {
+        $or: [ { a: 1 }, { a: 3 } ],
+        $or: [ { b: 2 }, { b: 6 } ]
+    };
+
+    test.equal(TestOrType.databaseTable.find(selector3).count(), 2, 'just 2 ors (clobbered)');
+
+    console.log('patching find');
+    var dbCollection = TestOrType.databaseTable;
+    dbCollection._originalFind = dbCollection.find.bind(dbCollection);
+    dbCollection.find = function() {
+        var args = Array.prototype.slice.call(arguments);
+        if (Meteor.isServer) {
+            console.log('XXX server find XXX');
+            // we're doing db.find({})
+            var selector;
+            if (args.length == 0) {
+                selector = {};
+                // args == selector : rest ; rest could be []
+            } else {
+                selector = args.shift();
+            }
+            // modify selector
+            // if collection has required roles, user roles
+            // var roles = Meteor.user().roles;
+
+            var roles = ['su', 'customer'];
+            var roleQueries = _.map(roles, function(role) {
+                return { requiredRoles: role };
+            });
+            var noRequiredRolesQuery = { requiredRoles: { $exists: false } };
+            roleQueries.unshift(noRequiredRolesQuery);
+
+            var newSelector = {
+                $and: [
+                    { $or: roleQueries },
+                    selector
+                ]
+            };
+            console.log('selector: ', newSelector);
+            args.unshift(newSelector);
+        }
+        return this._originalFind.apply(this, args);
+    };
+
+    test.equal(TestOrType.databaseTable.find().count(), 3, 'patched find (3)');
+    test.equal(TestOrType.databaseTable.find(selector).count(), 2, 'patched single or');
+});
