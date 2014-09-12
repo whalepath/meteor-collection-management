@@ -121,13 +121,15 @@ if ( Router != null) {
             var result = [];
             _.each(initialData, function(handleObj, key) {
                 var handle;
-                if(handleObj.handle) {
-                    handle = handleObj.handle;
-                } else {
-                    handle = handleObj;
-                }
-                if ( handle && typeof handle.ready === 'function') {
-                    result.push(handle);
+                if ( handleObj ) {
+                    if (handleObj && handleObj.handle) {
+                        handle = handleObj.handle;
+                    } else {
+                        handle = handleObj;
+                    }
+                    if (handle && typeof handle.ready === 'function') {
+                        result.push(handle);
+                    }
                 }
             });
             return result;
