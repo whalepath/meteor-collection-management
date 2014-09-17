@@ -2,7 +2,11 @@
   "dependencies": [
     [
       "application-configuration",
-      "1.0.1"
+      "1.0.2"
+    ],
+    [
+      "base64",
+      "1.0.0"
     ],
     [
       "binary-heap",
@@ -14,6 +18,10 @@
     ],
     [
       "blaze-tools",
+      "1.0.0"
+    ],
+    [
+      "boilerplate-generator",
       "1.0.0"
     ],
     [
@@ -34,7 +42,7 @@
     ],
     [
       "ejson",
-      "1.0.1"
+      "1.0.2"
     ],
     [
       "follower-livedata",
@@ -50,27 +58,43 @@
     ],
     [
       "htmljs",
-      "1.0.0"
+      "1.0.1"
     ],
     [
       "id-map",
       "1.0.0"
     ],
     [
+      "iron:controller",
+      "1.0.0-pre1"
+    ],
+    [
       "iron:core",
-      "0.3.4"
+      "1.0.0-pre1"
     ],
     [
       "iron:dynamic-template",
-      "0.4.1"
+      "1.0.0-pre1"
     ],
     [
       "iron:layout",
-      "0.4.1"
+      "1.0.0-pre1"
+    ],
+    [
+      "iron:location",
+      "1.0.0-pre1"
+    ],
+    [
+      "iron:middleware-stack",
+      "1.0.0-pre1"
     ],
     [
       "iron:router",
-      "0.9.3"
+      "1.0.0-pre1"
+    ],
+    [
+      "iron:url",
+      "1.0.0-pre1"
     ],
     [
       "jquery",
@@ -82,23 +106,23 @@
     ],
     [
       "logging",
-      "1.0.2"
-    ],
-    [
-      "meteor",
       "1.0.3"
     ],
     [
+      "meteor",
+      "1.1.0"
+    ],
+    [
       "minifiers",
-      "1.0.2"
+      "1.1.0"
     ],
     [
       "minimongo",
-      "1.0.2"
+      "1.0.3"
     ],
     [
       "mongo",
-      "1.0.4"
+      "1.0.5"
     ],
     [
       "observe-sequence",
@@ -126,7 +150,7 @@
     ],
     [
       "routepolicy",
-      "1.0.0"
+      "1.0.1"
     ],
     [
       "spacebars",
@@ -138,7 +162,7 @@
     ],
     [
       "templating",
-      "1.0.5"
+      "1.0.6"
     ],
     [
       "tracker",
@@ -154,10 +178,14 @@
     ],
     [
       "webapp",
-      "1.0.3"
+      "1.1.1"
+    ],
+    [
+      "webapp-hashing",
+      "1.0.0"
     ]
   ],
   "pluginDependencies": [],
-  "toolVersion": "meteor-tool@1.0.28",
+  "toolVersion": "meteor-tool@1.0.30",
   "format": "1.0"
 }
