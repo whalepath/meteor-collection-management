@@ -137,11 +137,12 @@ if ( Router != null) {
     };
 
     // HACK : Need to put method some place else: different name space?
+    // TODO: Be able to use RouteControllers
     Template.prototype._initializeRoutes = function() {
         // TODO: This does not work because no routes are defined at this moment
         // need to see if we can hook the route creation.
         _.each(Router.routes, function (route) {
-            var templateName = route.options.templateName || route.router.convertTemplateName(route.name);
+            var templateName = route.options.template || route.router.convertTemplateName(route.name);
             var template = Template[templateName];
             // not all routes have templates...
             if (template) {
@@ -153,9 +154,11 @@ if ( Router != null) {
                         console.log(route.name, " is getting a ", action);
                         route.options[action] = template[action];
                     } else {
-                        console.log(route.name, " already has a ", action);
+                        console.debug(route.name, " already has a ", action);
                     }
                 });
+            } else {
+                console.debug(route.name, " has no template");
             }
         });
     }
