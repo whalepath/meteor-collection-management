@@ -492,7 +492,6 @@ Tinytest.add('Meteor Collection Management - DbObject - no or collision', functi
     }
 
     if (TestOrType.databaseTable._originalFind) {
-        console.log('unpatching find');
         TestOrType.databaseTable.find = TestOrType.databaseTable._originalFind.bind(
             TestOrType.databaseTable
         );
@@ -555,13 +554,11 @@ Tinytest.add('Meteor Collection Management - DbObject - no or collision', functi
 
     test.equal(TestOrType.databaseTable.find(selector3).count(), 2, 'just 2 ors (clobbered)');
 
-    console.log('patching find');
     var dbCollection = TestOrType.databaseTable;
     dbCollection._originalFind = dbCollection.find.bind(dbCollection);
     dbCollection.find = function() {
         var args = Array.prototype.slice.call(arguments);
         if (Meteor.isServer) {
-            console.log('XXX server find XXX');
             // we're doing db.find({})
             var selector;
             if (args.length == 0) {
@@ -587,7 +584,6 @@ Tinytest.add('Meteor Collection Management - DbObject - no or collision', functi
                     selector
                 ]
             };
-            console.log('selector: ', newSelector);
             args.unshift(newSelector);
         }
         return this._originalFind.apply(this, args);
