@@ -244,9 +244,9 @@ Tinytest.add('Meteor Collection Management - DbObject - safeCopying from client'
     g.extendClient(clientObject);
     _.each(TestCollectionTypeComplex.prototype.propertyNames, function(propertyName) {
         if ( _.contains(TestCollectionTypeComplex.prototype.propertyNamesClientCanSet, propertyName)) {
-            test.equal(g[propertyName], 'good');
+            test.equal(g[propertyName], 'good', propertyName);
         } else {
-            test.notEqual(g[propertyName], 'bad');
+            test.notEqual(g[propertyName], 'bad', propertyName);
         }
     });
 });
