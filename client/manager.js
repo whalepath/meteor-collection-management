@@ -159,14 +159,6 @@ Meteor.startup(function() {
 
                 return handle;
             };
-            // TODO: make this return the results.
-            this[meteorTopicSuffix] = function() {
-                var args = Array.prototype.slice.call(arguments, 0);
-                thatManager.log(meteorTopicSuffix+': (WARNING) called instead of '+meteorTopicSuffix+'Handle');
-                throw new Meteor.Error("Removed non-Handle");
-                var handle = thatManager[meteorTopicSuffix+'Handle'].apply(thatManager, args);
-                return handle;
-            }
             thatManager._defineFindFunctionsForTopic(meteorTopicSuffix);
         }
     });
