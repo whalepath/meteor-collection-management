@@ -29,7 +29,8 @@ Meteor.startup(function() {
             var method = that[meteorCallNameSuffix].bind(that);
             var permittedRoles = that[meteorCallNameSuffix].permittedRoles;
             if (permittedRoles) {
-                if (_.contains(permittedRoles, 'public')) {
+                if (_.contains(permittedRoles, 'public')
+                    || permittedRoles == 'public') {
                     methods[callName] = method;
                 } else {
                     var wrappedMethod = this._wrapMethodWithPermittedRoles(
