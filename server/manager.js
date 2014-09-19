@@ -56,7 +56,7 @@ Meteor.startup(function() {
             if ( Roles ) {
                 var wrappedMethod = function () {
                     if (Roles.userIsInRole(Meteor.user(), permittedRoles)) {
-                        method.apply(that, arguments);
+                        return method.apply(that, arguments);
                     } else {
                         throw new Meteor.Error(403, "Current user not permitted to call " + callName);
                     }
