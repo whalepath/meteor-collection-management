@@ -110,11 +110,14 @@ Meteor.startup(function() {
                 },
             });
 
-            // insure that this.ready() is called when the no data is returned. (required for spiderable to work)
+            // insure that this.ready() is called when the no data is returned. (required for
+            // spiderable to work)
             var wrappedFn = function() {
-                // Question: this should be o.k. because we don't have the cursor (this) reused. (not certain that the topic cursor is not reused)
+                // Question: this should be o.k. because we don't have the cursor (this)
+                // reused. (not certain that the topic cursor is not reused)
                 this.meteorTopicCursorFunction = meteorTopicCursorFunction;
-                // so that this.thatManager always return the thatManager on both the client and the server.
+                // so that this.thatManager always return the thatManager on both the client and the
+                // server.
                 this.thatManager = thatManager;
                 var returnedValue = meteorTopicCursorFunction.apply(this, arguments);
                 if ( returnedValue == null || returnedValue === false) {
@@ -136,7 +139,9 @@ Meteor.startup(function() {
             if ( url == null ) {
                 url = Meteor.absoluteUrl();
             }
-            // TODO: alter window history so that a 'go back' goes to the previous whalepath page ( not this redirect page )
+            // TODO: alter window history so that a 'go back' goes to the previous whalepath page (
+            // not this redirect page )
+            //
             // TODO: except if the previous page is a non-whalepath page.
             router.response.setHeader('Location', url);
         }
