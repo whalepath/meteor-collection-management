@@ -29,19 +29,19 @@ Meteor.startup(function() {
             var method = that[meteorCallNameSuffix].bind(that);
             var permittedRoles = that[meteorCallNameSuffix].permittedRoles;
             if (permittedRoles) {
-                var wrappedMethod = this._wrapMethodWithPermittedRoles(
-                    method,
-                    permittedRoles,
-                    callName
-                );
-                methods[callName] = wrappedMethod;
+                if (_.contains(permittedRoles, 'public')) {
+                    methods[callName] = method;
+                } else {
+                    var wrappedMethod = this._wrapMethodWithPermittedRoles(
+                        method,
+                        permittedRoles,
+                        callName
+                    );
+                    methods[callName] = wrappedMethod;
+                }
             } else {
-                // TODO(dmr, 2014-08-28) check e.g. Meteor.settings.methodPermissionsRequired and
-                // crash if true.
-                //
-                // actually just crash
-                // throw new Error("No permittedRoles defined for " + callName);
-                methods[callName] = method;
+                // Require permissions to be defined
+                throw new Error("No permittedRoles defined for " + callName);
             }
             Meteor.methods(methods);
         },
