@@ -16,6 +16,7 @@ Package.onUse(function (api) {
     api.export('one');
     api.export('many');
 
+    api.addFiles('lib/internalutils.js', ['client', 'server']);
     api.addFiles('lib/underscoreExtensions.js', ['client', 'server']);
     api.addFiles('lib/enums.js', ['client', 'server']);
     api.addFiles('lib/dbobject.js', ['client', 'server']);
