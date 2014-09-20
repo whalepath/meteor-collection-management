@@ -10,6 +10,7 @@ Meteor.startup(function() {
             var that = this;
             var trackingEventKey;
             var meteorCallNameSuffix;
+            var permittedRoles;
             if ( meteorCallDefinition == null) {
                 return;
             } else if ( typeof(meteorCallDefinition) === "string") {
@@ -17,6 +18,7 @@ Meteor.startup(function() {
             } else {
                 meteorCallNameSuffix = meteorCallDefinition.callName;
                 trackingEventKey = meteorCallDefinition.trackingEventKey;
+                permittedRoles = meteorCallDefinition.permittedRoles;
             }
             var callName = this.getMeteorCallName(meteorCallNameSuffix);
             var methods = {};
@@ -27,7 +29,7 @@ Meteor.startup(function() {
                 throw new Meteor.Error(500, that.toString() +"."+meteorCallNameSuffix+" is not a function");
             }
             var method = that[meteorCallNameSuffix].bind(that);
-            var permittedRoles = that[meteorCallNameSuffix].permittedRoles;
+            permittedRoles = permittedRoles || that[meteorCallNameSuffix].permittedRoles;
             if (permittedRoles) {
                 if (_.contains(permittedRoles, 'public')
                     || permittedRoles == 'public') {
@@ -42,7 +44,7 @@ Meteor.startup(function() {
                 }
             } else {
                 // Require permissions to be defined
-                throw new Error("No permittedRoles defined for " + callName);
+                throw new Meteor.Error(500, "No permittedRoles defined for " + callName);
             }
             Meteor.methods(methods);
         },
@@ -140,7 +142,7 @@ Meteor.startup(function() {
                     );
                 }
             } else {
-                thatManager.log(meteorTopicName, 'has no secdefs');
+                thatManager.log("Topic ", meteorTopicName, 'has no permittedRoles');
                 securedCursorFunction = meteorTopicCursorFunction;
             }
 
