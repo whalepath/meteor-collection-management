@@ -67,6 +67,22 @@ Meteor.startup(function() {
                 return method;
             }
         },
+
+        _wrapCursorWithPermittedRoles: function(cursor, permittedRoles, topicName) {
+            var that = this;
+            if ( Roles ) {
+                var wrappedCursor = function () {
+                    if (Roles.userIsInRole(this.userId, permittedRoles)) {
+                        return cursor.apply(that, arguments);
+                    } else {
+                        return this.stop();
+                    }
+                };
+                return wrappedCursor;
+            } else {
+                return cursor;
+            }
+        },
         /**
          * Creates a Meteor topic with Meteor.publish()
          *
@@ -88,7 +104,6 @@ Meteor.startup(function() {
             var thatManager = this;
             var meteorTopicName = this.getMeteorTopicName(meteorTopicSuffix);
             var meteorTopicTableName = thatManager.getMeteorTopicTableName(meteorTopicSuffix);
-            thatManager.log("Creating meteorTopic: "+meteorTopicName);
             var meteorTopicCursorFunction = thatManager.getMeteorTopicCursorFunction(meteorTopicSuffix);
             // make the current manager available on cursor when doing publish subscribe.
             Object.defineProperties(meteorTopicCursorFunction, {
@@ -110,6 +125,25 @@ Meteor.startup(function() {
                 },
             });
 
+            var securedCursorFunction;
+            if (meteorTopicCursorFunction.permittedRoles) {
+                if(_.include(meteorTopicCursorFunction.permittedRoles, 'public')
+                   || meteorTopicCursorFunction.permittedRoles == 'public') {
+                    thatManager.log(meteorTopicName, 'is public');
+                    securedCursorFunction = meteorTopicCursorFunction;
+                } else {
+                    thatManager.log(meteorTopicName, 'is secured');
+                    securedCursorFunction = this._wrapCursorWithPermittedRoles(
+                        meteorTopicCursorFunction,
+                        meteorTopicCursorFunction.permittedRoles,
+                        meteorTopicName
+                    );
+                }
+            } else {
+                thatManager.log(meteorTopicName, 'has no secdefs');
+                securedCursorFunction = meteorTopicCursorFunction;
+            }
+
             // insure that this.ready() is called when the no data is returned. (required for
             // spiderable to work)
             var wrappedFn = function() {
@@ -119,18 +153,19 @@ Meteor.startup(function() {
                 // so that this.thatManager always return the thatManager on both the client and the
                 // server.
                 this.thatManager = thatManager;
-                var returnedValue = meteorTopicCursorFunction.apply(this, arguments);
+                var returnedValue = securedCursorFunction.apply(this, arguments);
                 if ( returnedValue == null || returnedValue === false) {
                     // required for spiderable to work
                     // see: http://www.meteorpedia.com/read/spiderable
                     returnedValue = void(0);
                     this.ready();
                 } else if ( returnedValue === true ) {
-                    // true means we would like to return null *but* the ready method was already called
+                    // true means we would like to return null *but* the ready method was already
+                    // called
                     returnedValue = void(0);
                 }
                 return returnedValue;
-            }
+            };
             Meteor.publish(meteorTopicName, wrappedFn);
             thatManager._defineFindFunctionsForTopic(meteorTopicSuffix);
         },
