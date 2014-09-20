@@ -243,10 +243,12 @@ Tinytest.add('Meteor Collection Management - DbObject - safeCopying from client'
     };
     g.extendClient(clientObject);
     _.each(TestCollectionTypeComplex.prototype.propertyNames, function(propertyName) {
-        if ( _.contains(TestCollectionTypeComplex.prototype.propertyNamesClientCanSet, propertyName)) {
-            test.equal(g[propertyName], 'good', propertyName);
-        } else {
+        if ( !_.contains(TestCollectionTypeComplex.prototype.propertyNamesClientCanSet, propertyName)) {
             test.notEqual(g[propertyName], 'bad', propertyName);
+        } else if (propertyName.substring(0, 'sampleForTestEnum'.length) == 'sampleForTestEnum') {
+            test.equal(g[propertyName], SampleForTestEnum.good, propertyName);
+        } else {
+            test.equal(g[propertyName], 'good', propertyName);
         }
     });
 });
