@@ -8,6 +8,7 @@ Meteor.startup(function() {
          */
         createMeteorCallMethod : function(meteorCallDefinition, meteorCallNameSuffix) {
             var that = this;
+            var thatManager = this;
             var trackingEventKey;
             var meteorCallNameSuffix;
             var permissionCheck;
@@ -23,23 +24,18 @@ Meteor.startup(function() {
             }
             var method = that[meteorCallNameSuffix].bind(that);
             permissionCheck = permissionCheck || that[meteorCallNameSuffix].permissionCheck;
-            if (permissionCheck) {
-                if (_.contains(permissionCheck, 'public')
-                    || permissionCheck == 'public') {
-                    methods[callName] = method;
-                } else {
-                    var wrappedMethod = this._wrapMethodWithPermittedRoles(
+            if (permissionCheck == null) {
+                console.log("warning: Method has no permissionCheck defined for " + callName);
+//                throw new Meteor.Error(500, "Method has no permissionCheck defined for " + callName);
+                methods[callName] = method;
+            } else if (_.contains(permissionCheck, 'public') || permissionCheck == 'public') {
+                methods[callName] = method;
+            } else {
+                methods[callName] = thatManager._wrapMethodWithPermittedRoles(
                         method,
                         permissionCheck,
                         callName
-                    );
-                    methods[callName] = wrappedMethod;
-                }
-            } else {
-                // Require permissions to be defined
-                // TODO :
-                console.log("Method has no permissionCheck defined for " + callName);
-//                throw new Meteor.Error(500, "Method has no permissionCheck defined for " + callName);
+                );
             }
             Meteor.methods(methods);
         },
@@ -50,12 +46,14 @@ Meteor.startup(function() {
          * @param permissionCheck array of roles
          */
         _wrapMethodWithPermittedRoles: function(method, permissionCheck, callName) {
-            var that = this;
+            var thatManager = this;
             if ( Roles ) {
                 var wrappedMethod = function () {
                     if (Roles.userIsInRole(Meteor.user(), permissionCheck)) {
                         return method.apply(that, arguments);
                     } else {
+                        debugger;
+                        thatManager.log(403, "Current user not permitted to call " + callName);
                         throw new Meteor.Error(403, "Current user not permitted to call " + callName);
                     }
                 };
@@ -72,6 +70,8 @@ Meteor.startup(function() {
                     if (Roles.userIsInRole(this.userId, permissionCheck)) {
                         return cursor.apply(that, arguments);
                     } else {
+                        debugger;
+                        thatManager.log(403, "Current user not permitted to call " + callName);
                         return this.stop();
                     }
                 };
