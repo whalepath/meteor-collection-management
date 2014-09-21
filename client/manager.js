@@ -71,7 +71,7 @@ Meteor.startup(function() {
          *
          * @param meteorTopicSuffix
          */
-        createTopic : function(meteorTopicSuffix) {
+        createTopic : function(meteorTopicDefinition, meteorTopicSuffix) {
             var thatManager = this;
             var meteorTopicName = this.getMeteorTopicName(meteorTopicSuffix);
             var meteorTopicCursorFunction = thatManager.getMeteorTopicCursorFunction(meteorTopicSuffix, true);

@@ -95,7 +95,7 @@ Meteor.startup(function() {
          *    meteorTopicSuffixOne = to fetch one
          * @param meteorTopicSuffix
          */
-        createTopic : function(meteorTopicSuffix) {
+        createTopic : function(meteorTopicDefinition, meteorTopicSuffix) {
             var thatManager = this;
             var meteorTopicName = this.getMeteorTopicName(meteorTopicSuffix);
             var meteorTopicTableName = thatManager.getMeteorTopicTableName(meteorTopicSuffix);
