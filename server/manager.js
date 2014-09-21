@@ -2,41 +2,74 @@ Meteor.startup(function() {
     _.extend(ManagerType.prototype, {
         /**
          * create the Meteor.method hook:
-         * Meteor.method({ <managers_prefix>+meteorCallDefinition : function that will invoke the
+         * Meteor.method({ <managers_prefix>+meteorCallDefinition : generated meteor  function that will invoke the
          * manager stubName function with this set to the manager instance );
-         * @param meteorCallDefinition
+         *
+         * @param meteorCallDefinitionParam could be an empty object if the meteor call was just specified with a string
+         * @param meteorCallNameSuffix : the name of the Meteor method. To make the meteor method name globally unique, the Manager.callPrefix is prepended
          */
-        createMeteorCallMethod : function(meteorCallDefinition, meteorCallNameSuffix) {
-            var that = this;
+        createMeteorCallMethod : function(meteorCallDefinitionParam, meteorCallNameSuffix) {
             var thatManager = this;
-            var trackingEventKey;
-            var meteorCallNameSuffix;
-            var permissionCheck;
-            var trackingEventKey = meteorCallDefinition.trackingEventKey;
-            var permissions = meteorCallDefinition.permissionCheck;
-            var callName = this.getMeteorCallName(meteorCallNameSuffix);
+            if ( meteorCallNameSuffix == null) {
+                throw new Meteor.Error(500, thatManager.toString() +" 'meteorCallNameSuffix' is null or undefined");
+            }
             var methods = {};
+            var callName = this.getMeteorCallName(meteorCallNameSuffix);
+            var meteorCallDefinition;
+            var methodFunction;
             // make sure that the subclass manager is bound as the 'this' parameter when the Meteor
             // method is called.
-            if ( typeof(that[meteorCallNameSuffix]) !== "function") {
+            if ( thatManager[meteorCallNameSuffix] == null || typeof thatManager[meteorCallNameSuffix] === 'object' ) {
+                // additional method definitions is separate from the array of client
+                meteorCallDefinition = _.extend({}, meteorCallDefinitionParam, thatManager[meteorCallNameSuffix]);
+                // the method function can be supplied in the definition : { method:<function> } or {method: 'methodName' }
+                // or not at all in which case it will default to
+                var methodFunctionObj = meteorCallDefinition.fn;
+                if ( methodFunctionObj == null ) {
+                    var methodFunctionObj = meteorCallNameSuffix+'Method';
+                    if ( typeof thatManager[methodFunctionObj] !== 'function' ) {
+                        throw new Meteor.Error(500, callName+ ": no '.method' in Meteor.method definition and default Meteor.method '"+methodFunctionObj+"' is not present.");
+                    } else {
+                        methodFunction = thatManager[methodFunctionObj];
+                    }
+                } else if ( typeof methodFunctionObj === 'string') {
+                    if ( typeof thatManager[methodFunctionObj] !== 'function' ) {
+                        throw new Meteor.Error(500, callName+ ": '.method' in Meteor.method definition '"+methodFunctionObj+"' is not present.");
+                    } else {
+                        methodFunction = thatManager[methodFunctionObj];
+                    }
+                } else if (typeof methodFunctionObj === 'function'){
+                    methodFunction = methodFunctionObj;
+                } else {
+                    // TODO: display better
+                    throw new Meteor.Error(500, thatManager.toString() +"."+meteorCallNameSuffix+".method is not a function");
+                }
+            } else if ( typeof(thatManager[meteorCallNameSuffix]) === "function") {
+                // old way of doing things.
+                methodFunction = thatManager[meteorCallNameSuffix];
+                meteorCallDefinition = _.extend({}, meteorCallDefinitionParam, _.pick(thatManager[meteorCallNameSuffix], 'permissionCheck'));
+            } else {
                 // TODO: display better
-                throw new Meteor.Error(500, that.toString() +"."+meteorCallNameSuffix+" is not a function");
+                throw new Meteor.Error(500, thatManager.toString() +"."+meteorCallNameSuffix+" is not a function or an object");
             }
-            var method = that[meteorCallNameSuffix].bind(that);
-            permissionCheck = permissionCheck || that[meteorCallNameSuffix].permissionCheck;
+            var trackingEventKey = meteorCallDefinition.trackingEventKey;
+            var permissionCheck = meteorCallDefinition.permissionCheck;
+            // bind to thatManager so that the function handling the Meteor.call() has a (very) useful 'this'
+            var meteorMethodFunctionBoundToManager = methodFunction.bind(thatManager);
             if (permissionCheck == null) {
-                console.log("warning: Method has no permissionCheck defined for " + callName);
+                thatManager.log("warning: Method has no permissionCheck defined for " + callName);
 //                throw new Meteor.Error(500, "Method has no permissionCheck defined for " + callName);
-                methods[callName] = method;
+                methods[callName] = meteorMethodFunctionBoundToManager;
             } else if (_.contains(permissionCheck, 'public') || permissionCheck == 'public') {
-                methods[callName] = method;
+                methods[callName] = meteorMethodFunctionBoundToManager;
             } else {
                 methods[callName] = thatManager._wrapMethodWithPermittedRoles(
-                        method,
+                    meteorMethodFunctionBoundToManager,
                         permissionCheck,
                         callName
                 );
             }
+            // Now do the Meteor.method definition
             Meteor.methods(methods);
         },
 
