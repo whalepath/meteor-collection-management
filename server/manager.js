@@ -6,20 +6,13 @@ Meteor.startup(function() {
          * manager stubName function with this set to the manager instance );
          * @param meteorCallDefinition
          */
-        createMeteorCallMethod : function(meteorCallDefinition) {
+        createMeteorCallMethod : function(meteorCallDefinition, meteorCallNameSuffix) {
             var that = this;
             var trackingEventKey;
             var meteorCallNameSuffix;
             var permittedRoles;
-            if ( meteorCallDefinition == null) {
-                return;
-            } else if ( typeof(meteorCallDefinition) === "string") {
-                meteorCallNameSuffix = meteorCallDefinition;
-            } else {
-                meteorCallNameSuffix = meteorCallDefinition.callName;
-                trackingEventKey = meteorCallDefinition.trackingEventKey;
-                permittedRoles = meteorCallDefinition.permittedRoles;
-            }
+            var trackingEventKey = meteorCallDefinition.trackingEventKey;
+            var permittedRoles = meteorCallDefinition.permittedRoles;
             var callName = this.getMeteorCallName(meteorCallNameSuffix);
             var methods = {};
             // make sure that the subclass manager is bound as the 'this' parameter when the Meteor

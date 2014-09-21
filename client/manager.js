@@ -6,18 +6,12 @@ Meteor.startup(function() {
          * To handle return results, the *last* argument should be a callback function ( function(error, results) )
          * @param meteorCallDefinition
          */
-        createMeteorCallMethod : function(meteorCallDefinition) {
+        createMeteorCallMethod : function(meteorCallDefinition, meteorCallNameSuffix) {
             var thatManager = this;
             var trackingEventKey;
-            if ( typeof(meteorCallDefinition) == "undefined" || meteorCallDefinition ==null) {
-                return;
-            } else if ( typeof(meteorCallDefinition) === "object") {
-                meteorCallNameSuffix = meteorCallDefinition.callName;
+            if ( typeof(meteorCallDefinition) === "object") {
                 trackingEventKey = meteorCallDefinition.trackingEventKey;
                 trackingEventData = meteorCallDefinition.trackingEventData
-            } else {
-                // assumed meteorCallDefinition is string
-                meteorCallNameSuffix = meteorCallDefinition;
             }
             var meteorCallName = this.getMeteorCallName(meteorCallNameSuffix);
             // Create the client function that will call the server-side function with the same name.
