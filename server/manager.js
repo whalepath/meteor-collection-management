@@ -10,9 +10,9 @@ Meteor.startup(function() {
             var that = this;
             var trackingEventKey;
             var meteorCallNameSuffix;
-            var permittedRoles;
+            var permissionCheck;
             var trackingEventKey = meteorCallDefinition.trackingEventKey;
-            var permittedRoles = meteorCallDefinition.permittedRoles;
+            var permissions = meteorCallDefinition.permissionCheck;
             var callName = this.getMeteorCallName(meteorCallNameSuffix);
             var methods = {};
             // make sure that the subclass manager is bound as the 'this' parameter when the Meteor
@@ -22,22 +22,24 @@ Meteor.startup(function() {
                 throw new Meteor.Error(500, that.toString() +"."+meteorCallNameSuffix+" is not a function");
             }
             var method = that[meteorCallNameSuffix].bind(that);
-            permittedRoles = permittedRoles || that[meteorCallNameSuffix].permittedRoles;
-            if (permittedRoles) {
-                if (_.contains(permittedRoles, 'public')
-                    || permittedRoles == 'public') {
+            permissionCheck = permissionCheck || that[meteorCallNameSuffix].permissionCheck;
+            if (permissionCheck) {
+                if (_.contains(permissionCheck, 'public')
+                    || permissionCheck == 'public') {
                     methods[callName] = method;
                 } else {
                     var wrappedMethod = this._wrapMethodWithPermittedRoles(
                         method,
-                        permittedRoles,
+                        permissionCheck,
                         callName
                     );
                     methods[callName] = wrappedMethod;
                 }
             } else {
                 // Require permissions to be defined
-                throw new Meteor.Error(500, "No permittedRoles defined for " + callName);
+                // TODO :
+                console.log("Method has no permissionCheck defined for " + callName);
+//                throw new Meteor.Error(500, "Method has no permissionCheck defined for " + callName);
             }
             Meteor.methods(methods);
         },
@@ -45,13 +47,13 @@ Meteor.startup(function() {
         /**
          * adds permissions
          * @param method the method
-         * @param permittedRoles array of roles
+         * @param permissionCheck array of roles
          */
-        _wrapMethodWithPermittedRoles: function(method, permittedRoles, callName) {
+        _wrapMethodWithPermittedRoles: function(method, permissionCheck, callName) {
             var that = this;
             if ( Roles ) {
                 var wrappedMethod = function () {
-                    if (Roles.userIsInRole(Meteor.user(), permittedRoles)) {
+                    if (Roles.userIsInRole(Meteor.user(), permissionCheck)) {
                         return method.apply(that, arguments);
                     } else {
                         throw new Meteor.Error(403, "Current user not permitted to call " + callName);
@@ -63,11 +65,11 @@ Meteor.startup(function() {
             }
         },
 
-        _wrapCursorWithPermittedRoles: function(cursor, permittedRoles, topicName) {
+        _wrapCursorWithPermittedRoles: function(cursor, permissionCheck, topicName) {
             var that = this;
             if ( Roles ) {
                 var wrappedCursor = function () {
-                    if (Roles.userIsInRole(this.userId, permittedRoles)) {
+                    if (Roles.userIsInRole(this.userId, permissionCheck)) {
                         return cursor.apply(that, arguments);
                     } else {
                         return this.stop();
@@ -121,21 +123,21 @@ Meteor.startup(function() {
             });
 
             var securedCursorFunction;
-            if (meteorTopicCursorFunction.permittedRoles) {
-                if(_.include(meteorTopicCursorFunction.permittedRoles, 'public')
-                   || meteorTopicCursorFunction.permittedRoles == 'public') {
+            if (meteorTopicCursorFunction.permissionCheck) {
+                if(_.include(meteorTopicCursorFunction.permissionCheck, 'public')
+                   || meteorTopicCursorFunction.permissionCheck == 'public') {
                     thatManager.log(meteorTopicName, 'is public');
                     securedCursorFunction = meteorTopicCursorFunction;
                 } else {
                     thatManager.log(meteorTopicName, 'is secured');
                     securedCursorFunction = this._wrapCursorWithPermittedRoles(
                         meteorTopicCursorFunction,
-                        meteorTopicCursorFunction.permittedRoles,
+                        meteorTopicCursorFunction.permissionCheck,
                         meteorTopicName
                     );
                 }
             } else {
-                thatManager.log("Topic ", meteorTopicName, 'has no permittedRoles');
+                thatManager.log("Topic ", meteorTopicName, ' has no permissionCheck');
                 securedCursorFunction = meteorTopicCursorFunction;
             }
 
