@@ -73,7 +73,7 @@ Meteor.startup(function() {
                     }
                 };
             } else {
-                throw new Meteor.Error(500, thatManager.toString(), ".", meteorCallNameSuffix, " has a permission check that is not a function or the string 'public'" );
+                throw new Meteor.Error(500, thatManager.toString()+ "."+ meteorCallNameSuffix+ " has a permission check ("+permissionCheck+") that is not a function or the string 'public'" );
             }
             // Now do the Meteor.method definition
             Meteor.methods(methods);
