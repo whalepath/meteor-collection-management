@@ -64,7 +64,18 @@ Meteor.startup(function() {
                 methods[callName] = meteorMethodFunctionBoundToManager;
             } else if ( typeof permissionCheck === 'function' ) {
                 methods[callName] = function() {
-                    if (permissionCheck()) {
+                    if (permissionCheck(this.userId)) {
+                        return meteorMethodFunctionBoundToManager.apply(arguments);
+                    } else {
+                        debugger;
+                        thatManager.log(403, "Current user not permitted to call " + callName);
+                        throw new Meteor.Error(403, "Current user not permitted to call " + callName);
+                    }
+                };
+            } else if ( Roles ) {
+                // HACK for Daniel and his stock price! - this elseif will be removed!
+                methods[callName] = function() {
+                    if (Roles.userIsInRole(this.userId, permissionCheck)) {
                         return meteorMethodFunctionBoundToManager.apply(arguments);
                     } else {
                         debugger;
