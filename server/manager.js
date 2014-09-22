@@ -62,40 +62,22 @@ Meteor.startup(function() {
                 methods[callName] = meteorMethodFunctionBoundToManager;
             } else if (_.contains(permissionCheck, 'public') || permissionCheck == 'public') {
                 methods[callName] = meteorMethodFunctionBoundToManager;
-            } else {
-                methods[callName] = thatManager._wrapMethodWithPermittedRoles(
-                    meteorMethodFunctionBoundToManager,
-                        permissionCheck,
-                        callName
-                );
-            }
-            // Now do the Meteor.method definition
-            Meteor.methods(methods);
-        },
-
-        /**
-         * adds permissions
-         * @param method the method
-         * @param permissionCheck array of roles
-         */
-        _wrapMethodWithPermittedRoles: function(method, permissionCheck, callName) {
-            var thatManager = this;
-            if ( Roles ) {
-                var wrappedMethod = function () {
-                    if (Roles.userIsInRole(Meteor.user(), permissionCheck)) {
-                        return method.apply(that, arguments);
+            } else if ( typeof permissionCheck === 'function' ) {
+                methods[callName] = function() {
+                    if (permissionCheck()) {
+                        return meteorMethodFunctionBoundToManager.apply(arguments);
                     } else {
                         debugger;
                         thatManager.log(403, "Current user not permitted to call " + callName);
                         throw new Meteor.Error(403, "Current user not permitted to call " + callName);
                     }
                 };
-                return wrappedMethod;
             } else {
-                return method;
+                throw new Meteor.Error(500, thatManager.toString(), ".", meteorCallNameSuffix, " has a permission check that is not a function or the string 'public'" );
             }
+            // Now do the Meteor.method definition
+            Meteor.methods(methods);
         },
-
         _wrapCursorWithPermittedRoles: function(cursor, permissionCheck, topicName) {
             var that = this;
             if ( Roles ) {
