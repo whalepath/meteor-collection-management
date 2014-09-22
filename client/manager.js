@@ -83,7 +83,7 @@ Meteor.startup(function() {
                 // no cursor function on client, means a hand-crafted meteorTopic with self.added() and such calls.
                 // create the receiving collection on the client side (with a unique name)
                 var meteorTopicTableName = thatManager.getMeteorTopicTableName(meteorTopicSuffix);
-                thatManager.log(meteorTopicName+": supplying default custom client meteorTopic function, temporary databaseTable is named:"+meteorTopicTableName);
+                thatManager.log(meteorTopicName+": supplying default custom client meteorTopic function, and client-side-only databaseTable named:"+meteorTopicTableName, " to hold the results.");
                 thatManager[meteorTopicTableName] = new Meteor.Collection(meteorTopicTableName);
                 // create the expected cursor function - that does no selection.
                 thatManager[meteorTopicSuffix+'Cursor'] = meteorTopicCursorFunction = function() {
@@ -92,7 +92,7 @@ Meteor.startup(function() {
                     var results = thatManager[meteorTopicTableName].find();
                     return results;
                 };
-                }
+            }
             // TODO: for some subscriptions ( i.e. currentHuman ) no arguments - the handle
             // should be saved on the manager so that we don't have multiple subscribes/unsubscribes
             //
