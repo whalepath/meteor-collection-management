@@ -28,7 +28,7 @@ Package.onUse(function (api) {
 });
 
 Package.onTest(function (api) {
-    api.use(['meteor-collection-management', 'tinytest', 'test-helpers']);
+    api.use(['patmoore:meteor-collection-management', 'tinytest', 'test-helpers']);
     api.addFiles('tests/dbobject-test.js', ['client', 'server']);
     api.addFiles('tests/enums-test.js', ['client', 'server']);
 });
