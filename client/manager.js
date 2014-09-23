@@ -10,11 +10,12 @@ Meteor.startup(function() {
         createMeteorCallMethod : function(meteorCallDefinition, meteorCallNameSuffix) {
             var thatManager = this;
             var trackingEventKey;
+            var trackingEventData;
+            var meteorCallName = this.getMeteorCallName(meteorCallNameSuffix);
             if ( typeof(meteorCallDefinition) === "object") {
                 trackingEventKey = meteorCallDefinition.trackingEventKey;
-                trackingEventData = meteorCallDefinition.trackingEventData
+                trackingEventData = meteorCallDefinition.trackingEventData;
             }
-            var meteorCallName = this.getMeteorCallName(meteorCallNameSuffix);
             // Create the client function that will call the server-side function with the same name.
             // This allows code to be location agnostic: if the outside code is running on the client: the Meteor call will happen,
             // if it is running on the server - the call will be a direct javascript call.
