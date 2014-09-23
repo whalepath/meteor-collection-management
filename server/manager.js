@@ -76,7 +76,7 @@ Meteor.startup(function() {
                 // HACK for Daniel and his stock price! - this elseif will be removed!
                 methods[callName] = function() {
                     if (Roles.userIsInRole(this.userId, permissionCheck)) {
-                        return meteorMethodFunctionBoundToManager.apply(arguments);
+                        return meteorMethodFunctionBoundToManager.apply(thatManager, arguments);
                     } else {
                         debugger;
                         thatManager.log(403, "Current user not permitted to call " + callName);
