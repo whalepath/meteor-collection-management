@@ -1,4 +1,5 @@
 Meteor.startup(function() {
+    'use strict';
     _.extend(ManagerType.prototype, {
         /**
          * Create the Meteor call stubs for the client.

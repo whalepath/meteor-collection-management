@@ -1,4 +1,5 @@
 Meteor.startup(function() {
+    'use strict';
     _.extend(ManagerType.prototype, {
         /**
          * create the Meteor.method hook:
