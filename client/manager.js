@@ -1,4 +1,5 @@
 Meteor.startup(function() {
+    'use strict';
     _.extend(ManagerType.prototype, {
         /**
          * Create the Meteor call stubs for the client.
@@ -9,11 +10,12 @@ Meteor.startup(function() {
         createMeteorCallMethod : function(meteorCallDefinition, meteorCallNameSuffix) {
             var thatManager = this;
             var trackingEventKey;
+            var trackingEventData;
+            var meteorCallName = this.getMeteorCallName(meteorCallNameSuffix);
             if ( typeof(meteorCallDefinition) === "object") {
                 trackingEventKey = meteorCallDefinition.trackingEventKey;
-                trackingEventData = meteorCallDefinition.trackingEventData
+                trackingEventData = meteorCallDefinition.trackingEventData;
             }
-            var meteorCallName = this.getMeteorCallName(meteorCallNameSuffix);
             // Create the client function that will call the server-side function with the same name.
             // This allows code to be location agnostic: if the outside code is running on the client: the Meteor call will happen,
             // if it is running on the server - the call will be a direct javascript call.
@@ -83,7 +85,7 @@ Meteor.startup(function() {
                 // no cursor function on client, means a hand-crafted meteorTopic with self.added() and such calls.
                 // create the receiving collection on the client side (with a unique name)
                 var meteorTopicTableName = thatManager.getMeteorTopicTableName(meteorTopicSuffix);
-                thatManager.log(meteorTopicName+": supplying default custom client meteorTopic function, temporary databaseTable is named:"+meteorTopicTableName);
+                thatManager.log(meteorTopicName+": supplying default custom client meteorTopic function, and client-side-only databaseTable named:"+meteorTopicTableName, " to hold the results.");
                 thatManager[meteorTopicTableName] = new Meteor.Collection(meteorTopicTableName);
                 // create the expected cursor function - that does no selection.
                 thatManager[meteorTopicSuffix+'Cursor'] = meteorTopicCursorFunction = function() {
@@ -92,7 +94,7 @@ Meteor.startup(function() {
                     var results = thatManager[meteorTopicTableName].find();
                     return results;
                 };
-                }
+            }
             // TODO: for some subscriptions ( i.e. currentHuman ) no arguments - the handle
             // should be saved on the manager so that we don't have multiple subscribes/unsubscribes
             //

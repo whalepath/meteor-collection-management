@@ -2,6 +2,7 @@
 // this works but can we use a global hook that for a given route does a universal lookup.
 if ( Router != null) {
     function oneFn() {
+        'use strict';
         var result;
         if (typeof this.findOne === 'function' ) {
             // mcm handles
@@ -19,6 +20,7 @@ if ( Router != null) {
         return result;
     }
     function manyFn() {
+        'use strict';
         var result;
         if (typeof this.findFetch === 'function' ) {
             // mcm handles
@@ -39,6 +41,7 @@ if ( Router != null) {
      * @returns {{}}
      */
     Template.prototype.data = function() {
+        'use strict';
         var initializeData;
         if ( this.route != null) {
             //we are being called by the iron:router code
@@ -102,6 +105,7 @@ if ( Router != null) {
         }
     };
     Template.prototype.waitOn = function() {
+        'use strict';
         var initializeData;
         if ( this.route != null) {
             //we are being called by the iron:router code
@@ -139,6 +143,7 @@ if ( Router != null) {
     // HACK : Need to put method some place else: different name space?
     // TODO: Be able to use RouteControllers
     Template.prototype._initializeRoutes = function() {
+        'use strict';
         // TODO: This does not work because no routes are defined at this moment
         // need to see if we can hook the route creation.
         _.each(Router.routes, function (route) {
