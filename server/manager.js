@@ -97,7 +97,7 @@ Meteor.startup(function() {
                         return cursor.apply(that, arguments);
                     } else {
                         debugger;
-                        thatManager.log(403, "Current user not permitted to call " + callName);
+                        thatManager.log(403, topicName+":Current user not permitted to subscribe");
                         return this.stop();
                     }
                 };
