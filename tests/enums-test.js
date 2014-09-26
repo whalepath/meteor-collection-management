@@ -50,7 +50,7 @@ Tinytest.add('Meteor Collection Management - enums - auto dbCode', function(test
 Tinytest.add('Meteor Collection Management - enums - toJSONValue/fromJSONValue', function(test) {
     test.equal(TestingEnumFake.one.toJSONValue(), 'one', 'Default DbCode was not initialized.');
     test.equal(TestingEnumFake.three.toJSONValue(), '_three', 'DbCode was not initialized.');
-    var jsonArray = TestingEnumFake.toJSONValue([TestingEnumFake.three, TestingEnumFake.one]);
+    var jsonArray = TestingEnumFake.toJSONValue([TestingEnumFake.three, TestingEnumFake.one, null, void(0)]);
     test.equal(jsonArray,
         ['_three', 'one'],
         'Not handling array.');
