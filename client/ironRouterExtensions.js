@@ -38,7 +38,19 @@ if ( Router != null) {
      * A standard data() that will be called by the Router code to get the template's data.
      * This function will be used by the Router code.
      *
-     * @returns {{}}
+     * Utilizes a user-defined initializeData() function to get the Meteor topics handles (or other data objects)
+     *
+     * initializeData(params) must return:
+     *    { <desired-context-key-1> : { handle: <handle1: some-object-with-ready>, method: <method1:function name to be run on object> },
+     *    <desired-context-key-2> : { handle: <handle2: some-object-with-ready>, method: <method2:function> },
+     *    <desired-context-key-3> : { handle: <handle3: some-object> },
+     *    <desired-context-key-4> : <handle4:some-object> },
+     *
+     * @returns { <desired-context-key-1>: handle1[method1](),
+     *            <desired-context-key-2>: method2.call(handle2),
+     *            <desired-context-key-3> : { handle: <handle3: some-object> },
+     *            <desired-context-key-4> : handle4
+     *          }
      */
     Template.prototype.data = function() {
         'use strict';
