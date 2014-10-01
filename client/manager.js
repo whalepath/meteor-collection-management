@@ -4,7 +4,8 @@ Meteor.startup(function() {
         /**
          * Create the Meteor call stubs for the client.
          * Defines this[meteorCallDefinition] to the call function.
-         * To handle return results, the *last* argument should be a callback function ( function(error, results) )
+         * To handle return results, the *last* argument should be a callback function (
+         * function(error, results) )
          * @param meteorCallDefinition
          */
         createMeteorCallMethod : function(meteorCallDefinition, meteorCallNameSuffix) {
@@ -17,8 +18,9 @@ Meteor.startup(function() {
                 trackingEventData = meteorCallDefinition.trackingEventData;
             }
             // Create the client function that will call the server-side function with the same name.
-            // This allows code to be location agnostic: if the outside code is running on the client: the Meteor call will happen,
-            // if it is running on the server - the call will be a direct javascript call.
+            // This allows code to be location agnostic: if the outside code is running on the
+            // client: the Meteor call will happen, if it is running on the server - the call will
+            // be a direct javascript call.
             thatManager[meteorCallNameSuffix] = function() {
                 var args = Array.prototype.slice.call(arguments);
                 // look for callback function that will be called with the result the server returns.
@@ -37,7 +39,8 @@ Meteor.startup(function() {
                 thatManager.log("calling "+meteorCallName);
                 return Meteor.apply(meteorCallName, args, null, callback);
             };
-            // make the underlying Meteor method name available for Meteor libraries that need to know the Meteor call ( like MeteorFile )
+            // make the underlying Meteor method name available for Meteor libraries that need to
+            // know the Meteor call ( like MeteorFile )
             Object.defineProperties(thatManager[meteorCallNameSuffix], {
                 meteorCallName : {
                     value : meteorCallName,
@@ -48,8 +51,9 @@ Meteor.startup(function() {
         /**
          * Creates a function this[meteorTopicSuffix+'Handle'].
          *
-         * this[meteorTopicSuffix+'Handle'](<Meteor-subscribe-arguments>) will take its arguments, add the correct meteor topic name to the
-         * beginning, and passed the new argument array to the Meteor.subscribe method
+         * this[meteorTopicSuffix+'Handle'](<Meteor-subscribe-arguments>) will take its arguments,
+         * add the correct meteor topic name to the beginning, and passed the new argument array to
+         * the Meteor.subscribe method
          *
          * The handle returned by Meteor.subscribe
          * Also attaches to the returned meteorTopic handle these functions:
