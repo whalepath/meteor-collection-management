@@ -79,10 +79,11 @@ Meteor.startup(function() {
             var meteorTopicCursorFunction = thatManager.getMeteorTopicCursorFunction(meteorTopicSuffix, true);
             if ( meteorTopicCursorFunction == null) {
                 // client has no 'Cursor' function defined. This happens when the server side has a
-                // non-standard topic. For example, a topic that is created with manually with : http://docs.meteor.com/#publish_added
+                // non-standard topic. For example, a topic that is created with manually with :
+                // http://docs.meteor.com/#publish_added
                 // see http://docs.meteor.com/#publishandsubscribe for more info.
-
-                // no cursor function on client, means a hand-crafted meteorTopic with self.added() and such calls.
+                // no cursor function on client, means a hand-crafted meteorTopic with self.added()
+                // and such calls.
                 // create the receiving collection on the client side (with a unique name)
                 var meteorTopicTableName = thatManager.getMeteorTopicTableName(meteorTopicSuffix);
                 thatManager.log(meteorTopicName+": supplying default custom client meteorTopic function, and client-side-only databaseTable named:"+meteorTopicTableName, " to hold the results.");
@@ -119,7 +120,8 @@ Meteor.startup(function() {
 
                 /**
                  *  create a results() function that will return an array of the results.
-                 *  This works by calling the manager's cursor function and passing the same arguments that were passed to the subscribe meteorTopic.
+                 *  This works by calling the manager's cursor function and passing the same
+                 *  arguments that were passed to the subscribe meteorTopic.
                  * @returns undefined if the handle is not ready.
                  */
                 handle.find = handle.cursor = function() {
