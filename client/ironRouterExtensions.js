@@ -1,27 +1,37 @@
 // TODO: put in a pull request to iron-router
 // this works but can we use a global hook that for a given route does a universal lookup.
+
 if ( Router != null) {
     function oneFn() {
         'use strict';
         var result;
+        if ( this == null) {
+            return this;
+        }
         if (typeof this.findOne === 'function' ) {
             // mcm handles
             result = this.findOne();
-        } else if ( typeof this.fetch === 'function') {
+            return result;
+        }
+
+        if ( typeof this.fetch === 'function') {
             // Mongo cursor
             result = this.fetch();
-            if ( result instanceof Array ) {
-                result = result[0];
-            }
         } else {
-//            throw new Meteor.Error(500, "No findOne() or fetch() on supplied 'this'");
+            // something which could be an array
             result = this;
+        }
+        if (_.isArray(result) ) {
+            result = result[0];
         }
         return result;
     }
     function manyFn() {
         'use strict';
         var result;
+        if ( this == null ) {
+            return this;
+        }
         if (typeof this.findFetch === 'function' ) {
             // mcm handles
             result = this.findFetch();
@@ -29,7 +39,7 @@ if ( Router != null) {
             // Mongo cursor
             result = this.fetch();
         } else {
-//            throw new Meteor.Error(500, "No findFetch() or fetch() on supplied 'this'");
+            // maybe do a console.warn ? - but still valid use case if a non-mongo cursor was passed. - just play nice
             result = this;
         }
         return result;
@@ -104,7 +114,7 @@ if ( Router != null) {
                         result[key] = handleObj.method.call(recipientObj);
                         break;
                     default:
-                        throw new Meteor(500, "For key=" + key + ": 'method' is " + typeof handleObj.method + " in handleObj");
+                        throw new Meteor.Error(500, "For key=" + key + ": 'method' is " + typeof handleObj.method + " in handleObj should be function or string");
                         break;
                     }
                 } else if ( isOneKey ) {
@@ -171,11 +181,11 @@ if ( Router != null) {
                         console.log(route.name, " is getting a ", action);
                         route.options[action] = template[action];
                     } else {
-                        console.debug(route.name, " already has a ", action);
+                        console.log(route.name, " already has a ", action);
                     }
                 });
             } else {
-                console.debug(route.name, " has no template");
+                console.log(route.name, " has no template");
             }
         });
     }
