@@ -95,6 +95,7 @@ Meteor.startup(function() {
         },
         _wrapCursorWithPermittedRoles: function(cursor, permissionCheck, topicName) {
             var that = this;
+            var thatManager = this.thatManager;
             if ( Roles ) {
                 var wrappedCursor = function () {
                     if (Roles.userIsInRole(this.userId, permissionCheck)) {
