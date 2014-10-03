@@ -3,11 +3,13 @@ Meteor.startup(function() {
     _.extend(ManagerType.prototype, {
         /**
          * create the Meteor.method hook:
-         * Meteor.method({ <managers_prefix>+meteorCallDefinition : generated meteor  function that will invoke the
-         * manager stubName function with this set to the manager instance );
+         * Meteor.method({ <managers_prefix>+meteorCallDefinition : generated meteor function that
+         * will invoke the manager stubName function with this set to the manager instance );
          *
-         * @param meteorCallDefinitionParam could be an empty object if the meteor call was just specified with a string
-         * @param meteorCallNameSuffix : the name of the Meteor method. To make the meteor method name globally unique, the Manager.callPrefix is prepended
+         * @param meteorCallDefinitionParam could be an empty object if the meteor call was just
+         * specified with a string
+         * @param meteorCallNameSuffix : the name of the Meteor method. To make the meteor method
+         * name globally unique, the Manager.callPrefix is prepended
          */
         createMeteorCallMethod : function(meteorCallDefinitionParam, meteorCallNameSuffix) {
             var thatManager = this;
@@ -23,8 +25,8 @@ Meteor.startup(function() {
             if ( thatManager[meteorCallNameSuffix] == null || typeof thatManager[meteorCallNameSuffix] === 'object' ) {
                 // additional method definitions is separate from the array of client
                 meteorCallDefinition = _.extend({}, meteorCallDefinitionParam, thatManager[meteorCallNameSuffix]);
-                // the method function can be supplied in the definition : { method:<function> } or {method: 'methodName' }
-                // or not at all in which case it will default to
+                // the method function can be supplied in the definition : { method:<function> } or
+                // {method: 'methodName' } or not at all in which case it will default to
                 var methodFunctionObj = meteorCallDefinition.fn;
                 if ( methodFunctionObj == null ) {
                     var methodFunctionObj = meteorCallNameSuffix+'Method';
@@ -55,7 +57,8 @@ Meteor.startup(function() {
             }
             var trackingEventKey = meteorCallDefinition.trackingEventKey;
             var permissionCheck = meteorCallDefinition.permissionCheck;
-            // bind to thatManager so that the function handling the Meteor.call() has a (very) useful 'this'
+            // bind to thatManager so that the function handling the Meteor.call() has a (very)
+            // useful 'this'
             var meteorMethodFunctionBoundToManager = methodFunction.bind(thatManager);
             if (permissionCheck == null) {
                 thatManager.log("warning: Method has no permissionCheck defined for " + callName);
@@ -110,8 +113,11 @@ Meteor.startup(function() {
         /**
          * Creates a Meteor topic with Meteor.publish()
          *
-         * Topic is named manager's callPrefix+'_topic_'+meteorTopicSuffix ( see this.getMeteorTopicName() )
-         * Meteor.publish/subscribe has a useful 'this': access the meteorTopic name, meteorTopic cursor function, and thatManager in the cursor function:
+         * Topic is named manager's callPrefix+'_topic_'+meteorTopicSuffix ( see
+         * this.getMeteorTopicName() )
+
+         * Meteor.publish/subscribe has a useful 'this': access the meteorTopic name, meteorTopic
+         * cursor function, and thatManager in the cursor function:
          *   this.meteorTopicCursorFunction.thatManager - the manager that created this meteorTopic
          *   this.meteorTopicCursorFunction.meteorTopicName - the full meteorTopic name
          *   this.meteorTopicCursorFunction.meteorTopicSuffix - the full meteorTopic name
@@ -207,17 +213,19 @@ Meteor.startup(function() {
     });
     Object.defineProperties(ManagerType.prototype, {
         /**
-         * This is a property so that code in a cursor can look like code elsewhere in the manager code.
-         * (see doc.Meteor.com about this.userId in publish/subscribe functions )
+         * This is a property so that code in a cursor can look like code elsewhere in the manager
+         * code. (see doc.Meteor.com about this.userId in publish/subscribe functions )
          */
         userId : {
             get : function() {
-                // 26 mar 2014 mimics the meteor check in Meteor.userId() to avoid exception being thrown
+                // 26 mar 2014 mimics the meteor check in Meteor.userId() to avoid exception being
+                // thrown
                 var currentInvocation = DDP._CurrentInvocation.get();
                 if ( currentInvocation) {
                     return Meteor.userId();
                 } else {
-                    // return undefined so we can tell difference between "no logged on user" and "we don't know"
+                    // return undefined so we can tell difference between "no logged on user" and
+                    // "we don't know"
                     return void(0);
                 }
             }
