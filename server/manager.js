@@ -214,7 +214,7 @@ Meteor.startup(function() {
     Object.defineProperties(ManagerType.prototype, {
         /**
          * This is a property so that code in a cursor can look like code elsewhere in the manager
-         * code. (see doc.Meteor.com about this.userId in publish/subscribe functions )
+         * code. (see docs.meteor.com about this.userId in publish/subscribe functions )
          */
         userId : {
             get : function() {
