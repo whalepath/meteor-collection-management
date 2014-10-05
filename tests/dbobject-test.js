@@ -172,7 +172,7 @@ if (Meteor.isServer) {
             if(err) {
                 throw err;
             }
-            test.equal(5, indexes.length, 'indexedCollectionTableName must have 3 indexes: _id, indexedField, refField, userId, and fooIds');
+            test.equal(indexes.length, 7, 'indexedCollectionTableName must have indexes: _id, createdAt, lastModifiedAt,indexedField, refField, userId, and fooIds but has '+indexes);
             done();
         }));
     });
@@ -265,24 +265,31 @@ TestUntrustedType = DbObjectType.createSubClass(
 Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted classmethod error conditions', function(test) {
     try {
         TestUntrustedType.prototype.upsertFromUntrusted(null, null, null);
-        test.equal(false, true);
+        test.equal(false, true, 'expected exception to be thrown on TestUntrustedType.prototype.upsertFromUntrusted(null, null, null)');
     }catch( e) {
         test.equal(e instanceof Meteor.Error, true);
     }
     try {
         TestUntrustedType.prototype.upsertFromUntrusted(undefined, undefined, undefined);
-        test.equal(false, true);
+        test.equal(false, true,
+            "expected exception to be thrown on TestUntrustedType.prototype.upsertFromUntrusted(undefined, undefined, undefined)");
     }catch( e) {
         test.equal(e instanceof Meteor.Error, true);
     }
 
-    try {
+    var nothing=
         TestUntrustedType.prototype.upsertFromUntrusted(
             null,
             null,
             {forcedValues: {normalField0: 'forced'}}
         );
-        test.equal(false, true);
+    test.equal(nothing, null,
+        "expected nothing to be returned because nothing done on TestUntrustedType.prototype.upsertFromUntrusted(null,null,{forcedValues: {normalField0: 'forced'}})");
+
+    try {
+        TestUntrustedType.prototype.upsertFromUntrusted({normalField0:'good'}, {}, {forcedValues: {normalField1:'forced'}});
+        test.equal(false, true,
+            "must have specific lookup to do update. expected exception to be thrown on TestUntrustedType.prototype.upsertFromUntrusted({normalField0:'good'}, {}, {forcedValues: normalField1:'forced'})");
     }catch( e) {
         test.equal(e instanceof Meteor.Error, true);
     }
@@ -344,7 +351,7 @@ Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted clas
         null,
         {forcedValues: {normalField0: 'forced'}}
     );
-    test.equal(g.normalField0, 'good', msg);
+    test.equal(g.normalField0, 'forced', msg);
     test.equal(g.normalField1, 'good', msg);
     test.equal(TestUntrustedType.databaseTable.find().count(), 1);
 
@@ -370,10 +377,11 @@ Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted clas
     test.equal(h.normalField0, hOriginal);
     test.equal(TestUntrustedType.databaseTable.find().count(), 2);
 
+    msg = 'looking at db to compare to original';
     g = TestUntrustedType.databaseTable.findOne({_id: g._id });
     h = TestUntrustedType.databaseTable.findOne({_id: h._id });
-    test.equal(g.normalField0, gOriginal);
-    test.equal(h.normalField0, hOriginal);
+    test.equal(g.normalField0, gOriginal, msg);
+    test.equal(h.normalField0, hOriginal, msg);
     test.equal(TestUntrustedType.databaseTable.find().count(), 2);
 
     // TODO(dmr) descr
@@ -425,13 +433,16 @@ Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted inst
     test.equal(TestUntrustedType.databaseTable.find(clientObject0).count(), 0);
 
     // check upsert inserts
-    g = TestUntrustedType.prototype.upsertFromUntrusted(clientObject0);
+    g = new TestUntrustedType(clientObject0);
+    // new instance from client
+    g = g.upsertFromUntrusted();
     // REDUNDANT
     test.equal(TestUntrustedType.databaseTable.find(clientObject0).count(), 1);
 
-    msg = 'update with instance method.'
-    g.upsertFromUntrusted({normalField0: 'bbqz'});
+    msg = 'update with instance method.';
+    g = g.upsertFromUntrusted({normalField0: 'bbqz'});
     test.equal(g.normalField0, 'bbqz', msg);
+
 });
 
 RequiredFieldsType = DbObjectType.createSubClass('testCollectionWithRequiredFields',

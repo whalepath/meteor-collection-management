@@ -27,7 +27,7 @@ Meteor.startup(function() {
                 meteorCallDefinition = _.extend({}, meteorCallDefinitionParam, thatManager[meteorCallNameSuffix]);
                 // the method function can be supplied in the definition : { method:<function> } or
                 // {method: 'methodName' } or not at all in which case it will default to
-                var methodFunctionObj = meteorCallDefinition.fn;
+                var methodFunctionObj = meteorCallDefinition.method;
                 if ( methodFunctionObj == null ) {
                     var methodFunctionObj = meteorCallNameSuffix+'Method';
                     if ( typeof thatManager[methodFunctionObj] !== 'function' ) {
