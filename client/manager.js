@@ -21,24 +21,27 @@ Meteor.startup(function() {
             // This allows code to be location agnostic: if the outside code is running on the
             // client: the Meteor call will happen, if it is running on the server - the call will
             // be a direct javascript call.
-            thatManager[meteorCallNameSuffix] = function() {
-                var args = Array.prototype.slice.call(arguments);
-                // look for callback function that will be called with the result the server returns.
-                var callback;
-                if ( args.length > 0) {
-                    if ( typeof args[args.length-1] == "function") {
-                        callback = args.pop();
-                    } else {
-                        callback = null;
+            Object.defineProperty(thatManager, meteorCallNameSuffix, {
+                value : function() {
+                    var args = Array.prototype.slice.call(arguments);
+                    // look for callback function that will be called with the result the server returns.
+                    var callback;
+                    if (args.length > 0) {
+                        if (typeof args[args.length - 1] == "function") {
+                            callback = args.pop();
+                        } else {
+                            callback = null;
+                        }
                     }
-                }
-                if ( trackingEventKey ) {
-                    // TODO: make 'TrackingManager' less wp specific : maybe a lookup/property etc.
-                    TrackingManager && TrackingManager.track(trackingEventKey);
-                }
-                thatManager.log("calling "+meteorCallName);
-                return Meteor.apply(meteorCallName, args, null, callback);
-            };
+                    if (trackingEventKey) {
+                        // TODO: make 'TrackingManager' less wp specific : maybe a lookup/property etc.
+                        TrackingManager && TrackingManager.track(trackingEventKey);
+                    }
+                    thatManager.log("calling ", meteorCallName);
+                    return Meteor.apply(meteorCallName, args, null, callback);
+                },
+                writable: false
+            });
             // make the underlying Meteor method name available for Meteor libraries that need to
             // know the Meteor call ( like MeteorFile )
             Object.defineProperties(thatManager[meteorCallNameSuffix], {
@@ -80,7 +83,8 @@ Meteor.startup(function() {
         createTopic : function(meteorTopicDefinition, meteorTopicSuffix) {
             var thatManager = this;
             var meteorTopicName = this.getMeteorTopicName(meteorTopicSuffix);
-            var meteorTopicCursorFunction = thatManager.getMeteorTopicCursorFunction(meteorTopicSuffix, true);
+//            var meteorTopicCursorFunction = thatManager.getMeteorTopicCursorFunction(meteorTopicSuffix, true);
+            var meteorTopicCursorFunction = meteorTopicDefinition.cursor;
             if ( meteorTopicCursorFunction == null) {
                 // client has no 'Cursor' function defined. This happens when the server side has a
                 // non-standard topic. For example, a topic that is created with manually with :
@@ -161,7 +165,7 @@ Meteor.startup(function() {
 
                 return handle;
             };
-            thatManager._defineFindFunctionsForTopic(meteorTopicSuffix);
+            thatManager._defineFindFunctionsForTopic(meteorTopicSuffix, meteorTopicCursorFunction);
         }
     });
     Object.defineProperties(ManagerType.prototype, {

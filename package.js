@@ -1,6 +1,6 @@
 Package.describe({
     summary: "Meteor Collection Management",
-    version: "1.0.24",
+    version: "1.1.0",
     git: "https://github.com/whalepath/meteor-collection-management.git"
 });
 
@@ -31,4 +31,5 @@ Package.onTest(function (api) {
     api.use(['patmoore:meteor-collection-management', 'tinytest', 'test-helpers']);
     api.addFiles('tests/dbobject-test.js', ['client', 'server']);
     api.addFiles('tests/enums-test.js', ['client', 'server']);
+    api.addFiles('tests/manager-test.js', ['client', 'server']);
 });
