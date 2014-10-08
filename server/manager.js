@@ -140,6 +140,7 @@ Meteor.startup(function() {
             Object.defineProperties(meteorTopicCursorFunction, {
                 thatManager: {
                     writable: false,
+                    enumerable:false,
                     value: thatManager
                 },
                 meteorTopicName: {
