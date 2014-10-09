@@ -117,7 +117,7 @@ Meteor.startup(function() {
                 thatManager.log("Topic ", meteorTopicName, ' has permissionCheck');
                 securedCursorFunction = function () {
                     if (permissionCheck === 'public' || (_.isFunction(permissionCheck) && permissionCheck(this.userId))) {
-                        return meteorTopicCursorFunction.apply(that, arguments);
+                        return meteorTopicCursorFunction.apply(this, arguments);
                     } else {
                         debugger;
                         thatManager.log(403, meteorTopicName+":Current user not permitted to subscribe");
