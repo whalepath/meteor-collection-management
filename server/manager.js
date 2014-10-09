@@ -42,7 +42,7 @@ Meteor.startup(function() {
                 thatManager.log(callName, " has permission Check");
                 methods[callName] = function() {
                     if (permissionCheck === 'public' || (_.isFunction(permissionCheck) && permissionCheck(this.userId))) {
-                        return meteorMethodFunctionBoundToManager.apply(arguments);
+                        return meteorMethodFunctionBoundToManager.apply(null, arguments);
                     } else {
                         debugger;
                         thatManager.log(403, "Current user not permitted to call " + callName);
