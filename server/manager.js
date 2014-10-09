@@ -40,9 +40,18 @@ Meteor.startup(function() {
                 methods[callName] = meteorMethodFunctionBoundToManager;
             } else if ( typeof permissionCheck === 'function' ) {
                 thatManager.log(callName, " has permission Check");
+                var permissionInfo = {
+                    thatManager: thatManager,
+                    method:callName
+                };
                 methods[callName] = function() {
-                    if (permissionCheck === 'public' || (_.isFunction(permissionCheck) && permissionCheck(this.userId))) {
-                        return meteorMethodFunctionBoundToManager.apply(null, arguments);
+                    var permissionCompleteInfo = _.extend({}, permissionInfo, {
+                        userId: this.userId,
+                        // copy the arguments so that permissionCheck can alter the arguments
+                        args: _.toArray(arguments)
+                    });
+                    if (permissionCheck === 'public' || (_.isFunction(permissionCheck) && permissionCheck(permissionCompleteInfo))){
+                        return meteorMethodFunctionBoundToManager.apply(null, permissionCompleteInfo.args);
                     } else {
                         debugger;
                         thatManager.log(403, "Current user not permitted to call " + callName);
@@ -115,9 +124,18 @@ Meteor.startup(function() {
                 securedCursorFunction = meteorTopicCursorFunction;
             } else {
                 thatManager.log("Topic ", meteorTopicName, ' has permissionCheck');
+                var permissionInfo = {
+                    thatManager: thatManager,
+                    topic:meteorTopicName
+                };
                 securedCursorFunction = function () {
-                    if (permissionCheck === 'public' || (_.isFunction(permissionCheck) && permissionCheck(this.userId))) {
-                        return meteorTopicCursorFunction.apply(this, arguments);
+                    var permissionCompleteInfo = _.extend({}, permissionInfo, {
+                        userId: this.userId,
+                        // copy the arguments so that permissionCheck can alter the arguments
+                        args: _.toArray(arguments)
+                    });
+                    if (permissionCheck === 'public' || (_.isFunction(permissionCheck) && permissionCheck(permissionCompleteInfo))){
+                        return meteorTopicCursorFunction.apply(this, permissionCompleteInfo.args);
                     } else {
                         debugger;
                         thatManager.log(403, meteorTopicName+":Current user not permitted to subscribe");
