@@ -443,6 +443,9 @@ Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted inst
     g = g.upsertFromUntrusted({normalField0: 'bbqz'});
     test.equal(g.normalField0, 'bbqz', msg);
 
+    msg = 'instance method updates receiver.';
+    g.upsertFromUntrusted({normalField0: 'xxxx'});
+    test.equal('xxxx', g.normalField0, msg);
 });
 
 RequiredFieldsType = DbObjectType.createSubClass('testCollectionWithRequiredFields',
