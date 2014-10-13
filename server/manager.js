@@ -19,25 +19,25 @@ Meteor.startup(function() {
             var methods = {};
             var callName = this.getMeteorCallName(meteorCallNameSuffix);
             var methodFunction = meteorCallDefinition.method;
+            var methodFunctionWithManager = function() {
+                this.thatManager = thatManager;
+                return methodFunction.apply(this, arguments);
+            };
             if ( !_.isFunction(methodFunction)) {
                 thatManager.fatal("No method supplied for ",callName);
             }
-            // make sure that the subclass manager is bound as the 'this' parameter when the Meteor
-            // method is called.
+
             var trackingEventKey = meteorCallDefinition.trackingEventKey;
             var permissionCheck = meteorCallDefinition.permissionCheck;
-            // bind to thatManager so that the function handling the Meteor.call() has a (very)
-            // useful 'this'
-            var meteorMethodFunctionBoundToManager = methodFunction.bind(thatManager);
 
             // HACK : permission check needs to be made generic
             if (permissionCheck == null) {
                 thatManager.warn(callName, ": Method has no permissionCheck defined");
-//                throw new Meteor.Error(500, "Method has no permissionCheck defined for " + callName);
-                methods[callName] = meteorMethodFunctionBoundToManager;
+                // throw new Meteor.Error(500, "Method has no permissionCheck defined for " + callName);
+                methods[callName] = methodFunctionWithManager;
             } else if (_.contains(permissionCheck, 'public') || permissionCheck == 'public') {
                 thatManager.log(callName, ": is public method");
-                methods[callName] = meteorMethodFunctionBoundToManager;
+                methods[callName] = methodFunctionWithManager;
             } else if ( typeof permissionCheck === 'function' ) {
                 thatManager.log(callName, " has permission Check");
                 var permissionInfo = {
@@ -50,8 +50,12 @@ Meteor.startup(function() {
                         // copy the arguments so that permissionCheck can alter the arguments
                         args: _.toArray(arguments)
                     });
-                    if (permissionCheck === 'public' || (_.isFunction(permissionCheck) && permissionCheck(permissionCompleteInfo))){
-                        return meteorMethodFunctionBoundToManager.apply(null, permissionCompleteInfo.args);
+                    if (permissionCheck === 'public'
+                        || (_.isFunction(permissionCheck) && permissionCheck(permissionCompleteInfo))){
+                            return methodFunctionWithManager.apply(
+                                this,
+                                permissionCompleteInfo.args
+                            );
                     } else {
                         debugger;
                         thatManager.log(403, "Current user not permitted to call " + callName);
@@ -59,7 +63,11 @@ Meteor.startup(function() {
                     }
                 };
             } else {
-                thatManager.fatal(thatManager.toString()+ "."+ meteorCallNameSuffix+ " has a permission check ("+permissionCheck+") that is not a function or the string 'public'" );
+                thatManager.fatal(
+                    thatManager.toString()+ "."+ meteorCallNameSuffix,
+                    "has a permission check ("+permissionCheck+")",
+                    "that is not a function or the string 'public'"
+                );
             }
             // Now do the Meteor.method definition
             Meteor.methods(methods);
