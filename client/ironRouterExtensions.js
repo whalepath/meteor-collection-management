@@ -179,7 +179,7 @@ if ( Router != null) {
                     // combined?
                     if (typeof route.options[action] === 'undefined') {
                         console.log(route.name, " is getting a ", action);
-                        route.options[action] = template[action];
+                        route.options[action] = Blaze._getTemplateHelper(template, action);
                     } else {
                         console.log(route.name, " already has a ", action);
                     }
