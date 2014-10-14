@@ -162,6 +162,8 @@ if ( Router != null) {
         }
     };
 
+    // HACK Meteor 0.9.5: to avoid warning messages because we have Template.prototype.waitOn/data defined.
+    Template.prototype._NOWARN_OLDSTYLE_HELPERS =true;
     // HACK : Need to put method some place else: different name space?
     // TODO: Be able to use RouteControllers
     Template.prototype._initializeRoutes = function() {
