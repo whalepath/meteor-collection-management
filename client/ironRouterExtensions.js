@@ -162,12 +162,12 @@ if ( Router != null) {
         }
     };
 
-    // HACK Meteor 0.9.5: to avoid warning messages because we have Template.prototype.waitOn/data defined.
-    Template.prototype._NOWARN_OLDSTYLE_HELPERS =true;
     // HACK : Need to put method some place else: different name space?
     // TODO: Be able to use RouteControllers
     Template.prototype._initializeRoutes = function() {
         'use strict';
+        // HACK Meteor 0.9.4: to avoid warning messages because we have Template.prototype.waitOn/data defined.
+        Template.prototype._NOWARN_OLDSTYLE_HELPERS =true;
         // TODO: This does not work because no routes are defined at this moment
         // need to see if we can hook the route creation.
         _.each(Router.routes, function (route) {
@@ -190,6 +190,8 @@ if ( Router != null) {
                 console.log(route.name, " has no template");
             }
         });
+        // HACK Meteor 0.9.4: to avoid warning messages because we have Template.prototype.waitOn/data defined.
+        delete Template.prototype._NOWARN_OLDSTYLE_HELPERS;
     }
 
     // Use these methods in initializeData
