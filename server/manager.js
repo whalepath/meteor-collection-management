@@ -120,6 +120,24 @@ Meteor.startup(function() {
                     writable: false,
                     value: meteorTopicTableName
                 },
+                addedObject: {
+                    writable: false,
+                    value: function(id, fields) {
+                        return this.added(meteorTopicTableName, id, fields);
+                    }
+                },
+                removeObject: {
+                    writable: false,
+                    value: function(id) {
+                        return this.remove(meteorTopicTableName, id);
+                    }
+                },
+                changedObject: {
+                    writable: false,
+                    value: function(id, fields) {
+                        return this.changed(meteorTopicTableName, id, fields);
+                    }
+                }
             });
 
             var securedCursorFunction;
@@ -155,12 +173,37 @@ Meteor.startup(function() {
             // insure that this.ready() is called when the no data is returned. (required for
             // spiderable to work)
             var wrappedFn = function() {
-                // Question: this should be o.k. because we don't have the cursor (this)
-                // reused. (not certain that the topic cursor is not reused)
-                this.meteorTopicCursorFunction = meteorTopicCursorFunction;
-                // so that this.thatManager always return the thatManager on both the client and the
-                // server.
-                this.thatManager = thatManager;
+                Object.defineProperties(this, {
+                    // Question: this should be o.k. because we don't have the cursor (this)
+                    // reused. (not certain that the topic cursor is not reused)
+                    meteorTopicCursorFunction: {
+                        enumerable: false,
+                        writable: false,
+                        value: meteorTopicCursorFunction
+                    },
+                    // so that this.thatManager always return the thatManager on both the client and the
+                    // server.
+                    thatManager: {
+                        enumerable: false,
+                        writable: false,
+                        value: thatManager
+                    },
+                    addedObject: {
+                        enumerable: false,
+                        writable: false,
+                        value: meteorTopicCursorFunction.addedObject
+                    },
+                    removeObject: {
+                        enumerable: false,
+                        writable: false,
+                        value: meteorTopicCursorFunction.removeObject
+                    },
+                    changedObject: {
+                        enumerable: false,
+                        writable: false,
+                        value: meteorTopicCursorFunction.changedObject
+                    }
+                });
                 var returnedValue = securedCursorFunction.apply(this, arguments);
                 if ( returnedValue == null || returnedValue === false) {
                     // required for spiderable to work
