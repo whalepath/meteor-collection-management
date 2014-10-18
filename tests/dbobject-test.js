@@ -264,32 +264,30 @@ TestUntrustedType = DbObjectType.createSubClass(
 
 Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted classmethod error conditions', function(test) {
     try {
-        TestUntrustedType.prototype.upsertFromUntrusted(null, null, null);
-        test.equal(false, true, 'expected exception to be thrown on TestUntrustedType.prototype.upsertFromUntrusted(null, null, null)');
+        TestUntrustedType.prototype.upsertFromUntrusted(null, null);
+        test.equal(false, true, 'expected exception to be thrown on TestUntrustedType.prototype.upsertFromUntrusted(null, null)');
     }catch( e) {
         test.equal(e instanceof Meteor.Error, true);
     }
     try {
-        TestUntrustedType.prototype.upsertFromUntrusted(undefined, undefined, undefined);
+        TestUntrustedType.prototype.upsertFromUntrusted(undefined, undefined);
         test.equal(false, true,
-            "expected exception to be thrown on TestUntrustedType.prototype.upsertFromUntrusted(undefined, undefined, undefined)");
+            "expected exception to be thrown on TestUntrustedType.prototype.upsertFromUntrusted(undefined, undefined)");
     }catch( e) {
         test.equal(e instanceof Meteor.Error, true);
     }
 
     var nothing=
         TestUntrustedType.prototype.upsertFromUntrusted(
-            null,
-            null,
             {forcedValues: {normalField0: 'forced'}}
         );
     test.equal(nothing, null,
-        "expected nothing to be returned because nothing done on TestUntrustedType.prototype.upsertFromUntrusted(null,null,{forcedValues: {normalField0: 'forced'}})");
+        "expected nothing to be returned because nothing done on TestUntrustedType.prototype.upsertFromUntrusted(null,{forcedValues: {normalField0: 'forced'}})");
 
     try {
-        TestUntrustedType.prototype.upsertFromUntrusted({normalField0:'good'}, {}, {forcedValues: {normalField1:'forced'}});
+        TestUntrustedType.prototype.upsertFromUntrusted({normalField0:'good'}, {forcedValues: {normalField1:'forced'}});
         test.equal(false, true,
-            "must have specific lookup to do update. expected exception to be thrown on TestUntrustedType.prototype.upsertFromUntrusted({normalField0:'good'}, {}, {forcedValues: normalField1:'forced'})");
+            "must have specific lookup to do update. expected exception to be thrown on TestUntrustedType.prototype.upsertFromUntrusted({normalField0:'good'}, {forcedValues: normalField1:'forced'})");
     }catch( e) {
         test.equal(e instanceof Meteor.Error, true);
     }
@@ -339,7 +337,7 @@ Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted clas
         normalField1: 'good'
     };
 
-    g = TestUntrustedType.prototype.upsertFromUntrusted(clientObject0, clientObject2);
+    g = TestUntrustedType.prototype.upsertFromUntrusted(clientObject0, {lookup:clientObject2});
     test.equal(g.normalField0, 'good');
     test.equal(g.normalField1, 'good');
     test.equal(TestUntrustedType.databaseTable.find().count(), 1);
@@ -359,7 +357,6 @@ Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted clas
     msg = 'basic forced values insert';
     g = TestUntrustedType.prototype.upsertFromUntrusted(
         clientObject0,
-        null,
         {forcedValues: {normalField0: 'forced'}}
     );
     test.equal(TestUntrustedType.databaseTable.find().count(), 2);
@@ -393,7 +390,7 @@ Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted clas
     test.equal(TestUntrustedType.databaseTable.find().count(), 2, msg);
 
     msg = 'null, query, null';
-    TestUntrustedType.prototype.upsertFromUntrusted(null, clientObject0, null);
+    TestUntrustedType.prototype.upsertFromUntrusted(null, {lookup:clientObject0});
     g = TestUntrustedType.databaseTable.findOne({_id: g._id });
     h = TestUntrustedType.databaseTable.findOne({_id: h._id });
     test.equal(g.normalField0, gOriginal, msg);
@@ -404,8 +401,7 @@ Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted clas
     msg = 'null, lookup, forced';
     TestUntrustedType.prototype.upsertFromUntrusted(
         null,
-        clientObject0,
-        {forcedValues: {normalField0: 'forced'}}
+        {lookup: clientObject0, forcedValues: {normalField0: 'forced'}}
     );
     g = TestUntrustedType.databaseTable.findOne({_id: g._id });
     h = TestUntrustedType.databaseTable.findOne({_id: h._id });
