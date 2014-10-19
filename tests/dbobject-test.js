@@ -1,3 +1,5 @@
+var mcm_dbobj = 'Meteor Collection Management - DbObject - ';
+
 var TEST_COLLECTION_TABLE_NAME = 'testCollectionTableName';
 var EJSON = Package.ejson.EJSON;
 TestCollectionType = DbObjectType.createSubClass('testCollection',
@@ -7,7 +9,7 @@ TestCollectionType = DbObjectType.createSubClass('testCollection',
     ],
     TEST_COLLECTION_TABLE_NAME);
 
-Tinytest.add('Meteor Collection Management - DbObject - _save', function(test) {
+Tinytest.add(mcm_dbobj + '_save', function(test) {
     var t = new TestCollectionType({field1:'value1', field2:'value2'});
     t._save();
     test.isTrue(t._id, 'Id must be set after call to _save: ' + t._id);
@@ -16,7 +18,7 @@ Tinytest.add('Meteor Collection Management - DbObject - _save', function(test) {
     test.equal(t._id, id_value, '_id field is not immutable!');
 });
 
-Tinytest.add('Meteor Collection Management - DbObject - databaseTable', function(test) {
+Tinytest.add(mcm_dbobj + 'databaseTable', function(test) {
     test.isTrue(TestCollectionType.databaseTable, 'Meteor collection wasn\'t initialized.');
     test.isTrue(TestCollectionType.databaseTable instanceof Meteor.Collection, 'databaseTable field is not a meteor collection');
     test.isTrue(TestCollectionType.databaseTable.findById, 'findById method wasn\'t defined on databaseTable');
@@ -106,7 +108,7 @@ var TestCollectionTypeComplex = DbObjectType.createSubClass('testCollectionCompl
 // Yt4aNmoPzSShSmhZw
 // - actual
 // pgqbT4Tmb6W4re9MB
-Tinytest.add('Meteor Collection Management - DbObject - Reference fields', function(test) {
+Tinytest.add(mcm_dbobj + 'Reference fields', function(test) {
     test.isTrue(TestCollectionTypeComplex.databaseTable.findOneByRefField, 'Reference field findOneBy selector wasn\'t created.');
     test.isTrue(TestCollectionTypeComplex.databaseTable.findByRefField, 'Reference field findBy selector wasn\'t created.');
     test.isFalse(TestCollectionTypeComplex.databaseTable.findByNormalField, 'Selector for normal field was created!');
@@ -131,7 +133,7 @@ Tinytest.add('Meteor Collection Management - DbObject - Reference fields', funct
 });
 
 
-Tinytest.add('Meteor Collection Management - DbObject - to/fromJsonValue', function(test) {
+Tinytest.add(mcm_dbobj + 'to/fromJsonValue', function(test) {
     var complex = new TestCollectionTypeComplex({
         sampleForTestEnum0: SampleForTestEnum.one.dbCode,
         sampleForTestEnum1: SampleForTestEnum.one.dbCode,
@@ -164,7 +166,7 @@ if (Meteor.isServer) {
     var t = new IndexedCollection({normalField:'value'});
     t._save();
 
-    Tinytest.addAsync('Meteor Collection Management - DbObject - Indexes', function(test, done) {
+    Tinytest.addAsync(mcm_dbobj + 'Indexes', function(test, done) {
         var table = IndexedCollection.databaseTable;
         var collection = table.getMongoDbCollection();
 
@@ -217,7 +219,7 @@ TestSettablePropertiesType = DbObjectType.createSubClass('testSettableProperties
 // TODO: Since we found a bug in createSubClass's population of
 // propertyNamesClientCanSet, we may want to do more complicated
 // testing of it, since it's pretty important.
-Tinytest.add('Meteor Collection Management - DbObject - createSubClass setting propertyNamesClientCanSet', function(test) {
+Tinytest.add(mcm_dbobj + 'createSubClass setting propertyNamesClientCanSet', function(test) {
     test.equal(TestCollectionTypeComplex.prototype.propertyNamesClientCanSet, ['sampleForTestEnum0','sampleForTestEnum1','sampleForTestEnum2','normalField']);
 
     test.equal(TestSettablePropertiesType.prototype.propertyNamesClientCanSet,
@@ -225,7 +227,7 @@ Tinytest.add('Meteor Collection Management - DbObject - createSubClass setting p
     );
 });
 
-Tinytest.add('Meteor Collection Management - DbObject - safeCopying from client', function(test) {
+Tinytest.add(mcm_dbobj + 'safeCopying from client', function(test) {
     var g = new TestCollectionTypeComplex();
     var clientObject = {
          id:'bad',
@@ -262,7 +264,7 @@ TestUntrustedType = DbObjectType.createSubClass(
     'testUntrustedTableName'
 );
 
-Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted classmethod error conditions',
+Tinytest.add(mcm_dbobj + 'upsertFromUntrusted classmethod error conditions',
 function(test) {
     // TO_PAT: Tinytest has a throws method which works like this. Unfortunately, there's no way to
     // print a message, unless you test by exception message string/regex instead of by class.
@@ -300,7 +302,7 @@ function(test) {
     }
 });
 
-Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted classmethod', function(test) {
+Tinytest.add(mcm_dbobj + 'upsertFromUntrusted classmethod', function(test) {
     // This test assumes we start with a clean db. Is this a mistake?
     // Should we redesign so we don't depend on the db being clean?
     //
@@ -420,7 +422,7 @@ Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted clas
     // multiple objects match the lookup (we can't, but test anyway).
 });
 
-Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted instance method', function(test) {
+Tinytest.add(mcm_dbobj + 'upsertFromUntrusted instance method', function(test) {
     var msg;
     if ( Meteor.isServer )
         TestUntrustedType.databaseTable.remove({});
@@ -459,7 +461,7 @@ RequiredFieldsType = DbObjectType.createSubClass('testCollectionWithRequiredFiel
     ],
     'testCollectionWithRequiredFieldsTable');
 
-Tinytest.add('Meteor Collection Management - DbObject - required fields', function(test) {
+Tinytest.add(mcm_dbobj + 'required fields', function(test) {
     var t = new RequiredFieldsType({field2:'value2'});
     var failed = false;
     try {
@@ -505,7 +507,7 @@ TestOrType = DbObjectType.createSubClass('testOrCollection',
 
 
 //Tinytest.add('MCM - DbObject - no or collision', function(test) {
-Tinytest.add('Meteor Collection Management - DbObject - no or collision', function(test) {
+Tinytest.add(mcm_dbobj + 'no or collision', function(test) {
     if (Meteor.isServer) {
         TestOrType.databaseTable.remove({});
     }
