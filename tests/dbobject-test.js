@@ -264,6 +264,12 @@ TestUntrustedType = DbObjectType.createSubClass(
 
 Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted classmethod error conditions',
 function(test) {
+    // TO_PAT: Tinytest has a throws method which works like this. Unfortunately, there's no way to
+    // print a message, unless you test by exception message string/regex instead of by class.
+    // test.throws(function() {
+    //     TestUntrustedType.prototype.upsertFromUntrusted(null, null);
+    // }, Meteor.Error);
+
     try {
         TestUntrustedType.prototype.upsertFromUntrusted(null, null);
         test.equal(false, true, 'expected exception to be thrown on TestUntrustedType.prototype.upsertFromUntrusted(null, null)');
