@@ -20,7 +20,7 @@ Tinytest.add(mcm_dbobj + '_save', function(test) {
 
 Tinytest.add(mcm_dbobj + 'databaseTable', function(test) {
     test.isTrue(TestCollectionType.databaseTable, 'Meteor collection wasn\'t initialized.');
-    test.isTrue(TestCollectionType.databaseTable instanceof Meteor.Collection, 'databaseTable field is not a meteor collection');
+    test.isTrue(TestCollectionType.databaseTable instanceof Mongo.Collection, 'databaseTable field is not a mongo collection');
     test.isTrue(TestCollectionType.databaseTable.findById, 'findById method wasn\'t defined on databaseTable');
 
     var t = new TestCollectionType({field1:'value1', field2:'value2'});
