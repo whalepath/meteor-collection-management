@@ -262,7 +262,8 @@ TestUntrustedType = DbObjectType.createSubClass(
     'testUntrustedTableName'
 );
 
-Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted classmethod error conditions', function(test) {
+Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted classmethod error conditions',
+function(test) {
     try {
         TestUntrustedType.prototype.upsertFromUntrusted(null, null);
         test.equal(false, true, 'expected exception to be thrown on TestUntrustedType.prototype.upsertFromUntrusted(null, null)');
