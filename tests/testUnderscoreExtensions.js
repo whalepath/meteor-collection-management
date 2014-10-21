@@ -28,8 +28,9 @@ function testDeep() {
     var result;
     result = _.deep(x, 'key1.0.1.key2');
     // result is null
-    result = _.deep(x, 'key1.0.1.key2');
+    result = _.deep(x, 'key1.0.1.key2', 'value');
     // test to make sure the middle things are arrays
+    result = _.deep(x, 'key2.0', 'value');
 }
 
 
