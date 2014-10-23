@@ -5,14 +5,14 @@ Collection manager abstraction for Meteor.
 Meteor-Collection-Management takes Meteor's concept of javascript code that runs on both the client and the server to 
 the next level.
 
-MCM target developers are organizations with:
+MCM target developers are organizations with some of these problems:
 
  1. differing skill levels 
  2. differing levels of involvement with the code - for example some developers may jump in to fix a few items before 
  working on a different project. A prime example is UX/UI designers - who do not have the time or energy
     to understand all the intricacies of proper Meteor development
- 3. a large number of developers
- 4. competent Javascript contractors or summer interns who need to be productive quickly - with minimal learning of Meteor
+ 3. a medium to large number of developers
+ 4. competent Javascript contractors or summer interns who need to be productive quickly with minimal learning of Meteor
  5. Need to audit and provide provable security mechanisms.
  
 MCM focus is on:
@@ -31,6 +31,12 @@ MCM focus is on:
     1. Consistent read/write to/from the database across the wire 
     2. Ability to attach security access rules
     3. Secured fields: secured fields are not modifiable by client.
+    4. Consistent code for client-side only collections
+
+ 4. Cursor/Method security
+
+    1. Security checks can be applied on both the client and the server
+    2. Flexible security checks alter the cursor/method arguments to impose conditions depending on user
 
 
 Subscription/Publish gaps:
