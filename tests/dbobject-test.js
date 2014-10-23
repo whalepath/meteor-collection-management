@@ -1,3 +1,5 @@
+var mcm_dbobj = 'Meteor Collection Management - DbObject - ';
+
 var TEST_COLLECTION_TABLE_NAME = 'testCollectionTableName';
 var EJSON = Package.ejson.EJSON;
 TestCollectionType = DbObjectType.createSubClass('testCollection',
@@ -7,7 +9,7 @@ TestCollectionType = DbObjectType.createSubClass('testCollection',
     ],
     TEST_COLLECTION_TABLE_NAME);
 
-Tinytest.add('Meteor Collection Management - DbObject - _save', function(test) {
+Tinytest.add(mcm_dbobj + '_save', function(test) {
     var t = new TestCollectionType({field1:'value1', field2:'value2'});
     t._save();
     test.isTrue(t._id, 'Id must be set after call to _save: ' + t._id);
@@ -16,9 +18,9 @@ Tinytest.add('Meteor Collection Management - DbObject - _save', function(test) {
     test.equal(t._id, id_value, '_id field is not immutable!');
 });
 
-Tinytest.add('Meteor Collection Management - DbObject - databaseTable', function(test) {
+Tinytest.add(mcm_dbobj + 'databaseTable', function(test) {
     test.isTrue(TestCollectionType.databaseTable, 'Meteor collection wasn\'t initialized.');
-    test.isTrue(TestCollectionType.databaseTable instanceof Meteor.Collection, 'databaseTable field is not a meteor collection');
+    test.isTrue(TestCollectionType.databaseTable instanceof Mongo.Collection, 'databaseTable field is not a mongo collection');
     test.isTrue(TestCollectionType.databaseTable.findById, 'findById method wasn\'t defined on databaseTable');
 
     var t = new TestCollectionType({field1:'value1', field2:'value2'});
@@ -106,7 +108,7 @@ var TestCollectionTypeComplex = DbObjectType.createSubClass('testCollectionCompl
 // Yt4aNmoPzSShSmhZw
 // - actual
 // pgqbT4Tmb6W4re9MB
-Tinytest.add('Meteor Collection Management - DbObject - Reference fields', function(test) {
+Tinytest.add(mcm_dbobj + 'Reference fields', function(test) {
     test.isTrue(TestCollectionTypeComplex.databaseTable.findOneByRefField, 'Reference field findOneBy selector wasn\'t created.');
     test.isTrue(TestCollectionTypeComplex.databaseTable.findByRefField, 'Reference field findBy selector wasn\'t created.');
     test.isFalse(TestCollectionTypeComplex.databaseTable.findByNormalField, 'Selector for normal field was created!');
@@ -131,7 +133,7 @@ Tinytest.add('Meteor Collection Management - DbObject - Reference fields', funct
 });
 
 
-Tinytest.add('Meteor Collection Management - DbObject - to/fromJsonValue', function(test) {
+Tinytest.add(mcm_dbobj + 'to/fromJsonValue', function(test) {
     var complex = new TestCollectionTypeComplex({
         sampleForTestEnum0: SampleForTestEnum.one.dbCode,
         sampleForTestEnum1: SampleForTestEnum.one.dbCode,
@@ -164,7 +166,7 @@ if (Meteor.isServer) {
     var t = new IndexedCollection({normalField:'value'});
     t._save();
 
-    Tinytest.addAsync('Meteor Collection Management - DbObject - Indexes', function(test, done) {
+    Tinytest.addAsync(mcm_dbobj + 'Indexes', function(test, done) {
         var table = IndexedCollection.databaseTable;
         var collection = table.getMongoDbCollection();
 
@@ -217,7 +219,7 @@ TestSettablePropertiesType = DbObjectType.createSubClass('testSettableProperties
 // TODO: Since we found a bug in createSubClass's population of
 // propertyNamesClientCanSet, we may want to do more complicated
 // testing of it, since it's pretty important.
-Tinytest.add('Meteor Collection Management - DbObject - createSubClass setting propertyNamesClientCanSet', function(test) {
+Tinytest.add(mcm_dbobj + 'createSubClass setting propertyNamesClientCanSet', function(test) {
     test.equal(TestCollectionTypeComplex.prototype.propertyNamesClientCanSet, ['sampleForTestEnum0','sampleForTestEnum1','sampleForTestEnum2','normalField']);
 
     test.equal(TestSettablePropertiesType.prototype.propertyNamesClientCanSet,
@@ -225,7 +227,7 @@ Tinytest.add('Meteor Collection Management - DbObject - createSubClass setting p
     );
 });
 
-Tinytest.add('Meteor Collection Management - DbObject - safeCopying from client', function(test) {
+Tinytest.add(mcm_dbobj + 'safeCopying from client', function(test) {
     var g = new TestCollectionTypeComplex();
     var clientObject = {
          id:'bad',
@@ -262,40 +264,44 @@ TestUntrustedType = DbObjectType.createSubClass(
     'testUntrustedTableName'
 );
 
-Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted classmethod error conditions', function(test) {
+Tinytest.add(mcm_dbobj + 'upsertFromUntrusted classmethod error conditions', function(test) {
+    // TO_PAT: Tinytest has a throws method which works like this. Unfortunately, there's no way to
+    // print a message, unless you test by exception message string/regex instead of by class.
+    // test.throws(function() {
+    //     TestUntrustedType.prototype.upsertFromUntrusted(null, null);
+    // }, Meteor.Error);
+
     try {
-        TestUntrustedType.prototype.upsertFromUntrusted(null, null, null);
-        test.equal(false, true, 'expected exception to be thrown on TestUntrustedType.prototype.upsertFromUntrusted(null, null, null)');
+        TestUntrustedType.prototype.upsertFromUntrusted(null, null);
+        test.equal(false, true, 'expected exception to be thrown on TestUntrustedType.prototype.upsertFromUntrusted(null, null)');
     }catch( e) {
         test.equal(e instanceof Meteor.Error, true);
     }
     try {
-        TestUntrustedType.prototype.upsertFromUntrusted(undefined, undefined, undefined);
+        TestUntrustedType.prototype.upsertFromUntrusted(undefined, undefined);
         test.equal(false, true,
-            "expected exception to be thrown on TestUntrustedType.prototype.upsertFromUntrusted(undefined, undefined, undefined)");
+            "expected exception to be thrown on TestUntrustedType.prototype.upsertFromUntrusted(undefined, undefined)");
     }catch( e) {
         test.equal(e instanceof Meteor.Error, true);
     }
 
     var nothing=
         TestUntrustedType.prototype.upsertFromUntrusted(
-            null,
-            null,
             {forcedValues: {normalField0: 'forced'}}
         );
     test.equal(nothing, null,
-        "expected nothing to be returned because nothing done on TestUntrustedType.prototype.upsertFromUntrusted(null,null,{forcedValues: {normalField0: 'forced'}})");
+        "expected nothing to be returned because nothing done on TestUntrustedType.prototype.upsertFromUntrusted(null,{forcedValues: {normalField0: 'forced'}})");
 
     try {
-        TestUntrustedType.prototype.upsertFromUntrusted({normalField0:'good'}, {}, {forcedValues: {normalField1:'forced'}});
+        TestUntrustedType.prototype.upsertFromUntrusted({normalField0:'good'}, {forcedValues: {normalField1:'forced'}});
         test.equal(false, true,
-            "must have specific lookup to do update. expected exception to be thrown on TestUntrustedType.prototype.upsertFromUntrusted({normalField0:'good'}, {}, {forcedValues: normalField1:'forced'})");
+            "must have specific lookup to do update. expected exception to be thrown on TestUntrustedType.prototype.upsertFromUntrusted({normalField0:'good'}, {forcedValues: normalField1:'forced'})");
     }catch( e) {
         test.equal(e instanceof Meteor.Error, true);
     }
 });
 
-Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted classmethod', function(test) {
+Tinytest.add(mcm_dbobj + 'upsertFromUntrusted classmethod', function(test) {
     // This test assumes we start with a clean db. Is this a mistake?
     // Should we redesign so we don't depend on the db being clean?
     //
@@ -339,7 +345,7 @@ Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted clas
         normalField1: 'good'
     };
 
-    g = TestUntrustedType.prototype.upsertFromUntrusted(clientObject0, clientObject2);
+    g = TestUntrustedType.prototype.upsertFromUntrusted(clientObject0, {lookup:clientObject2});
     test.equal(g.normalField0, 'good');
     test.equal(g.normalField1, 'good');
     test.equal(TestUntrustedType.databaseTable.find().count(), 1);
@@ -359,7 +365,6 @@ Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted clas
     msg = 'basic forced values insert';
     g = TestUntrustedType.prototype.upsertFromUntrusted(
         clientObject0,
-        null,
         {forcedValues: {normalField0: 'forced'}}
     );
     test.equal(TestUntrustedType.databaseTable.find().count(), 2);
@@ -393,7 +398,7 @@ Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted clas
     test.equal(TestUntrustedType.databaseTable.find().count(), 2, msg);
 
     msg = 'null, query, null';
-    TestUntrustedType.prototype.upsertFromUntrusted(null, clientObject0, null);
+    TestUntrustedType.prototype.upsertFromUntrusted(null, {lookup:clientObject0});
     g = TestUntrustedType.databaseTable.findOne({_id: g._id });
     h = TestUntrustedType.databaseTable.findOne({_id: h._id });
     test.equal(g.normalField0, gOriginal, msg);
@@ -404,8 +409,7 @@ Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted clas
     msg = 'null, lookup, forced';
     TestUntrustedType.prototype.upsertFromUntrusted(
         null,
-        clientObject0,
-        {forcedValues: {normalField0: 'forced'}}
+        {lookup: clientObject0, forcedValues: {normalField0: 'forced'}}
     );
     g = TestUntrustedType.databaseTable.findOne({_id: g._id });
     h = TestUntrustedType.databaseTable.findOne({_id: h._id });
@@ -417,7 +421,7 @@ Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted clas
     // multiple objects match the lookup (we can't, but test anyway).
 });
 
-Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted instance method', function(test) {
+Tinytest.add(mcm_dbobj + 'upsertFromUntrusted instance method', function(test) {
     var msg;
     if ( Meteor.isServer )
         TestUntrustedType.databaseTable.remove({});
@@ -443,6 +447,9 @@ Tinytest.add('Meteor Collection Management - DbObject - upsertFromUntrusted inst
     g = g.upsertFromUntrusted({normalField0: 'bbqz'});
     test.equal(g.normalField0, 'bbqz', msg);
 
+    msg = 'instance method updates receiver.';
+    g.upsertFromUntrusted({normalField0: 'xxxx'});
+    test.equal('xxxx', g.normalField0, msg);
 });
 
 RequiredFieldsType = DbObjectType.createSubClass('testCollectionWithRequiredFields',
@@ -453,7 +460,7 @@ RequiredFieldsType = DbObjectType.createSubClass('testCollectionWithRequiredFiel
     ],
     'testCollectionWithRequiredFieldsTable');
 
-Tinytest.add('Meteor Collection Management - DbObject - required fields', function(test) {
+Tinytest.add(mcm_dbobj + 'required fields', function(test) {
     var t = new RequiredFieldsType({field2:'value2'});
     var failed = false;
     try {
@@ -499,7 +506,7 @@ TestOrType = DbObjectType.createSubClass('testOrCollection',
 
 
 //Tinytest.add('MCM - DbObject - no or collision', function(test) {
-Tinytest.add('Meteor Collection Management - DbObject - no or collision', function(test) {
+Tinytest.add(mcm_dbobj + 'no or collision', function(test) {
     if (Meteor.isServer) {
         TestOrType.databaseTable.remove({});
     }

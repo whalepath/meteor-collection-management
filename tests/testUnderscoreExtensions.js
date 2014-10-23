@@ -23,5 +23,15 @@ function test3() {
     _.pickRequired({o1: true, o2:true, o3 : true}, [], ['o1', 'o2', 'o3']);
 }
 
+function testDeep() {
+    var x = null;
+    var result;
+    result = _.deep(x, 'key1.0.1.key2');
+    // result is null
+    result = _.deep(x, 'key1.0.1.key2', 'value');
+    // test to make sure the middle things are arrays
+    result = _.deep(x, 'key2.0', 'value');
+}
+
 
 

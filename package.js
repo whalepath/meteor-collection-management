@@ -28,7 +28,9 @@ Package.onUse(function (api) {
 });
 
 Package.onTest(function (api) {
-    api.use(['patmoore:meteor-collection-management', 'tinytest', 'test-helpers']);
+    // TO_PAT: not sure what this is about, but it breaks the test server
+    //api.use(['patmoore:meteor-collection-management', 'tinytest', 'test-helpers']);
+    api.use(['meteor-collection-management', 'tinytest', 'test-helpers']);
     api.addFiles('tests/dbobject-test.js', ['client', 'server']);
     api.addFiles('tests/enums-test.js', ['client', 'server']);
     api.addFiles('tests/manager-test.js', ['client', 'server']);
