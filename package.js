@@ -1,6 +1,6 @@
 Package.describe({
     summary: "Meteor Collection Management",
-    version: "1.1.3",
+    version: "1.1.10",
     git: "https://github.com/patmoore/meteor-collection-management.git"
 });
 
