@@ -36,10 +36,8 @@ Meteor.startup(function() {
                 // throw new Meteor.Error(500, "Method has no permissionCheck defined for " + callName);
                 methods[callName] = methodFunctionWithManager;
             } else if (_.contains(permissionCheck, 'public') || permissionCheck == 'public') {
-                thatManager.log(callName, ": is public method");
                 methods[callName] = methodFunctionWithManager;
             } else if ( typeof permissionCheck === 'function' ) {
-                thatManager.log(callName, " has permission Check");
                 var permissionInfo = {
                     thatManager: thatManager,
                     method:callName
@@ -146,10 +144,8 @@ Meteor.startup(function() {
                 thatManager.warn("Topic ", meteorTopicName, ' has no permissionCheck');
                 securedCursorFunction = meteorTopicCursorFunction;
             } else if(_.contains(permissionCheck, 'public') || permissionCheck == 'public') {
-                thatManager.log(meteorTopicName, 'is public');
                 securedCursorFunction = meteorTopicCursorFunction;
             } else {
-                thatManager.log("Topic ", meteorTopicName, ' has permissionCheck');
                 var permissionInfo = {
                     thatManager: thatManager,
                     topic:meteorTopicName
