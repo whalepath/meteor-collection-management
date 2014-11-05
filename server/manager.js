@@ -49,11 +49,18 @@ Meteor.startup(function() {
                         args: _.toArray(arguments)
                     });
                     if (permissionCheck === 'public'
-                        || (_.isFunction(permissionCheck) && permissionCheck(permissionCompleteInfo))){
-                            return methodFunctionWithManager.apply(
-                                this,
-                                permissionCompleteInfo.args
-                            );
+                      || (_.isFunction(permissionCheck) && permissionCheck(permissionCompleteInfo))){
+                        return methodFunctionWithManager.apply(this, permissionCompleteInfo.args);
+                    } else if ( _.isArray(permissionCheck)) {
+                        for(var i =0 ; i < permissionCheck.length; i++) {
+                            if ( !permissionCheck[i] || !_.isFunction(permissionCheck[i]) || !permissionCheck[i](permissionCompleteInfo)) {
+                                // failed permission check
+                                debugger;
+                                thatManager.log(403, "Current user not permitted to call " + callName);
+                                return this.stop();
+                            }
+                        }
+                        return methodFunctionWithManager.apply(this, permissionCompleteInfo.args);
                     } else {
                         debugger;
                         thatManager.log(403, "Current user not permitted to call " + callName);
@@ -157,6 +164,16 @@ Meteor.startup(function() {
                         args: _.toArray(arguments)
                     });
                     if (permissionCheck === 'public' || (_.isFunction(permissionCheck) && permissionCheck(permissionCompleteInfo))){
+                        return meteorTopicCursorFunction.apply(this, permissionCompleteInfo.args);
+                    } else if ( _.isArray(permissionCheck)) {
+                        for(var i =0 ; i < permissionCheck.length; i++) {
+                            if ( !permissionCheck[i] || !_.isFunction(permissionCheck[i]) || !permissionCheck[i](permissionCompleteInfo)) {
+                                // failed permission check
+                                debugger;
+                                thatManager.log(403, meteorTopicName+":Current user not permitted to subscribe");
+                                return this.stop();
+                            }
+                        }
                         return meteorTopicCursorFunction.apply(this, permissionCompleteInfo.args);
                     } else {
                         debugger;
