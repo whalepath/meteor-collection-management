@@ -166,7 +166,8 @@ if ( Router != null) {
     // TODO: Be able to use RouteControllers
     Template.prototype._initializeRoutes = function() {
         'use strict';
-        // HACK Meteor 0.9.4: to avoid warning messages because we have Template.prototype.waitOn/data defined.
+        // HACK Meteor 0.9.4: to avoid warning messages because we have
+        // Template.prototype.waitOn/data defined.
         Template.prototype._NOWARN_OLDSTYLE_HELPERS =true;
         // TODO: This does not work because no routes are defined at this moment
         // need to see if we can hook the route creation.
@@ -180,17 +181,18 @@ if ( Router != null) {
                     // maybe in future merge Router.xx() and Template.xx() so that the results are
                     // combined?
                     if (typeof route.options[action] === 'undefined') {
-                        console.log(route.name, " is getting a ", action);
+                        console.log(route.getName(), " is getting a ", action);
                         route.options[action] = Blaze._getTemplateHelper(template, action);
                     } else {
-                        console.log(route.name, " already has a ", action);
+                        console.log(route.getName(), " already has a ", action);
                     }
                 });
             } else {
-                console.log(route.name, " has no template");
+                console.log(route.getName(), " has no template");
             }
         });
-        // HACK Meteor 0.9.4: to avoid warning messages because we have Template.prototype.waitOn/data defined.
+        // HACK Meteor 0.9.4: to avoid warning messages because we have
+        // Template.prototype.waitOn/data defined.
         delete Template.prototype._NOWARN_OLDSTYLE_HELPERS;
     }
 
