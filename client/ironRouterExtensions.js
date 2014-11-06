@@ -181,14 +181,14 @@ if ( Router != null) {
                     // maybe in future merge Router.xx() and Template.xx() so that the results are
                     // combined?
                     if (typeof route.options[action] === 'undefined') {
-                        console.log(route.getName(), " is getting a ", action);
+                        console.log(route.name, " is getting a ", action);
                         route.options[action] = Blaze._getTemplateHelper(template, action);
                     } else {
-                        console.log(route.getName(), " already has a ", action);
+                        console.log(route.name, " already has a ", action);
                     }
                 });
             } else {
-                console.log(route.getName(), " has no template");
+                console.log(route.name, " has no template");
             }
         });
         // HACK Meteor 0.9.4: to avoid warning messages because we have
