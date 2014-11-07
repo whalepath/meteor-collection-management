@@ -39,11 +39,12 @@ if ( Router != null) {
             // Mongo cursor
             result = this.fetch();
         } else {
-            // maybe do a console.warn ? - but still valid use case if a non-mongo cursor was passed. - just play nice
+            // This is not an error, maybe the dev passed an array - but still valid use case if a non-mongo cursor was passed. - just play nice
             result = this;
         }
         return result;
     }
+
     /**
      * A standard data() that will be called by the Router code to get the template's data.
      * This function will be used by the Router code.

@@ -127,13 +127,14 @@ Meteor.startup(function() {
                 thatManager.log("subscribing to "+meteorTopicName);
 
                 /**
-                 *  create a results() function that will return an array of the results.
+                 *  create a find() function that will return an array of the results.
                  *  This works by calling the manager's cursor function and passing the same
                  *  arguments that were passed to the subscribe meteorTopic.
                  * @returns undefined if the handle is not ready.
                  */
                 handle.find = handle.cursor = function() {
                     var resultsCursor = void(0);
+                    // TODO: deep merge arguments
                     if ( handle.ready() ) {
                         resultsCursor = meteorTopicCursorFunction.apply(thatManager,passedArguments);
                     }
