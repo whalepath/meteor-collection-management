@@ -33,11 +33,14 @@ Meteor.startup(function() {
                             callback = null;
                         }
                     }
+                    // TODO: provide hook mechanism. Find Meteor existing method hook.
                     if (trackingEventKey) {
                         // TODO: make 'TrackingManager' less wp specific : maybe a lookup/property etc.
                         TrackingManager && TrackingManager.track(trackingEventKey);
                     }
                     thatManager.log("calling ", meteorCallName);
+                    // END TODO: should be in hook.
+
                     return Meteor.apply(meteorCallName, args, null, callback);
                 },
                 writable: false
