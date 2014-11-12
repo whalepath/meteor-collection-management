@@ -230,6 +230,15 @@ Meteor.startup(function() {
                 }
                 return returnedValue;
             };
+            /**
+             * IMPORTANT TODO: allow for the publication to be configured with different method
+             * i.e.
+             * 'publishComposite' so that https://atmospherejs.com/reywood/publish-composite
+             * could be used.
+             * or
+             * 'publishCache' so that https://atmospherejs.com/bozhao/publish-cache
+             * could be used.
+             */
             Meteor.publish(meteorTopicName, wrappedFn);
             thatManager._defineFindFunctionsForTopic(meteorTopicSuffix, meteorTopicCursorFunction);
         },
