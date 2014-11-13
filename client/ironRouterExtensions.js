@@ -77,7 +77,13 @@ if ( Router != null) {
         if ( initializeData ) {
             var initialData;
             if ( typeof initializeData ==='function' ) {
-                var params = getRouterParams();
+                var router = Router.current(true);
+                var params;
+                if ( router && router.params) {
+                    params = router.params;
+                } else {
+                    params = {};
+                }
                 initialData = initializeData(params);
             } else {
                 initialData = initializeData;
@@ -140,7 +146,13 @@ if ( Router != null) {
         if ( initializeData ) {
             var initialData;
             if ( typeof initializeData ==='function' ) {
-                var params = getRouterParams();
+                var router = Router.current(true);
+                var params;
+                if ( router && router.params) {
+                    params = router.params;
+                } else {
+                    params = {};
+                }
                 initialData = initializeData(params);
             } else {
                 initialData = initializeData;
