@@ -9,6 +9,7 @@ Package.onUse(function (api) {
     api.use('underscore', ['client', 'server']);
     api.use('iron:router', ['client']);
     api.use('templating', ['client']);
+    api.use('mongo', ['client', 'server']);
 
     api.export('DbObjectType');
     api.export('ManagerType');
