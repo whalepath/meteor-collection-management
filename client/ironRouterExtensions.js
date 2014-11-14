@@ -222,7 +222,7 @@ if ( Router != null) {
         // HACK Meteor 0.9.4: to avoid warning messages because we have
         // Template.prototype.waitOn/data defined.
         delete Template.prototype._NOWARN_OLDSTYLE_HELPERS;
-    }
+    };
 
     // Use these methods in initializeData
     one = function(handle) {
