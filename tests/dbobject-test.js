@@ -612,3 +612,28 @@ Tinytest.add(mcm_dbobj + 'no or collision', function(test) {
     test.equal(TestOrType.databaseTable.find().count(), 3, 'patched find (3)');
     test.equal(TestOrType.databaseTable.find(selector).count(), 2, 'patched single or');
 });
+
+RevisionType = DbObjectType.createSubClass(
+    'revision',
+    [
+        'a',
+        'b'
+    ],
+    'revisionTableName'
+);
+
+Tinytest.add(mcm_dbobj + '_revisionSave', function(test) {
+    var x = new RevisionType({a: 1, b: 2});
+    x._save();
+    var xId = x.id;
+    x.a = 3;
+    x._revisionSave();
+    test.equal(RevisionType.databaseTable.find().count(), 2, 'revision creates new obj');
+
+    fetchedX = RevisionType.databaseTable.findOne(xId);
+    test.equal(fetchedX.a, 1, 'old rev unchanged');
+
+    if (Meteor.isServer) {
+        RevisionType.databaseTable.remove({});
+    }
+});
