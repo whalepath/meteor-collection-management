@@ -623,17 +623,36 @@ RevisionType = DbObjectType.createSubClass(
 );
 
 Tinytest.add(mcm_dbobj + '_revisionSave', function(test) {
+    if (Meteor.isServer) {
+        RevisionType.databaseTable.remove({});
+    }
+
     var x = new RevisionType({a: 1, b: 2});
     x._save();
     var xId = x.id;
     x.a = 3;
-    x._revisionSave();
+    var result0 = x._revisionSave();
     test.equal(RevisionType.databaseTable.find().count(), 2, 'revision creates new obj');
+    test.notEqual(xId, result0.id, 'revision creates new id');
 
-    fetchedX = RevisionType.databaseTable.findOne(xId);
+    var fetchedX = RevisionType.databaseTable.findOne(xId);
     test.equal(fetchedX.a, 1, 'old rev unchanged');
+    var fetchedNew = RevisionType.databaseTable.findOne(result0.id);
+    test.equal(fetchedNew.a, 3, 'new rev changed');
 
-    if (Meteor.isServer) {
-        RevisionType.databaseTable.remove({});
-    }
+    var newXId = fetchedNew.id;
+
+    var result1 = fetchedNew.upsertFromUntrusted({
+        clientObj: {a: 4},
+        revision: true
+    });
+
+    test.equal(RevisionType.databaseTable.find().count(), 3, 'revision upsert creates new obj');
+    var fetchedX0 = RevisionType.databaseTable.findOne(xId);
+    test.equal(fetchedX0.a, 1, 'rev 0 unchanged');
+    var fetchedX1 = RevisionType.databaseTable.findOne(newXId);
+    test.equal(fetchedX1.a, 3, 'rev 1 unchanged');
+    var fetchedX2 = RevisionType.databaseTable.findOne({_id: { $nin: [xId, newXId]}});
+    // var fetchedX2 = RevisionType.databaseTable.findOne(result1.id);
+    test.equal(fetchedX2.a, 4, 'latest set');
 });
