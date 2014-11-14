@@ -39,7 +39,8 @@ if ( Router != null) {
             // Mongo cursor
             result = this.fetch();
         } else {
-            // This is not an error, maybe the dev passed an array - but still valid use case if a non-mongo cursor was passed. - just play nice
+            // This is not an error, maybe the dev passed an array - but still valid use case if a
+            // non-mongo cursor was passed. - just play nice
             result = this;
         }
         return result;
@@ -49,11 +50,14 @@ if ( Router != null) {
      * A standard data() that will be called by the Router code to get the template's data.
      * This function will be used by the Router code.
      *
-     * Utilizes a user-defined initializeData() function to get the Meteor topics handles (or other data objects)
+     * Utilizes a user-defined initializeData() function to get the Meteor topics handles (or other
+     * data objects)
      *
      * initializeData(params) must return:
-     *    { <desired-context-key-1> : { handle: <handle1: some-object-with-ready>, method: <method1:function name to be run on object> },
-     *    <desired-context-key-2> : { handle: <handle2: some-object-with-ready>, method: <method2:function> },
+     *    { <desired-context-key-1> : { handle: <handle1: some-object-with-ready>, method:
+     *    <method1:function name to be run on object> },
+     *    <desired-context-key-2> : { handle: <handle2: some-object-with-ready>, method:
+     *    <method2:function> },
      *    <desired-context-key-3> : { handle: <handle3: some-object> },
      *    <desired-context-key-4> : <handle4:some-object> },
      *
