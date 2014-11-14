@@ -70,6 +70,8 @@ if ( Router != null) {
     Template.prototype.data = function() {
         'use strict';
         var initializeData;
+        // TO_PAT(2014-11-14): what does this alternative mean? In most cases, we have helper
+        // functions on the tmpl itself, but we take the first path.
         if ( this.route != null) {
             //we are being called by the iron:router code
             initializeData = this.route.options.initializeData;
