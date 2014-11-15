@@ -655,4 +655,12 @@ Tinytest.add(mcm_dbobj + '_revisionSave', function(test) {
     var fetchedX2 = RevisionType.databaseTable.findOne({_id: { $nin: [xId, newXId]}});
     // var fetchedX2 = RevisionType.databaseTable.findOne(result1.id);
     test.equal(fetchedX2.a, 4, 'latest set');
+
+    var query;
+    query = { _isRevision: { $exists: false } };
+    var latestCursor = RevisionType.databaseTable.find(query);
+    test.equal(latestCursor.count(), 1, 'only one latest');
+
+    var latestX = latestCursor.fetch()[0];
+    test.equal(latestX.a, 4, 'latest is latest');
 });
