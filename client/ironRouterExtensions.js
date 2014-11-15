@@ -213,6 +213,27 @@ if ( Router != null) {
                         route.options[action] = Blaze._getTemplateHelper(template, action);
                     } else {
                         console.log(route.name, " already has a ", action);
+                        var templateAction = Blaze._getTemplateHelper(template, action);
+                        console.log(route.name, "making combined", action);
+                        var routeAction = route.options[action];
+                        var combinedAction;
+                        if (action == 'waitOn') {
+                            if (_.isArray(routeAction)) {
+                                combinedAction = routeAction.concat([templateAction]);
+                            } else if (_.isFunction(routeAction)) {
+                                combinedAction = [routeAction, templateAction];
+                            } else {
+                                throw new Error(route.name, 'waitOn not fn or array');
+                            }
+                        } else {
+                            combinedAction = function() {
+                                var results = {};
+                                _.extend(results, templateAction.call(this));
+                                _.extend(results, routeAction.call(this));
+                                return results;
+                            };
+                        }
+                        route.options[action] = combinedAction;
                     }
                 });
             } else {
