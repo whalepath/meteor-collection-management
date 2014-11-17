@@ -1,24 +1,24 @@
 Tinytest.add('Meteor Collection Management - manager - simple', function(test) {
     var calledMethods = {};
-    var TestManagerType = ManagerType.createSubClass('testManager',
-        [
+    var TestManagerType = ManagerType.create({
+        callPrefix: 'testManager',
+        meteorCallDefinitions: [
             'DoSomething_1',
             'DoSomething_2',
             {
-                'DoSomething_3' : {
-                    permissionCheck: function() {
+                'DoSomething_3': {
+                    permissionCheck: function () {
                         'DoSomething_3';
                         return true;
                     },
-                    method: function() {
+                    method: function () {
                         return 'DoSomething_3';
                     }
                 }
             }
         ],
-        {
-            getSomething_1: {
-            },
+        meteorTopicDefinitions: {
+            getSomething_1: {},
             'getSomething_2': function () {
                 return 'getSomething_2';
             },
@@ -28,20 +28,18 @@ Tinytest.add('Meteor Collection Management - manager - simple', function(test) {
                 }
             }
         },
-        null,
-        null,
-        {
+        extensions: {
             DoSomething_1: function () {
                 return 'DoSomething_1';
             },
             DoSomething_2Method: function () {
                 return 'DoSomething_2';
             },
-            getSomething_1Cursor: function() {
+            getSomething_1Cursor: function () {
                 return 'getSomething_1';
             }
         }
-    );
+    });
     TestManagerType.prototype.createMeteorCallMethod = function(definition, definitionName) {
         var fn = definition.method;
         var thatManager = this.thatManager;
