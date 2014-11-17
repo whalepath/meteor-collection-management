@@ -238,6 +238,9 @@ Meteor.startup(function() {
              * or
              * 'publishCache' so that https://atmospherejs.com/bozhao/publish-cache
              * could be used.
+             * or
+             * 'reactivePublish' so that : https://github.com/Diggsey/meteor-reactive-publish
+             * could be used.
              */
             Meteor.publish(meteorTopicName, wrappedFn);
             thatManager._defineFindFunctionsForTopic(meteorTopicSuffix, meteorTopicCursorFunction);
