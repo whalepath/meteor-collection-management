@@ -657,7 +657,7 @@ Tinytest.add(mcm_dbobj + '_revisionSave', function(test) {
     test.equal(fetchedX2.a, 4, 'latest set');
 
     var query;
-    query = { _isRevision: { $exists: false } };
+    query = { _nextRevisionId: null };
     var latestCursor = RevisionType.databaseTable.find(query);
     test.equal(latestCursor.count(), 1, 'only one latest');
 
