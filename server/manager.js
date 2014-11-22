@@ -14,7 +14,10 @@ Meteor.startup(function() {
         createMeteorCallMethod : function(meteorCallDefinition, meteorCallNameSuffix) {
             var thatManager = this.thatManager;
             if ( meteorCallNameSuffix == null) {
-                thatManager.fatal(thatManager.toString() +" 'meteorCallNameSuffix' is null or undefined");
+                thatManager.fatal(
+                    thatManager.toString(),
+                    "'meteorCallNameSuffix' is null or undefined"
+                );
             }
             var methods = {};
             var callName = this.getMeteorCallName(meteorCallNameSuffix);
@@ -53,7 +56,9 @@ Meteor.startup(function() {
                         return methodFunctionWithManager.apply(this, permissionCompleteInfo.args);
                     } else if ( _.isArray(permissionCheck)) {
                         for(var i =0 ; i < permissionCheck.length; i++) {
-                            if ( !permissionCheck[i] || !_.isFunction(permissionCheck[i]) || !permissionCheck[i](permissionCompleteInfo)) {
+                            if ( !permissionCheck[i]
+                              || !_.isFunction(permissionCheck[i])
+                              || !permissionCheck[i](permissionCompleteInfo)) {
                                 // failed permission check
                                 debugger;
                                 thatManager.log(403, "Current user not permitted to call " + callName);
@@ -163,21 +168,30 @@ Meteor.startup(function() {
                         // copy the arguments so that permissionCheck can alter the arguments
                         args: _.toArray(arguments)
                     });
-                    if (permissionCheck === 'public' || (_.isFunction(permissionCheck) && permissionCheck(permissionCompleteInfo))){
+                    if (permissionCheck === 'public'
+                        || (_.isFunction(permissionCheck) && permissionCheck(permissionCompleteInfo))){
                         return meteorTopicCursorFunction.apply(this, permissionCompleteInfo.args);
                     } else if ( _.isArray(permissionCheck)) {
                         for(var i =0 ; i < permissionCheck.length; i++) {
-                            if ( !permissionCheck[i] || !_.isFunction(permissionCheck[i]) || !permissionCheck[i](permissionCompleteInfo)) {
+                            if ( !permissionCheck[i]
+                              || !_.isFunction(permissionCheck[i])
+                              || !permissionCheck[i](permissionCompleteInfo)) {
                                 // failed permission check
                                 debugger;
-                                thatManager.log(403, meteorTopicName+":Current user not permitted to subscribe");
+                                thatManager.log(
+                                    403,
+                                    meteorTopicName+":Current user not permitted to subscribe"
+                                );
                                 return this.stop();
                             }
                         }
                         return meteorTopicCursorFunction.apply(this, permissionCompleteInfo.args);
                     } else {
                         debugger;
-                        thatManager.log(403, meteorTopicName+":Current user not permitted to subscribe");
+                        thatManager.log(
+                            403,
+                            meteorTopicName+":Current user not permitted to subscribe"
+                        );
                         return this.stop();
                     }
                 };
@@ -194,8 +208,8 @@ Meteor.startup(function() {
                         writable: false,
                         value: meteorTopicCursorFunction
                     },
-                    // so that this.thatManager always return the thatManager on both the client and the
-                    // server.
+                    // so that this.thatManager always return the thatManager on both the client and
+                    // the server.
                     thatManager: {
                         enumerable: false,
                         writable: false,
