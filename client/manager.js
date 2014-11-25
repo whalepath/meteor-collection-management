@@ -97,7 +97,12 @@ Meteor.startup(function() {
                 // and such calls.
                 // create the receiving collection on the client side (with a unique name)
                 var meteorTopicTableName = thatManager.getMeteorTopicTableName(meteorTopicSuffix);
-                thatManager.log(meteorTopicName+": supplying default custom client meteorTopic function, and client-side-only databaseTable named:"+meteorTopicTableName, " to hold the results.");
+                thatManager.log(
+                    meteorTopicName+":",
+                    "supplying default custom client meteorTopic function,",
+                    "and client-side-only databaseTable named:", meteorTopicTableName,
+                    "to hold the results."
+                );
                 thatManager[meteorTopicTableName] = new Mongo.Collection(meteorTopicTableName);
                 // create the expected cursor function - that does no selection.
                 thatManager[meteorTopicSuffix+'Cursor'] = meteorTopicCursorFunction = function() {
