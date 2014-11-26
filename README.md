@@ -68,7 +68,7 @@ To run tests locally run following:
 
 ## to understand
 * look in lib/manager.js
-* find ManagerType.createSubClass
+* find ManagerType.create
 
 ## TODO: how to do testing on the client/ server/ manager code?
 

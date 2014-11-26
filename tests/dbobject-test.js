@@ -2,12 +2,14 @@ var mcm_dbobj = 'Meteor Collection Management - DbObject - ';
 
 var TEST_COLLECTION_TABLE_NAME = 'testCollectionTableName';
 var EJSON = Package.ejson.EJSON;
-TestCollectionType = DbObjectType.createSubClass('testCollection',
-    [
+TestCollectionType = DbObjectType.create({
+    typeName: 'testCollection',
+    properties: [
         'field1',
         'field2'
     ],
-    TEST_COLLECTION_TABLE_NAME);
+    databaseTableName: TEST_COLLECTION_TABLE_NAME
+});
 
 Tinytest.add(mcm_dbobj + '_save', function(test) {
     var t = new TestCollectionType({field1:'value1', field2:'value2'});
@@ -58,18 +60,19 @@ function __toGlobal(key, value) {
 }
 __toGlobal('SampleForTestEnum', SampleForTestEnum);
 
-var TestCollectionTypeComplex = DbObjectType.createSubClass('testCollectionComplex',
-    [
+var TestCollectionTypeComplex = DbObjectType.create({
+    typeName: 'testCollectionComplex',
+    properties: [
         {
-            refField : {
+            refField: {
                 reference: true
             },
 
-            refField2 : {
+            refField2: {
                 reference: true
             },
             aDate: {
-                'get': function() {
+                'get': function () {
                     return new Date();
                 }
             },
@@ -93,7 +96,8 @@ var TestCollectionTypeComplex = DbObjectType.createSubClass('testCollectionCompl
             }
         }
     ],
-    'testCollectionTableNameComplex');
+    databaseTableName: 'testCollectionTableNameComplex'
+});
 
 // TODO(dmr) this test had transient failure a couple of times during
 // development of extendClientWithForcedValues. Check whether there
@@ -150,19 +154,22 @@ Tinytest.add(mcm_dbobj + 'to/fromJsonValue', function(test) {
 });
 
 if (Meteor.isServer) {
-    IndexedCollection = DbObjectType.createSubClass('indexedCollection', [
-           'normalField',
-           {'indexedField' : {indexed: true}},
-           {'refField' : {reference: true}},
-           // test case 'by default' reference parameters
-           'userId',
-           'fooIds',
-           // 'id' ending should not be flagged as an id ( because words can end in 'id' )
-           'notanid',
-           'nottheids',
-           'valid'
+    IndexedCollection = DbObjectType.create({
+        typeName: 'indexedCollection',
+        properties: [
+            'normalField',
+            {'indexedField': {indexed: true}},
+            {'refField': {reference: true}},
+            // test case 'by default' reference parameters
+            'userId',
+            'fooIds',
+            // 'id' ending should not be flagged as an id ( because words can end in 'id' )
+            'notanid',
+            'nottheids',
+            'valid'
         ],
-    'indexedCollectionTableName');
+        databaseTableName: 'indexedCollectionTableName'
+    });
     var t = new IndexedCollection({normalField:'value'});
     t._save();
 
@@ -180,28 +187,29 @@ if (Meteor.isServer) {
     });
 }
 
-TestSettablePropertiesType = DbObjectType.createSubClass('testSettableProperties',
-    [
+TestSettablePropertiesType = DbObjectType.create({
+    typeName: 'testSettableProperties',
+    properties: [
         {
-            refField : {
+            refField: {
                 reference: true
             },
             fieldGet: {
-                'get': function() {
+                'get': function () {
                     return new Date();
                 }
             },
             fieldSet: {
-                'set': function() {
+                'set': function () {
                     // something
                 }
             },
             fieldSetGet: {
-                'get': function() {
+                'get': function () {
                     return new Date();
                 },
-                'set': function(value) {
-                    this.fieldSetGet = value+1;
+                'set': function (value) {
+                    this.fieldSetGet = value + 1;
                 }
             },
             securedField: {
@@ -213,13 +221,14 @@ TestSettablePropertiesType = DbObjectType.createSubClass('testSettableProperties
             emptyField: {}
         }
     ],
-    'testSettablePropertiesTableName');
+    databaseTableName: 'testSettablePropertiesTableName'
+});
 
 
 // TODO: Since we found a bug in createSubClass's population of
 // propertyNamesClientCanSet, we may want to do more complicated
 // testing of it, since it's pretty important.
-Tinytest.add(mcm_dbobj + 'createSubClass setting propertyNamesClientCanSet', function(test) {
+Tinytest.add(mcm_dbobj + 'create Subclass setting propertyNamesClientCanSet', function(test) {
     test.equal(TestCollectionTypeComplex.prototype.propertyNamesClientCanSet, ['sampleForTestEnum0','sampleForTestEnum1','sampleForTestEnum2','normalField']);
 
     test.equal(TestSettablePropertiesType.prototype.propertyNamesClientCanSet,
@@ -255,14 +264,14 @@ Tinytest.add(mcm_dbobj + 'safeCopying from client', function(test) {
     });
 });
 
-TestUntrustedType = DbObjectType.createSubClass(
-    'testUntrusted',
-    [
+TestUntrustedType = DbObjectType.create({
+    typeName: 'testUntrusted',
+    properties: [
         'normalField0',
         'normalField1'
     ],
-    'testUntrustedTableName'
-);
+    databaseTableName: 'testUntrustedTableName'
+});
 
 Tinytest.add(mcm_dbobj + 'upsertFromUntrusted classmethod error conditions', function(test) {
     // TO_PAT: Tinytest has a throws method which works like this. Unfortunately, there's no way to
@@ -451,13 +460,14 @@ Tinytest.add(mcm_dbobj + 'upsertFromUntrusted instance method', function(test) {
     test.equal('xxxx', g.normalField0, msg);
 });
 
-RequiredFieldsType = DbObjectType.createSubClass('testCollectionWithRequiredFields',
-    [
-        {'field1' : {required: true}},
-
+RequiredFieldsType = DbObjectType.create({
+    typeName: 'testCollectionWithRequiredFields',
+    properties: [
+        {'field1': {required: true}},
         'field2'
     ],
-    'testCollectionWithRequiredFieldsTable');
+    databaseTableName: 'testCollectionWithRequiredFieldsTable'
+});
 
 Tinytest.add(mcm_dbobj + 'required fields', function(test) {
     var t = new RequiredFieldsType({field2:'value2'});
@@ -471,16 +481,17 @@ Tinytest.add(mcm_dbobj + 'required fields', function(test) {
     test.isTrue(failed, 'checkKeys did not fail with unset required property.');
 });
 
-var TestEnumType = DbObjectType.createSubClass('testEnumType',
-    [
+var TestEnumType = DbObjectType.create({
+    typeName: 'testEnumType',
+    properties: [
         {
             x: {
                 jsonHelper: SampleForTestEnum
             }
         }
     ],
-    'testEnumTable'
-);
+    databaseTableName: 'testEnumTable'
+});
 
 Tinytest.add('MCM - DbObject - jsonHelper', function(test) {
     var te = new TestEnumType();
@@ -495,13 +506,14 @@ Tinytest.add('MCM - DbObject - jsonHelper', function(test) {
     test.equal(SampleForTestEnum.one, rte.x, 'retrieved is enum obj');
 });
 
-TestOrType = DbObjectType.createSubClass('testOrCollection',
-    [
+TestOrType = DbObjectType.create({
+    typeName: 'testOrCollection',
+    properties: [
         'a',
         'b'
     ],
-    'testOrCollection'
-);
+    databaseTableName: 'testOrCollection'
+});
 
 
 //Tinytest.add('MCM - DbObject - no or collision', function(test) {
@@ -612,14 +624,14 @@ Tinytest.add(mcm_dbobj + 'no or collision', function(test) {
     test.equal(TestOrType.databaseTable.find(selector).count(), 2, 'patched single or');
 });
 
-RevisionType = DbObjectType.createSubClass(
-    'revision',
-    [
+RevisionType = DbObjectType.create({
+    typeName: 'revision',
+    properties: [
         'a',
         'b'
     ],
-    'revisionTableName'
-);
+    databaseTableName: 'revisionTableName'
+});
 
 Tinytest.add(mcm_dbobj + '_revisionSave', function(test) {
     if (Meteor.isServer) {
