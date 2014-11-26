@@ -272,15 +272,15 @@ Tinytest.add(mcm_dbobj + 'upsertFromUntrusted classmethod error conditions', fun
     // }, Meteor.Error);
 
     try {
-        TestUntrustedType.prototype.upsertFromUntrusted(null, null);
-        test.equal(false, true, 'expected exception to be thrown on TestUntrustedType.prototype.upsertFromUntrusted(null, null)');
+        TestUntrustedType.prototype.upsertFromUntrusted({clientObj:null, lookup:null});
+        test.equal(false, true, 'expected exception to be thrown on TestUntrustedType.prototype.upsertFromUntrusted({clientObj:null, lookup:null})');
     }catch( e) {
         test.equal(e instanceof Meteor.Error, true);
     }
     try {
-        TestUntrustedType.prototype.upsertFromUntrusted(undefined, undefined);
+        TestUntrustedType.prototype.upsertFromUntrusted({clientObj:undefined, lookup:undefined});
         test.equal(false, true,
-            "expected exception to be thrown on TestUntrustedType.prototype.upsertFromUntrusted(undefined, undefined)");
+            "expected exception to be thrown on TestUntrustedType.prototype.upsertFromUntrusted({clientObj:undefined, lookup:undefined})");
     }catch( e) {
         test.equal(e instanceof Meteor.Error, true);
     }
@@ -290,7 +290,7 @@ Tinytest.add(mcm_dbobj + 'upsertFromUntrusted classmethod error conditions', fun
             {forcedValues: {normalField0: 'forced'}}
         );
     test.equal(nothing, null,
-        "expected nothing to be returned because nothing done on TestUntrustedType.prototype.upsertFromUntrusted(null,{forcedValues: {normalField0: 'forced'}})");
+        "expected nothing to be returned because nothing done on TestUntrustedType.prototype.upsertFromUntrusted({forcedValues: {normalField0: 'forced'}})");
 
     try {
         TestUntrustedType.prototype.upsertFromUntrusted({normalField0:'good'}, {forcedValues: {normalField1:'forced'}});
@@ -319,7 +319,7 @@ Tinytest.add(mcm_dbobj + 'upsertFromUntrusted classmethod', function(test) {
     test.equal(TestUntrustedType.databaseTable.find().count(), 0);
 
     // check upsert inserts
-    g = TestUntrustedType.prototype.upsertFromUntrusted(clientObject0);
+    g = TestUntrustedType.prototype.upsertFromUntrusted({clientObj:clientObject0});
     test.equal(TestUntrustedType.databaseTable.find().count(), 1);
 
     // check upsert sets
@@ -334,7 +334,7 @@ Tinytest.add(mcm_dbobj + 'upsertFromUntrusted classmethod', function(test) {
         normalField1: 'good'
     };
 
-    g = TestUntrustedType.prototype.upsertFromUntrusted(clientObject1);
+    g = TestUntrustedType.prototype.upsertFromUntrusted({clientObj:clientObject1});
     test.equal(TestUntrustedType.databaseTable.find().count(), 1);
     test.equal(g.normalField0, 'better');
     test.equal(g.normalField1, 'good');
@@ -345,28 +345,27 @@ Tinytest.add(mcm_dbobj + 'upsertFromUntrusted classmethod', function(test) {
         normalField1: 'good'
     };
 
-    g = TestUntrustedType.prototype.upsertFromUntrusted(clientObject0, {lookup:clientObject2});
+    g = TestUntrustedType.prototype.upsertFromUntrusted({clientObj:clientObject0, lookup:clientObject2});
     test.equal(g.normalField0, 'good');
     test.equal(g.normalField1, 'good');
     test.equal(TestUntrustedType.databaseTable.find().count(), 1);
 
     // Test update with forced values
     var msg = 'basic forced values update';
-    g = TestUntrustedType.prototype.upsertFromUntrusted(
-        clientObject1,
-        null,
-        {forcedValues: {normalField0: 'forced'}}
-    );
+    g = TestUntrustedType.prototype.upsertFromUntrusted({
+        clientObj: clientObject1,
+        forcedValues: {normalField0: 'forced'}
+    });
     test.equal(g.normalField0, 'forced', msg);
     test.equal(g.normalField1, 'good', msg);
     test.equal(TestUntrustedType.databaseTable.find().count(), 1);
 
     // Test insert with forced values.
     msg = 'basic forced values insert';
-    g = TestUntrustedType.prototype.upsertFromUntrusted(
-        clientObject0,
-        {forcedValues: {normalField0: 'forced'}}
-    );
+    g = TestUntrustedType.prototype.upsertFromUntrusted({
+        clientObj:clientObject0,
+        forcedValues: {normalField0: 'forced'}
+    });
     test.equal(TestUntrustedType.databaseTable.find().count(), 2);
     test.equal(g.normalField0, 'forced', msg);
     test.equal(g.normalField1, 'good', msg);
@@ -444,11 +443,11 @@ Tinytest.add(mcm_dbobj + 'upsertFromUntrusted instance method', function(test) {
     test.equal(TestUntrustedType.databaseTable.find(clientObject0).count(), 1);
 
     msg = 'update with instance method.';
-    g = g.upsertFromUntrusted({normalField0: 'bbqz'});
+    g = g.upsertFromUntrusted({clientObj:{normalField0: 'bbqz'}});
     test.equal(g.normalField0, 'bbqz', msg);
 
     msg = 'instance method updates receiver.';
-    g.upsertFromUntrusted({normalField0: 'xxxx'});
+    g.upsertFromUntrusted({clientObj:{normalField0: 'xxxx'}});
     test.equal('xxxx', g.normalField0, msg);
 });
 

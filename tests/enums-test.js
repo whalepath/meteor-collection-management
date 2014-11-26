@@ -37,7 +37,7 @@ Tinytest.add('Meteor Collection Management - enums - display', function(test) {
 Tinytest.add('Meteor Collection Management - enums - array', function(test) {
     var enumsArray = TestingEnumFake.toArray(['one','three']);
     test.equal(enumsArray, [TestingEnumFake.one, TestingEnumFake.three]);
-    test.equal(enumsArray.toString(), 'ONE,THREE');
+    test.equal(enumsArray.toString(), 'one,_three');
 });
 
 Tinytest.add('Meteor Collection Management - enums - auto dbCode', function(test) {
