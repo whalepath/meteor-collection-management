@@ -106,7 +106,6 @@ Meteor.startup(function() {
             var thatManager = this.thatManager;
             var meteorTopicName = this.getMeteorTopicName(meteorTopicSuffix);
             var meteorTopicTableName = thatManager.getMeteorTopicTableName(meteorTopicSuffix);
-//            var meteorTopicCursorFunction = thatManager.getMeteorTopicCursorFunction(meteorTopicSuffix);
             var meteorTopicCursorFunction = meteorTopicDefinition.cursor;
             if ( !_.isFunction(meteorTopicCursorFunction)) {
                 thatManager.fatal("No cursor function supplied for "+meteorTopicName);

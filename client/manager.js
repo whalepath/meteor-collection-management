@@ -86,7 +86,6 @@ Meteor.startup(function() {
         createTopic : function(meteorTopicDefinition, meteorTopicSuffix) {
             var thatManager = this;
             var meteorTopicName = this.getMeteorTopicName(meteorTopicSuffix);
-//            var meteorTopicCursorFunction = thatManager.getMeteorTopicCursorFunction(meteorTopicSuffix, true);
             var meteorTopicCursorFunction = meteorTopicDefinition.cursor;
             if ( meteorTopicCursorFunction == null) {
                 // client has no 'Cursor' function defined. This happens when the server side has a
