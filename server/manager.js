@@ -62,7 +62,7 @@ Meteor.startup(function() {
                                 // failed permission check
                                 debugger;
                                 thatManager.log(403, "Current user not permitted to call " + callName);
-                                return this.stop();
+                                throw new Meteor.Error(403, "Current user not permitted to call " + callName);
                             }
                         }
                         return methodFunctionWithManager.apply(this, permissionCompleteInfo.args);
