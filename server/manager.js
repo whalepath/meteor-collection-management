@@ -256,7 +256,7 @@ Meteor.startup(function() {
              * could be used.
              */
             Meteor.publish(meteorTopicName, wrappedFn);
-            thatManager._defineFindFunctionsForTopic(meteorTopicSuffix, meteorTopicCursorFunction);
+            thatManager._defineFindFunctionsForSubscription(meteorTopicSuffix, meteorTopicCursorFunction);
         },
         redirect: function(url, router) {
             router.response.statusCode = 302;

@@ -173,7 +173,7 @@ Meteor.startup(function() {
 
                 return handle;
             };
-            thatManager._defineFindFunctionsForTopic(meteorTopicSuffix, meteorTopicCursorFunction);
+            thatManager._defineFindFunctionsForSubscription(meteorTopicSuffix, meteorTopicCursorFunction);
         }
     });
     Object.defineProperties(ManagerType.prototype, {
