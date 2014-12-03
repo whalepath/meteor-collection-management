@@ -43,7 +43,7 @@ Meteor.startup(function() {
             } else if ( typeof permissionCheck === 'function' ) {
                 var permissionInfo = {
                     thatManager: thatManager,
-                    method:callName
+                    meteorMethodName:callName
                 };
                 methods[callName] = function() {
                     var permissionCompleteInfo = _.extend({}, permissionInfo, {
@@ -152,14 +152,14 @@ Meteor.startup(function() {
             var securedCursorFunction;
             var permissionCheck = meteorTopicDefinition.permissionCheck;
             if (permissionCheck == null ) {
-                thatManager.warn("Topic ", meteorTopicName, ' has no permissionCheck');
+                thatManager.warn("PubSub ", meteorTopicName, ' has no permissionCheck');
                 securedCursorFunction = meteorTopicCursorFunction;
             } else if(_.contains(permissionCheck, 'public') || permissionCheck == 'public') {
                 securedCursorFunction = meteorTopicCursorFunction;
             } else {
                 var permissionInfo = {
                     thatManager: thatManager,
-                    topic:meteorTopicName
+                    meteorTopicName:meteorTopicName
                 };
                 securedCursorFunction = function () {
                     var permissionCompleteInfo = _.extend({}, permissionInfo, {
