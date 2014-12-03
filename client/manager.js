@@ -176,6 +176,26 @@ Meteor.startup(function() {
                 return handle;
             };
             thatManager._defineFindFunctionsForSubscription(meteorTopicSuffix, meteorTopicCursorFunction);
+
+            if ( meteorTopicDefinition.derived ) {
+                _.each(meteorTopicDefinition.derived, function(derivedDefinition, extensionName){
+                    debugger;
+                    // we don't want the meteorTopicDefinition.cursor function
+                    // this allows for different permissionCheck option for example.
+                    var fullDerivedDefinition = _.extend({}, _.omit(meteorTopicDefinition, 'cursor', 'derived'), derivedDefinition);
+                    if ( extensionName === 'count' && fullDerivedDefinition.cursor == null) {
+                        var countPublicationName = thatManager.callPrefix + '_counts_';
+                        fullDerivedDefinition.cursor = function() {
+                            // TODO: create a hash with arguments to add to id string.
+                            var id = meteorTopicName+'Count';
+                            var cursor = thatManager[meteorTopicTableName].find(id);
+                            return cursor;
+                        }
+                    }
+                    var derivedMeteorTopicSuffix = meteorTopicSuffix + extensionName.charAt(0).toUpperCase() + extensionName.substring(1);
+                    thatManager.createTopic(fullDerivedDefinition, derivedMeteorTopicSuffix);
+                });
+            }
         }
     });
     Object.defineProperties(ManagerType.prototype, {

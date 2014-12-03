@@ -212,6 +212,26 @@ Meteor.startup(function() {
              */
             Meteor.publish(meteorTopicName, wrappedFn);
             thatManager._defineFindFunctionsForSubscription(meteorTopicSuffix, meteorTopicCursorFunction);
+
+            if ( meteorTopicDefinition.derived ) {
+                _.each(meteorTopicDefinition.derived, function(derivedDefinition, extensionName){
+                    debugger;
+                    // we don't want the meteorTopicDefinition.cursor function
+                    // this allows for different permissionCheck option for example.
+                    var fullDerivedDefinition = _.extend({}, _.omit(meteorTopicDefinition, 'cursor', 'derived'), derivedDefinition);
+                    if ( extensionName === 'count' && fullDerivedDefinition.cursor == null) {
+                        var countPublicationName = thatManager.callPrefix + '_counts_';
+                        fullDerivedDefinition.cursor = function() {
+                            var cursor = meteorTopicCursorFunction.apply(this, arguments);
+                            // TODO: create a hash with arguments to add to id string.
+                            var id = meteorTopicName+'Count';
+                            this.added(countPublicationName, id, cursor.count());
+                        }
+                    }
+                    var derivedMeteorTopicSuffix = meteorTopicSuffix + extensionName.charAt(0).toUpperCase() + extensionName.substring(1);
+                    thatManager.createTopic(fullDerivedDefinition, derivedMeteorTopicSuffix);
+                });
+            }
         },
         _createMeteorHandleAugmentationFunction: function(meteorTopicCursorFunction, securedCursorFunction) {
             // TODO: PATM: why can't we just pass securedCursorFunction?
