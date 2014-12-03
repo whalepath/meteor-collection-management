@@ -104,7 +104,9 @@ Meteor.startup(function() {
                 );
                 thatManager[meteorTopicTableName] = new Mongo.Collection(meteorTopicTableName);
                 // create the expected cursor function - that does no selection.
-                thatManager[meteorTopicSuffix+'Cursor'] = meteorTopicCursorFunction = function() {
+                thatManager[meteorTopicSuffix+'Cursor'] = // fix TODO in handleStringOrObjectDefinition() so we don't need this.
+                meteorTopicDefinition.cursor =
+                    meteorTopicCursorFunction = function() {
                     // note: no selection criteria because the server will only return the needed
                     // results.
                     var results = thatManager[meteorTopicTableName].find();
