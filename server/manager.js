@@ -196,6 +196,26 @@ Meteor.startup(function() {
                 };
             }
 
+            var wrappedFn = thatManager._createMeteorHandleAugmentationFunction(meteorTopicCursorFunction, securedCursorFunction);
+
+            /**
+             * IMPORTANT TODO: allow for the publication to be configured with different method
+             * i.e.
+             * 'publishComposite' so that https://atmospherejs.com/reywood/publish-composite / https://github.com/englue/meteor-publish-composite.git
+             * could be used.
+             * or
+             * 'publishCache' so that https://atmospherejs.com/bozhao/publish-cache / https://github.com/yubozhao/meteor-publish-cache.git
+             * could be used.
+             * or
+             * 'reactivePublish' so that : https://github.com/Diggsey/meteor-reactive-publish.git
+             * could be used.
+             */
+            Meteor.publish(meteorTopicName, wrappedFn);
+            thatManager._defineFindFunctionsForSubscription(meteorTopicSuffix, meteorTopicCursorFunction);
+        },
+        _createMeteorHandleAugmentationFunction: function(meteorTopicCursorFunction, securedCursorFunction) {
+            // TODO: PATM: why can't we just pass securedCursorFunction?
+            var thatManager = this.thatManager;
             // insure that this.ready() is called when the no data is returned. (required for
             // spiderable to work)
             var wrappedFn = function() {
@@ -243,20 +263,7 @@ Meteor.startup(function() {
                 }
                 return returnedValue;
             };
-            /**
-             * IMPORTANT TODO: allow for the publication to be configured with different method
-             * i.e.
-             * 'publishComposite' so that https://atmospherejs.com/reywood/publish-composite
-             * could be used.
-             * or
-             * 'publishCache' so that https://atmospherejs.com/bozhao/publish-cache
-             * could be used.
-             * or
-             * 'reactivePublish' so that : https://github.com/Diggsey/meteor-reactive-publish
-             * could be used.
-             */
-            Meteor.publish(meteorTopicName, wrappedFn);
-            thatManager._defineFindFunctionsForSubscription(meteorTopicSuffix, meteorTopicCursorFunction);
+            return wrappedFn;
         },
         redirect: function(url, router) {
             router.response.statusCode = 302;
