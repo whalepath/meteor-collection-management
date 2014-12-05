@@ -87,8 +87,9 @@ Meteor.startup(function() {
             var thatManager = this.thatManager;
             var meteorTopicName = this.getMeteorTopicName(meteorTopicSuffix);
             var meteorTopicCursorFunction = meteorTopicDefinition.cursor;
-            if ( meteorTopicCursorFunction == null) {
-                // client has no 'Cursor' function defined. This happens when the server side has a
+            var meteorTopicTableName = null;
+            var _createClientOnlyCollection = function(meteorTopicSuffix) {
+                // This happens when the server side has a
                 // non-standard topic. For example, a topic that is created with manually with :
                 // http://docs.meteor.com/#publish_added
                 // see http://docs.meteor.com/#publishandsubscribe for more info.
@@ -97,12 +98,16 @@ Meteor.startup(function() {
                 // create the receiving collection on the client side (with a unique name)
                 var meteorTopicTableName = thatManager.getMeteorTopicTableName(meteorTopicSuffix);
                 thatManager.log(
-                    meteorTopicName+":",
-                    "supplying default custom client meteorTopic function,",
-                    "and client-side-only databaseTable named:", meteorTopicTableName,
+                    "For publication: ", meteorTopicName+":",
+                    "create client-side-only databaseTable named:", meteorTopicTableName,
                     "to hold the results."
                 );
                 thatManager[meteorTopicTableName] = new Mongo.Collection(meteorTopicTableName);
+                return meteorTopicTableName;
+            }
+            if ( meteorTopicCursorFunction == null) {
+                // client has no 'Cursor' function defined.
+                meteorTopicTableName =_createClientOnlyCollection(meteorTopicSuffix);
                 // create the expected cursor function - that does no selection.
                 thatManager[meteorTopicSuffix+'Cursor'] = // fix TODO in handleStringOrObjectDefinition() so we don't need this.
                 meteorTopicDefinition.cursor =
@@ -181,20 +186,20 @@ Meteor.startup(function() {
 
             if ( meteorTopicDefinition.derived ) {
                 _.each(meteorTopicDefinition.derived, function(derivedDefinition, extensionName){
-                    debugger;
                     // we don't want the meteorTopicDefinition.cursor function
                     // this allows for different permissionCheck option for example.
                     var fullDerivedDefinition = _.extend({}, _.omit(meteorTopicDefinition, 'cursor', 'derived'), derivedDefinition);
+                    var uppercaseExtensionName = extensionName.charAt(0).toUpperCase() + extensionName.substring(1);
+                    var derivedMeteorTopicSuffix = meteorTopicSuffix + uppercaseExtensionName;
                     if ( extensionName === 'count' && fullDerivedDefinition.cursor == null) {
-                        var countPublicationName = thatManager.callPrefix + '_counts_';
+                        var meteorTopicTableName = _createClientOnlyCollection(derivedMeteorTopicSuffix);
                         fullDerivedDefinition.cursor = function() {
                             // TODO: create a hash with arguments to add to id string.
-                            var id = meteorTopicName+'Count';
+                            var id = meteorTopicName+uppercaseExtensionName;
                             var cursor = thatManager[meteorTopicTableName].find(id);
                             return cursor;
                         }
                     }
-                    var derivedMeteorTopicSuffix = meteorTopicSuffix + extensionName.charAt(0).toUpperCase() + extensionName.substring(1);
                     thatManager.createTopic(fullDerivedDefinition, derivedMeteorTopicSuffix);
                 });
             }

@@ -218,13 +218,15 @@ Meteor.startup(function() {
                     // we don't want the meteorTopicDefinition.cursor function
                     // this allows for different permissionCheck option for example.
                     var fullDerivedDefinition = _.extend({}, _.omit(meteorTopicDefinition, 'cursor', 'derived'), derivedDefinition);
+                    var uppercaseExtensionName = extensionName.charAt(0).toUpperCase() + extensionName.substring(1);
+                    var derivedMeteorTopicSuffix = meteorTopicSuffix + uppercaseExtensionName;
                     if ( extensionName === 'count' && fullDerivedDefinition.cursor == null) {
-                        var countPublicationName = thatManager.callPrefix + '_counts_';
+                        var meteorTopicTableName = thatManager.getMeteorTopicTableName(derivedMeteorTopicSuffix);
                         fullDerivedDefinition.cursor = function() {
                             var cursor = meteorTopicCursorFunction.apply(this, arguments);
                             // TODO: create a hash with arguments to add to id string.
-                            var id = meteorTopicName+'Count';
-                            this.added(countPublicationName, id, cursor.count());
+                            var id = meteorTopicName+uppercaseExtensionName;
+                            this.added(meteorTopicTableName, id, {count:cursor.count()});
                         }
                     }
                     var derivedMeteorTopicSuffix = meteorTopicSuffix + extensionName.charAt(0).toUpperCase() + extensionName.substring(1);

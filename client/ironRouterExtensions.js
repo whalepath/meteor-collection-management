@@ -252,6 +252,19 @@ if ( Router != null) {
             method: oneFn
         };
     };
+    count = function(handle) {
+        return {
+            handle: handle,
+            method: function() {
+                var oneResult = oneFn.apply(this, arguments);
+                if ( oneResult != null) {
+                    return oneResult.count;
+                } else {
+                    return void(0);
+                }
+            }
+        };
+    };
     // Use these methods in initializeData
     many = function(handle) {
         return {

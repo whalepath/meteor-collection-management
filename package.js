@@ -16,6 +16,7 @@ Package.onUse(function (api) {
     api.export('Enums');
     api.export('one');
     api.export('many');
+    api.export('count');
 
     api.addFiles('lib/internalutils.js', ['client', 'server']);
     api.addFiles('lib/underscoreExtensions.js', ['client', 'server']);
