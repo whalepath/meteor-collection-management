@@ -9,7 +9,7 @@ Meteor.startup(function() {
          * @param meteorCallDefinition
          */
         createMeteorCallMethod : function(meteorCallDefinition, meteorCallNameSuffix) {
-            var thatManager = this;
+            var thatManager = this.thatManager;
             var trackingEventKey;
             var trackingEventData;
             var meteorCallName = this.getMeteorCallName(meteorCallNameSuffix);
@@ -84,7 +84,7 @@ Meteor.startup(function() {
          * @param meteorTopicSuffix
          */
         createTopic : function(meteorTopicDefinition, meteorTopicSuffix) {
-            var thatManager = this;
+            var thatManager = this.thatManager;
             var meteorTopicName = this.getMeteorTopicName(meteorTopicSuffix);
             var meteorTopicCursorFunction = meteorTopicDefinition.cursor;
             if ( meteorTopicCursorFunction == null) {
@@ -135,6 +135,8 @@ Meteor.startup(function() {
                 }
                 thatManager.log("subscribing to "+meteorTopicName);
 
+                handle.thatManager = thatManager;
+                handle.meteorTopicCursorFunction = meteorTopicCursorFunction;
                 /**
                  *  create a find() function that will return an array of the results.
                  *  This works by calling the manager's cursor function and passing the same
@@ -145,7 +147,7 @@ Meteor.startup(function() {
                     var resultsCursor = void(0);
                     // TODO: deep merge arguments
                     if ( handle.ready() ) {
-                        resultsCursor = meteorTopicCursorFunction.apply(thatManager,passedArguments);
+                        resultsCursor = handle.meteorTopicCursorFunction.apply(this,passedArguments);
                     }
                     return resultsCursor;
                 };

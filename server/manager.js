@@ -215,7 +215,6 @@ Meteor.startup(function() {
 
             if ( meteorTopicDefinition.derived ) {
                 _.each(meteorTopicDefinition.derived, function(derivedDefinition, extensionName){
-                    debugger;
                     // we don't want the meteorTopicDefinition.cursor function
                     // this allows for different permissionCheck option for example.
                     var fullDerivedDefinition = _.extend({}, _.omit(meteorTopicDefinition, 'cursor', 'derived'), derivedDefinition);
