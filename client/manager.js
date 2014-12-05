@@ -177,7 +177,7 @@ Meteor.startup(function() {
                     }
                     return resultsCursor;
                 };
-                handle.findFetch = handle.results = function() {
+                handle.findFetch = function() {
                     var results = void(0);
                     var resultsCursor = this.find();
                     if ( resultsCursor != null ) {
@@ -189,7 +189,7 @@ Meteor.startup(function() {
                  * function that returns only a single result ( if the results are ready)
                  * @returns
                  */
-                handle.findOne = handle.oneResult = function() {
+                handle.findOne = function() {
                     var results = this.findFetch();
                     if ( results === undefined) {
                         return void(0);
