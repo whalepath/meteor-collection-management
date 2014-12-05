@@ -140,8 +140,29 @@ Meteor.startup(function() {
                 }
                 thatManager.log("subscribing to "+meteorTopicName);
 
-                handle.thatManager = thatManager;
-                handle.meteorTopicCursorFunction = meteorTopicCursorFunction;
+                Object.defineProperties(handle, {
+                    thatManager: {
+                        value: thatManager,
+                        writable: false,
+                        configurable: false,
+                        enumerable: false
+                    },
+                    userId: {
+                        'get': function () {
+                            // always safe on client
+                            return Meteor.userId();
+                        },
+                        configurable: false,
+                        enumerable: false
+                    },
+                    meteorTopicCursorFunction: {
+                        value: meteorTopicCursorFunction,
+                        writable: false,
+                        configurable: false,
+                        enumerable: false
+                    },
+                });
+
                 /**
                  *  create a find() function that will return an array of the results.
                  *  This works by calling the manager's cursor function and passing the same
