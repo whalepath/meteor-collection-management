@@ -110,6 +110,11 @@ Meteor.startup(function() {
             if ( !_.isFunction(meteorTopicCursorFunction)) {
                 thatManager.fatal("No cursor function supplied for "+meteorTopicName);
             }
+            // TODO: idea to handle multiple cursors returned. meteorTopicDefinition.cursor is the primary cursor
+            // meteorTopicDefinition.query is the function called that calls meteorTopicDefinition.cursor and adds in
+            // additional cursors to the publication.
+            //
+            //var meteorTopicQueryFunction = meteorTopicDefinition.query | meteorTopicCursorFunction;
             // make the current manager available on cursor when doing publish subscribe.
             Object.defineProperties(meteorTopicCursorFunction, {
                 thatManager: {
