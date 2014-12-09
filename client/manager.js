@@ -148,7 +148,7 @@ Meteor.startup(function() {
                         enumerable: false
                     },
                     userId: {
-                        'get': function () {
+                        'get' : function() {
                             // always safe on client
                             return Meteor.userId();
                         },
@@ -160,9 +160,8 @@ Meteor.startup(function() {
                         writable: false,
                         configurable: false,
                         enumerable: false
-                    },
+                    }
                 });
-
                 /**
                  *  create a find() function that will return an array of the results.
                  *  This works by calling the manager's cursor function and passing the same
