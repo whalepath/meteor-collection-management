@@ -231,7 +231,20 @@ Meteor.startup(function() {
                             var cursor = meteorTopicCursorFunction.apply(this, arguments);
                             // TODO: create a hash with arguments to add to id string.
                             var id = meteorTopicName+uppercaseExtensionName;
-                            this.added(meteorTopicTableName, id, {count:cursor.count()});
+                            var countValue;
+                            if ( cursor == null) {
+                                // cursor() returned a undefined/null.
+                                // this can happen if the client hasn't yet logged in for example
+                                // so this is not really an error.
+                                countValue = void(0);
+                            } else {
+                                countValue = cursor.count();
+                            }
+                            if ( this == null ) {
+                                thatManager.error("no this in count() for ", derivedMeteorTopicSuffix);
+                                debugger;
+                            }
+                            this.added(meteorTopicTableName, id, {count: countValue});
                         }
                     }
                     var derivedMeteorTopicSuffix = meteorTopicSuffix + extensionName.charAt(0).toUpperCase() + extensionName.substring(1);
