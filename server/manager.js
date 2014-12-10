@@ -102,7 +102,7 @@ Meteor.startup(function() {
          *    meteorTopicSuffixOne = to fetch one
          * @param meteorTopicSuffix
          */
-        createTopic : function(meteorTopicDefinition, meteorTopicSuffix) {
+        createPublication : function(meteorTopicDefinition, meteorTopicSuffix) {
             var thatManager = this.thatManager;
             var meteorTopicName = this.getMeteorTopicName(meteorTopicSuffix);
             var meteorTopicTableName = thatManager.getMeteorTopicTableName(meteorTopicSuffix);
@@ -120,18 +120,31 @@ Meteor.startup(function() {
                 thatManager: {
                     writable: false,
                     enumerable:false,
+                    configurable: false,
                     value: thatManager
+                },
+                meteorTopicDefinition: {
+                    writable: false,
+                    enumerable:false,
+                    configurable: false,
+                    value: meteorTopicDefinition
                 },
                 meteorTopicName: {
                     writable: false,
+                    enumerable:false,
+                    configurable: false,
                     value: meteorTopicName
                 },
                 meteorTopicSuffix : {
                     writable: false,
+                    enumerable:false,
+                    configurable: false,
                     value: meteorTopicSuffix
                 },
                 meteorTopicTableName: {
                     writable: false,
+                    enumerable:false,
+                    configurable: false,
                     value: meteorTopicTableName
                 },
                 addedObject: {
@@ -222,33 +235,40 @@ Meteor.startup(function() {
                 _.each(meteorTopicDefinition.derived, function(derivedDefinition, extensionName){
                     // we don't want the meteorTopicDefinition.cursor function
                     // this allows for different permissionCheck option for example.
-                    var fullDerivedDefinition = _.extend({}, _.omit(meteorTopicDefinition, 'cursor', 'derived'), derivedDefinition);
+                    var fullDerivedDefinition = _.extend({parentMeteorTopicDefinition:meteorTopicDefinition}, _.omit(meteorTopicDefinition, 'cursor', 'derived'), derivedDefinition);
                     var uppercaseExtensionName = extensionName.charAt(0).toUpperCase() + extensionName.substring(1);
                     var derivedMeteorTopicSuffix = meteorTopicSuffix + uppercaseExtensionName;
-                    if ( extensionName === 'count' && fullDerivedDefinition.cursor == null) {
-                        var meteorTopicTableName = thatManager.getMeteorTopicTableName(derivedMeteorTopicSuffix);
-                        fullDerivedDefinition.cursor = function() {
-                            var cursor = meteorTopicCursorFunction.apply(this, arguments);
-                            // TODO: create a hash with arguments to add to id string.
-                            var id = meteorTopicName+uppercaseExtensionName;
-                            var countValue;
-                            if ( cursor == null) {
-                                // cursor() returned a undefined/null.
-                                // this can happen if the client hasn't yet logged in for example
-                                // so this is not really an error.
-                                countValue = void(0);
-                            } else {
-                                countValue = cursor.count();
+
+                    if ( extensionName === 'count') {
+                        if( fullDerivedDefinition.cursor == null) {
+                            var meteorTopicTableName = thatManager.getMeteorTopicTableName(derivedMeteorTopicSuffix);
+                            fullDerivedDefinition.cursor = function() {
+                                var cursor = meteorTopicCursorFunction.apply(this, arguments);
+                                // TODO: create a hash with arguments to add to id string.
+                                var id = meteorTopicName+uppercaseExtensionName;
+                                var countValue;
+                                if ( cursor == null) {
+                                    // cursor() returned a undefined/null.
+                                    // this can happen if the client hasn't yet logged in for example
+                                    // so this is not really an error.
+                                    countValue = void(0);
+                                } else {
+                                    countValue = cursor.count();
+                                }
+                                if ( this == null ) {
+                                    thatManager.error("no 'this' in count() for ", derivedMeteorTopicSuffix);
+                                    debugger;
+                                }
+                                this.added(meteorTopicTableName, id, {count: countValue});
                             }
-                            if ( this == null ) {
-                                thatManager.error("no this in count() for ", derivedMeteorTopicSuffix);
-                                debugger;
-                            }
-                            this.added(meteorTopicTableName, id, {count: countValue});
                         }
+                    } else {
+                        thatManager.error("Only know how to handle derived 'count' not ", extensionName, " in ", derivedMeteorTopicSuffix);
+                        debugger;
+                        return;
                     }
                     var derivedMeteorTopicSuffix = meteorTopicSuffix + extensionName.charAt(0).toUpperCase() + extensionName.substring(1);
-                    thatManager.createTopic(fullDerivedDefinition, derivedMeteorTopicSuffix);
+                    thatManager.createPublication(fullDerivedDefinition, derivedMeteorTopicSuffix);
                 });
             }
         },

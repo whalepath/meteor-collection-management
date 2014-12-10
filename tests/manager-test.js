@@ -48,7 +48,7 @@ Tinytest.add('Meteor Collection Management - manager - simple', function(test) {
         calledMethods[actual] = true;
         test.equal(definitionName, actual, "Bad method definition");
     }
-    TestManagerType.prototype.createTopic = function(definition, definitionName) {
+    TestManagerType.prototype.createPublication = function(definition, definitionName) {
         var fn = definition.cursor;
         var thatManager = this.thatManager;
         test.equal(_.isFunction(fn), true, "no cursor:"+definitionName);

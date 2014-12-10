@@ -71,7 +71,7 @@ Meteor.startup(function() {
          *
          * Example:
          *
-         * AssetManager.createTopic('reportPresentations')
+         * AssetManager.createPublication('reportPresentations')
          * (AssetManager.reportPresentationsCursor must exist)
          * causes:
          *
@@ -83,7 +83,7 @@ Meteor.startup(function() {
          *
          * @param meteorTopicSuffix
          */
-        createTopic : function(meteorTopicDefinition, meteorTopicSuffix) {
+        createPublication : function(meteorTopicDefinition, meteorTopicSuffix) {
             var thatManager = this.thatManager;
             var meteorTopicName = this.getMeteorTopicName(meteorTopicSuffix);
             var meteorTopicCursorFunction = meteorTopicDefinition.cursor;
@@ -211,16 +211,22 @@ Meteor.startup(function() {
                     var fullDerivedDefinition = _.extend({}, _.omit(meteorTopicDefinition, 'cursor', 'derived'), derivedDefinition);
                     var uppercaseExtensionName = extensionName.charAt(0).toUpperCase() + extensionName.substring(1);
                     var derivedMeteorTopicSuffix = meteorTopicSuffix + uppercaseExtensionName;
-                    if ( extensionName === 'count' && fullDerivedDefinition.cursor == null) {
-                        var meteorTopicTableName = _createClientOnlyCollection(derivedMeteorTopicSuffix);
-                        fullDerivedDefinition.cursor = function() {
-                            // TODO: create a hash with arguments to add to id string.
-                            var id = meteorTopicName+uppercaseExtensionName;
-                            var cursor = thatManager[meteorTopicTableName].find(id);
-                            return cursor;
+                    if ( extensionName === 'count') {
+                        if (fullDerivedDefinition.cursor == null) {
+                            var meteorTopicTableName = _createClientOnlyCollection(derivedMeteorTopicSuffix);
+                            fullDerivedDefinition.cursor = function () {
+                                // TODO: create a hash with arguments to add to id string.
+                                var id = meteorTopicName + uppercaseExtensionName;
+                                var cursor = thatManager[meteorTopicTableName].find(id);
+                                return cursor;
+                            }
                         }
+                    } else {
+                        thatManager.error("Only know how to handle derived 'count' not ", extensionName, " in ", derivedMeteorTopicSuffix);
+                        debugger;
+                        return;
                     }
-                    thatManager.createTopic(fullDerivedDefinition, derivedMeteorTopicSuffix);
+                    thatManager.createPublication(fullDerivedDefinition, derivedMeteorTopicSuffix);
                 });
             }
         }
