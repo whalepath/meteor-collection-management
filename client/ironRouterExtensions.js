@@ -200,7 +200,8 @@ if ( Router != null) {
         // TODO: This does not work because no routes are defined at this moment
         // need to see if we can hook the route creation.
         _.each(Router.routes, function (route) {
-            var templateName = route.options.template || route.router.convertTemplateName(route.name);
+            var routeName = route.getName? route.getName(): route.name;
+            var templateName = route.options.template || (route.router.toTemplateName?route.router.toTemplateName(routeName):route.router.convertTemplateName(routeName));
             var template = Template[templateName];
             // not all routes have templates...
             if (template) {
@@ -209,12 +210,12 @@ if ( Router != null) {
                     // maybe in future merge Router.xx() and Template.xx() so that the results are
                     // combined?
                     if (typeof route.options[action] === 'undefined') {
-                        console.log(route.name, " is getting a ", action);
+                        console.log(routeName, " is getting a ", action);
                         route.options[action] = Blaze._getTemplateHelper(template, action);
                     } else {
-                        console.log(route.name, " already has a ", action);
+                        console.log(routeName, " already has a ", action);
                         var templateAction = Blaze._getTemplateHelper(template, action);
-                        console.log(route.name, "making combined", action);
+                        console.log(routeName, "making combined", action);
                         var routeAction = route.options[action];
                         var combinedAction;
                         if (action == 'waitOn') {
@@ -223,7 +224,7 @@ if ( Router != null) {
                             } else if (_.isFunction(routeAction)) {
                                 combinedAction = [routeAction, templateAction];
                             } else {
-                                throw new Error(route.name, 'waitOn not fn or array');
+                                throw new Error(routeName, 'waitOn not fn or array');
                             }
                         } else {
                             combinedAction = function() {
@@ -237,7 +238,7 @@ if ( Router != null) {
                     }
                 });
             } else {
-                console.log(route.name, " has no template");
+                console.log(routeName, " has no template");
             }
         });
         // HACK Meteor 0.9.4: to avoid warning messages because we have
