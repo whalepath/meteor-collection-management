@@ -24,7 +24,8 @@ Meteor.startup(function() {
             Object.defineProperty(thatManager, meteorCallNameSuffix, {
                 value : function() {
                     var args = Array.prototype.slice.call(arguments);
-                    // look for callback function that will be called with the result the server returns.
+                    // look for callback function that will be called with the result the server
+                    // returns.
                     var callback;
                     if (args.length > 0) {
                         if (typeof args[args.length - 1] == "function") {
@@ -77,9 +78,14 @@ Meteor.startup(function() {
          *
          * AssetManager.reportPresentations function to be created.
          *
-         * var subscribeHandle = AssetManager.reportPresentationsHandle('34'); // subscribe passing '34' to the server for subscription.
-         * subscribeHandle.findFetch(); // return when subscribeHandle.ready() == true call AssetManager.reportPresentationsCursor('34').fetch();
-         * subscribeHandle.findOne(); // return when subscribeHandle.ready() == true call AssetManager.reportPresentationsCursor('34').fetch()[0];
+         * // subscribe passing '34' to the server for subscription.
+         * var subscribeHandle = AssetManager.reportPresentationsHandle('34');
+         * // return when subscribeHandle.ready() == true call
+         * // AssetManager.reportPresentationsCursor('34').fetch();
+         * subscribeHandle.findFetch();
+         * // return when subscribeHandle.ready() == true call
+         * // AssetManager.reportPresentationsCursor('34').fetch()[0];
+         * subscribeHandle.findOne();
          *
          * @param meteorTopicSuffix
          */
@@ -104,12 +110,14 @@ Meteor.startup(function() {
                 );
                 thatManager[meteorTopicTableName] = new Mongo.Collection(meteorTopicTableName);
                 return meteorTopicTableName;
-            }
+            };
             if ( meteorTopicCursorFunction == null) {
                 // client has no 'Cursor' function defined.
                 meteorTopicTableName =_createClientOnlyCollection(meteorTopicSuffix);
                 // create the expected cursor function - that does no selection.
-                thatManager[meteorTopicSuffix+'Cursor'] = // fix TODO in handleStringOrObjectDefinition() so we don't need this.
+                thatManager[meteorTopicSuffix+'Cursor'] = // fix TODO in
+                                                          // handleStringOrObjectDefinition() so we
+                                                          // don't need this.
                 meteorTopicDefinition.cursor =
                     meteorTopicCursorFunction = function() {
                     // note: no selection criteria because the server will only return the needed
@@ -202,27 +210,41 @@ Meteor.startup(function() {
 
                 return handle;
             };
-            thatManager._defineFindFunctionsForSubscription(meteorTopicSuffix, meteorTopicCursorFunction);
+            thatManager._defineFindFunctionsForSubscription(
+                meteorTopicSuffix,
+                meteorTopicCursorFunction
+            );
 
             if ( meteorTopicDefinition.derived ) {
                 _.each(meteorTopicDefinition.derived, function(derivedDefinition, extensionName){
                     // we don't want the meteorTopicDefinition.cursor function
                     // this allows for different permissionCheck option for example.
-                    var fullDerivedDefinition = _.extend({}, _.omit(meteorTopicDefinition, 'cursor', 'derived'), derivedDefinition);
-                    var uppercaseExtensionName = extensionName.charAt(0).toUpperCase() + extensionName.substring(1);
+                    var fullDerivedDefinition = _.extend({},
+                        _.omit(meteorTopicDefinition, 'cursor', 'derived'),
+                        derivedDefinition
+                    );
+                    var uppercaseExtensionName = extensionName.charAt(0).toUpperCase()
+                            + extensionName.substring(1);
                     var derivedMeteorTopicSuffix = meteorTopicSuffix + uppercaseExtensionName;
                     if ( extensionName === 'count') {
                         if (fullDerivedDefinition.cursor == null) {
-                            var meteorTopicTableName = _createClientOnlyCollection(derivedMeteorTopicSuffix);
+                            var meteorTopicTableName = _createClientOnlyCollection(
+                                derivedMeteorTopicSuffix
+                            );
                             fullDerivedDefinition.cursor = function () {
                                 // TODO: create a hash with arguments to add to id string.
                                 var id = meteorTopicName + uppercaseExtensionName;
                                 var cursor = thatManager[meteorTopicTableName].find(id);
                                 return cursor;
-                            }
+                            };
                         }
                     } else {
-                        thatManager.error("Only know how to handle derived 'count' not ", extensionName, " in ", derivedMeteorTopicSuffix);
+                        thatManager.error(
+                            "Only know how to handle derived 'count' not",
+                            extensionName,
+                            "in",
+                            derivedMeteorTopicSuffix
+                        );
                         debugger;
                         return;
                     }
