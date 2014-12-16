@@ -227,9 +227,6 @@ Meteor.startup(function() {
              * 'publishComposite' so that https://atmospherejs.com/reywood/publish-composite / https://github.com/englue/meteor-publish-composite.git
              * could be used.
              * or
-             * 'publishCache' so that https://atmospherejs.com/bozhao/publish-cache / https://github.com/yubozhao/meteor-publish-cache.git
-             * could be used.
-             * or
              * 'reactivePublish' so that : https://github.com/Diggsey/meteor-reactive-publish.git
              * could be used.
              */
