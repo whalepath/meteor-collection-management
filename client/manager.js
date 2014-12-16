@@ -1,3 +1,8 @@
+var subscribeTypes = {
+    cache: 'subscribeCache',
+    default: 'subscribe'
+};
+
 Meteor.startup(function() {
     'use strict';
     _.extend(ManagerType.prototype, {
@@ -133,7 +138,8 @@ Meteor.startup(function() {
             this[meteorTopicSuffix+'Handle'] = function() {
                 var args = Array.prototype.slice.call(arguments, 0);
                 args.unshift(meteorTopicName);
-                var handle = Meteor.subscribe.apply(Meteor,args);
+                var subscribeMethod = subscribeTypes[meteorTopicDefinition.type] || 'subscribe';
+                var handle = Meteor[subscribeMethod].apply(Meteor,args);
 
                 var passedArguments = Array.prototype.slice.call(arguments, 0);
                 var lastPassedArgument = passedArguments

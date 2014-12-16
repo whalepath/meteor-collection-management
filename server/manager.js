@@ -1,3 +1,8 @@
+var publishTypes = {
+    cache: 'publishCache',
+    default: 'publish'
+};
+
 Meteor.startup(function() {
     'use strict';
     _.extend(ManagerType.prototype, {
@@ -228,7 +233,8 @@ Meteor.startup(function() {
              * 'reactivePublish' so that : https://github.com/Diggsey/meteor-reactive-publish.git
              * could be used.
              */
-            Meteor.publish(meteorTopicName, wrappedFn);
+            var publishMethod = publishTypes[meteorTopicDefinition.type] || 'publish';
+            Meteor[publishMethod](meteorTopicName, wrappedFn);
             thatManager._defineFindFunctionsForSubscription(meteorTopicSuffix, meteorTopicCursorFunction);
 
             if ( meteorTopicDefinition.derived ) {
