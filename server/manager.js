@@ -283,10 +283,12 @@ Meteor.startup(function() {
                             };
                         }
                     } else {
+                        // TO_PAT: log methods add the extra space between arguments; you don't need
+                        // to do it manually.
                         thatManager.error(
-                            "Only know how to handle derived 'count' not ",
+                            "Only know how to handle derived 'count' not",
                             extensionName,
-                            " in ",
+                            "in",
                             derivedMeteorTopicSuffix
                         );
                         debugger;
