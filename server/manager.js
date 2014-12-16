@@ -66,8 +66,10 @@ Meteor.startup(function() {
                               || !permissionCheck[i](permissionCompleteInfo)) {
                                 // failed permission check
                                 debugger;
-                                thatManager.log(403, "Current user not permitted to call " + callName);
-                                throw new Meteor.Error(403, "Current user not permitted to call " + callName);
+                                thatManager.log(403, "Current user not permitted to call", callName);
+                                throw new Meteor.Error(403,
+                                    "Current user not permitted to call", callName
+                                );
                             }
                         }
                         return methodFunctionWithManager.apply(this, permissionCompleteInfo.args);
@@ -115,9 +117,9 @@ Meteor.startup(function() {
             if ( !_.isFunction(meteorTopicCursorFunction)) {
                 thatManager.fatal("No cursor function supplied for "+meteorTopicName);
             }
-            // TODO: idea to handle multiple cursors returned. meteorTopicDefinition.cursor is the primary cursor
-            // meteorTopicDefinition.query is the function called that calls meteorTopicDefinition.cursor and adds in
-            // additional cursors to the publication.
+            // TODO: idea to handle multiple cursors returned. meteorTopicDefinition.cursor is the
+            // primary cursor meteorTopicDefinition.query is the function called that calls
+            // meteorTopicDefinition.cursor and adds in additional cursors to the publication.
             //
             //var meteorTopicQueryFunction = meteorTopicDefinition.query | meteorTopicCursorFunction;
             // make the current manager available on cursor when doing publish subscribe.
@@ -219,12 +221,16 @@ Meteor.startup(function() {
                 };
             }
 
-            var wrappedFn = thatManager._createMeteorHandleAugmentationFunction(meteorTopicCursorFunction, securedCursorFunction);
+            var wrappedFn = thatManager._createMeteorHandleAugmentationFunction(
+                meteorTopicCursorFunction,
+                securedCursorFunction
+            );
 
             /**
              * IMPORTANT TODO: allow for the publication to be configured with different method
              * i.e.
-             * 'publishComposite' so that https://atmospherejs.com/reywood/publish-composite / https://github.com/englue/meteor-publish-composite.git
+             * 'publishComposite' so that https://atmospherejs.com/reywood/publish-composite /
+             * https://github.com/englue/meteor-publish-composite.git
              * could be used.
              * or
              * 'reactivePublish' so that : https://github.com/Diggsey/meteor-reactive-publish.git
@@ -232,19 +238,27 @@ Meteor.startup(function() {
              */
             var publishMethod = publishTypes[meteorTopicDefinition.type] || 'publish';
             Meteor[publishMethod](meteorTopicName, wrappedFn);
-            thatManager._defineFindFunctionsForSubscription(meteorTopicSuffix, meteorTopicCursorFunction);
+            thatManager._defineFindFunctionsForSubscription(
+                meteorTopicSuffix,
+                meteorTopicCursorFunction
+            );
 
             if ( meteorTopicDefinition.derived ) {
                 _.each(meteorTopicDefinition.derived, function(derivedDefinition, extensionName){
                     // we don't want the meteorTopicDefinition.cursor function
                     // this allows for different permissionCheck option for example.
-                    var fullDerivedDefinition = _.extend({parentMeteorTopicDefinition:meteorTopicDefinition}, _.omit(meteorTopicDefinition, 'cursor', 'derived'), derivedDefinition);
-                    var uppercaseExtensionName = extensionName.charAt(0).toUpperCase() + extensionName.substring(1);
+                    var fullDerivedDefinition = _.extend({
+                            parentMeteorTopicDefinition:meteorTopicDefinition
+                    }, _.omit(meteorTopicDefinition, 'cursor', 'derived'), derivedDefinition);
+                    var uppercaseExtensionName = extensionName.charAt(0).toUpperCase()
+                            + extensionName.substring(1);
                     var derivedMeteorTopicSuffix = meteorTopicSuffix + uppercaseExtensionName;
 
                     if ( extensionName === 'count') {
                         if( fullDerivedDefinition.cursor == null) {
-                            var meteorTopicTableName = thatManager.getMeteorTopicTableName(derivedMeteorTopicSuffix);
+                            var meteorTopicTableName = thatManager.getMeteorTopicTableName(
+                                derivedMeteorTopicSuffix
+                            );
                             fullDerivedDefinition.cursor = function() {
                                 var cursor = meteorTopicCursorFunction.apply(this, arguments);
                                 // TODO: create a hash with arguments to add to id string.
@@ -259,23 +273,35 @@ Meteor.startup(function() {
                                     countValue = cursor.count();
                                 }
                                 if ( this == null ) {
-                                    thatManager.error("no 'this' in count() for ", derivedMeteorTopicSuffix);
+                                    thatManager.error(
+                                        "no 'this' in count() for",
+                                        derivedMeteorTopicSuffix
+                                    );
                                     debugger;
                                 }
                                 this.added(meteorTopicTableName, id, {count: countValue});
-                            }
+                            };
                         }
                     } else {
-                        thatManager.error("Only know how to handle derived 'count' not ", extensionName, " in ", derivedMeteorTopicSuffix);
+                        thatManager.error(
+                            "Only know how to handle derived 'count' not ",
+                            extensionName,
+                            " in ",
+                            derivedMeteorTopicSuffix
+                        );
                         debugger;
                         return;
                     }
-                    var derivedMeteorTopicSuffix = meteorTopicSuffix + extensionName.charAt(0).toUpperCase() + extensionName.substring(1);
+                    var derivedMeteorTopicSuffix = meteorTopicSuffix
+                            + extensionName.charAt(0).toUpperCase() + extensionName.substring(1);
                     thatManager.createPublication(fullDerivedDefinition, derivedMeteorTopicSuffix);
                 });
             }
         },
-        _createMeteorHandleAugmentationFunction: function(meteorTopicCursorFunction, securedCursorFunction) {
+        _createMeteorHandleAugmentationFunction: function(
+            meteorTopicCursorFunction,
+            securedCursorFunction
+        ) {
             // TODO: PATM: why can't we just pass securedCursorFunction?
             var thatManager = this.thatManager;
             // insure that this.ready() is called when the no data is returned. (required for
