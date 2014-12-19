@@ -65,7 +65,6 @@ Meteor.startup(function() {
                               || !_.isFunction(permissionCheck[i])
                               || !permissionCheck[i](permissionCompleteInfo)) {
                                 // failed permission check
-                                debugger;
                                 thatManager.log(403, "Current user not permitted to call", callName);
                                 throw new Meteor.Error(403,
                                     "Current user not permitted to call", callName
@@ -74,7 +73,6 @@ Meteor.startup(function() {
                         }
                         return methodFunctionWithManager.apply(this, permissionCompleteInfo.args);
                     } else {
-                        debugger;
                         thatManager.log(403, "Current user not permitted to call " + callName);
                         throw new Meteor.Error(403, "Current user not permitted to call " + callName);
                     }
@@ -201,7 +199,6 @@ Meteor.startup(function() {
                               || !_.isFunction(permissionCheck[i])
                               || !permissionCheck[i](permissionCompleteInfo)) {
                                 // failed permission check
-                                debugger;
                                 thatManager.log(
                                     403,
                                     meteorTopicName+":Current user not permitted to subscribe"
@@ -211,7 +208,6 @@ Meteor.startup(function() {
                         }
                         return meteorTopicCursorFunction.apply(this, permissionCompleteInfo.args);
                     } else {
-                        debugger;
                         thatManager.log(
                             403,
                             meteorTopicName+":Current user not permitted to subscribe"
