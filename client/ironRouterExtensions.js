@@ -26,6 +26,13 @@ if ( Router != null) {
         }
         return result;
     }
+    // Use these methods in initializeData
+    one = function(handle) {
+        return {
+            handle: handle,
+            method: oneFn
+        };
+    };
     function manyFn() {
         'use strict';
         var result;
@@ -45,6 +52,26 @@ if ( Router != null) {
         }
         return result;
     }
+    // Use these methods in initializeData
+    many = function(handle) {
+        return {
+            handle: handle,
+            method: manyFn
+        };
+    };
+    count = function(handle) {
+        return {
+            handle: handle,
+            method: function() {
+                var oneResult = oneFn.apply(this, arguments);
+                if ( oneResult != null) {
+                    return oneResult.count;
+                } else {
+                    return void(0);
+                }
+            }
+        };
+    };
 
     /**
      * A standard data() that will be called by the Router code to get the template's data.
@@ -244,33 +271,5 @@ if ( Router != null) {
         // HACK Meteor 0.9.4: to avoid warning messages because we have
         // Template.prototype.waitOn/data defined.
         delete Template.prototype._NOWARN_OLDSTYLE_HELPERS;
-    };
-
-    // Use these methods in initializeData
-    one = function(handle) {
-        return {
-            handle: handle,
-            method: oneFn
-        };
-    };
-    count = function(handle) {
-        return {
-            handle: handle,
-            method: function() {
-                var oneResult = oneFn.apply(this, arguments);
-                if ( oneResult != null) {
-                    return oneResult.count;
-                } else {
-                    return void(0);
-                }
-            }
-        };
-    };
-    // Use these methods in initializeData
-    many = function(handle) {
-        return {
-            handle: handle,
-            method: manyFn
-        };
     };
 }

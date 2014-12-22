@@ -174,6 +174,12 @@ Meteor.startup(function() {
                         writable: false,
                         configurable: false,
                         enumerable: false
+                    },
+                    meteorTopicName: {
+                        value: meteorTopicName,
+                        writable: false,
+                        configurable: false,
+                        enumerable: false
                     }
                 });
                 /**
