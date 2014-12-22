@@ -351,16 +351,21 @@ Meteor.startup(function() {
             };
             return wrappedFn;
         },
-        redirect: function(url, router) {
-            router.response.statusCode = 302;
-            if ( url == null ) {
-                url = Meteor.absoluteUrl();
+        redirect: function(redirectUrl, router) {
+            var thatManager = this.thatManager;
+            thatManager.log("redirect to :",redirectUrl);
+            if ( redirectUrl == null ) {
+                redirectUrl = Meteor.absoluteUrl();
             }
             // TODO: alter window history so that a 'go back' goes to the previous whalepath page (
             // not this redirect page )
             //
             // TODO: except if the previous page is a non-whalepath page.
-            router.response.setHeader('Location', url);
+            router.response.writeHead(302, {
+                'Location': redirectUrl
+            });
+
+            router.response.end();
         }
     });
     Object.defineProperties(ManagerType.prototype, {

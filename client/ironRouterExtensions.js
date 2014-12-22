@@ -94,126 +94,128 @@ if ( Router != null) {
      *            <desired-context-key-4> : handle4
      *          }
      */
-    Template.prototype.data = function() {
-        'use strict';
-        var initializeData;
-        // TO_PAT(2014-11-14): what does this alternative mean? In most cases, we have helper
-        // functions on the tmpl itself, but we take the first path.
-        if ( this.route != null) {
-            //we are being called by the iron:router code
-            initializeData = this.route.options.initializeData;
-        } else {
-            // template helper functions are on the template itself
-            initializeData = this.initializeData;
-        }
+    var DefaultIronRouterFunctions = {
+        data: function () {
+            'use strict';
+            var initializeData;
+            // TO_PAT(2014-11-14): what does this alternative mean? In most cases, we have helper
+            // functions on the tmpl itself, but we take the first path.
+            if (this.route != null) {
+                //we are being called by the iron:router code
+                initializeData = this.route.options.initializeData;
+            } else {
+                // template helper functions are on the template itself
+                initializeData = this.initializeData;
+            }
 
-        if ( initializeData ) {
-            var initialData;
-            if ( typeof initializeData ==='function' ) {
-                var router = Router.current(true);
-                var params;
-                if ( router && router.params) {
-                    params = router.params;
-                } else {
-                    params = {};
-                }
-                initialData = initializeData(params);
-            } else {
-                initialData = initializeData;
-            }
-            var result = {};
-            _.each(initialData, function(handleObj, key) {
-                var isHandleAndMethod;
-                try {
-                    isHandleAndMethod = handleObj != null
-                                    && 'handle' in handleObj
-                                    && 'method' in handleObj;
-                } catch(e) {
-                    // string or something else
-                    isHandleAndMethod = false;
-                }
-                var recipientObj = isHandleAndMethod? handleObj.handle : handleObj;
-                var isOneKey = key.length > 3 && key.substring(key.length-3, key.length) == 'One';
-                if ( recipientObj == null ) {
-                    // null or undefined handleObj or handle.handleObj is null or undefined
-                    result[key] = recipientObj;
-                    if ( isOneKey ) {
-                        result[key.substring(0, key.length - 3)] = recipientObj;
-                    }
-                } else if ( isHandleAndMethod ) {
-                    switch(typeof handleObj.method) {
-                    case 'undefined':
-                        throw new Meteor.Error(500, "For key=", key, ": ",
-                            "'method' is undefined in handleObj"
-                        );
-                        break;
-                    case 'string':
-                        if (typeof recipientObj[handleObj.method] === 'function') {
-                            result[key] = recipientObj[handleObj.method]();
-                        } else {
-                            throw new Meteor.Error(500, "For key=", key, ": ",
-                                "'method'=" + handleObj.method + " is not a function on recipientObj"
-                            );
-                        }
-                        break;
-                    case 'function':
-                        result[key] = handleObj.method.call(recipientObj);
-                        break;
-                    default:
-                        throw new Meteor.Error(500, "For key=", key, ": ",
-                            "'method' is", typeof handleObj.method, "in handleObj",
-                            "should be function or string"
-                        );
-                        break;
-                    }
-                } else if ( isOneKey ) {
-                    result[key] = result[key.substring(0, key.length - 3)] = oneFn.call(recipientObj);
-                } else {
-                    result[key] = manyFn.call(recipientObj);
-                }
-            });
-            return result;
-        }
-    };
-    Template.prototype.waitOn = function() {
-        'use strict';
-        var initializeData;
-        if ( this.route != null) {
-            //we are being called by the iron:router code
-            initializeData = this.route.options.initializeData;
-        } else {
-            // template helper functions are on the template itself
-            initializeData = this.initializeData;
-        }
-        if ( initializeData ) {
-            var initialData;
-            if ( typeof initializeData ==='function' ) {
-                var router = Router.current(true);
-                var params;
-                if ( router && router.params) {
-                    params = router.params;
-                } else {
-                    params = {};
-                }
-                initialData = initializeData(params);
-            } else {
-                initialData = initializeData;
-            }
-            var result = [];
-            _.each(initialData, function(handleObj, key) {
-                var handle;
-                if ( handleObj ) {
-                    if (handleObj && handleObj.handle) {
-                        handle = handleObj.handle;
+            if (initializeData) {
+                var initialData;
+                if (typeof initializeData === 'function') {
+                    var router = Router.current(true);
+                    var params;
+                    if (router && router.params) {
+                        params = router.params;
                     } else {
-                        handle = handleObj;
+                        params = {};
                     }
-                    if (handle && typeof handle.ready === 'function') {
-                        result.push(handle);
-                    }
+                    initialData = initializeData(params);
+                } else {
+                    initialData = initializeData;
                 }
-            });
-            return result;
+                var result = {};
+                _.each(initialData, function (handleObj, key) {
+                    var isHandleAndMethod;
+                    try {
+                        isHandleAndMethod = handleObj != null
+                        && 'handle' in handleObj
+                        && 'method' in handleObj;
+                    } catch (e) {
+                        // string or something else
+                        isHandleAndMethod = false;
+                    }
+                    var recipientObj = isHandleAndMethod ? handleObj.handle : handleObj;
+                    var isOneKey = key.length > 3 && key.substring(key.length - 3, key.length) == 'One';
+                    if (recipientObj == null) {
+                        // null or undefined handleObj or handle.handleObj is null or undefined
+                        result[key] = recipientObj;
+                        if (isOneKey) {
+                            result[key.substring(0, key.length - 3)] = recipientObj;
+                        }
+                    } else if (isHandleAndMethod) {
+                        switch (typeof handleObj.method) {
+                        case 'undefined':
+                            throw new Meteor.Error(500, "For key=", key, ": ",
+                                "'method' is undefined in handleObj"
+                            );
+                            break;
+                        case 'string':
+                            if (typeof recipientObj[handleObj.method] === 'function') {
+                                result[key] = recipientObj[handleObj.method]();
+                            } else {
+                                throw new Meteor.Error(500, "For key=", key, ": ",
+                                    "'method'=" + handleObj.method + " is not a function on recipientObj"
+                                );
+                            }
+                            break;
+                        case 'function':
+                            result[key] = handleObj.method.call(recipientObj);
+                            break;
+                        default:
+                            throw new Meteor.Error(500, "For key=", key, ": ",
+                                "'method' is", typeof handleObj.method, "in handleObj",
+                                "should be function or string"
+                            );
+                            break;
+                        }
+                    } else if (isOneKey) {
+                        result[key] = result[key.substring(0, key.length - 3)] = oneFn.call(recipientObj);
+                    } else {
+                        result[key] = manyFn.call(recipientObj);
+                    }
+                });
+                return result;
+            }
+        },
+        waitOn: function () {
+            'use strict';
+            var initializeData;
+            if (this.route != null) {
+                //we are being called by the iron:router code
+                initializeData = this.route.options.initializeData;
+            } else {
+                // template helper functions are on the template itself
+                initializeData = this.initializeData;
+            }
+            if (initializeData) {
+                var initialData;
+                if (typeof initializeData === 'function') {
+                    var router = Router.current(true);
+                    var params;
+                    if (router && router.params) {
+                        params = router.params;
+                    } else {
+                        params = {};
+                    }
+                    initialData = initializeData(params);
+                } else {
+                    initialData = initializeData;
+                }
+                var result = [];
+                _.each(initialData, function (handleObj, key) {
+                    var handle;
+                    if (handleObj) {
+                        if (handleObj && handleObj.handle) {
+                            handle = handleObj.handle;
+                        } else {
+                            handle = handleObj;
+                        }
+                        if (handle && typeof handle.ready === 'function') {
+                            result.push(handle);
+                        }
+                    }
+                });
+                return result;
+            }
         }
     };
 
@@ -237,8 +239,8 @@ if ( Router != null) {
                     // maybe in future merge Router.xx() and Template.xx() so that the results are
                     // combined?
                     if (typeof route.options[action] === 'undefined') {
-                        console.log(routeName, " is getting a ", action);
-                        route.options[action] = Blaze._getTemplateHelper(template, action);
+                        route.options[action] = Blaze._getTemplateHelper(template, action) || DefaultIronRouterFunctions[action];
+                        console.log(routeName, " is getting a ", action, " and set ", route.options[action]!=null);
                     } else {
                         console.log(routeName, " already has a ", action);
                         var templateAction = Blaze._getTemplateHelper(template, action);
