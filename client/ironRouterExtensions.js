@@ -103,7 +103,8 @@ if ( Router != null) {
             if (this.route != null) {
                 //we are being called by the iron:router code
                 initializeData = this.route.options.initializeData;
-            } else {
+            }
+            if ( initializeData == null) {
                 // template helper functions are on the template itself
                 initializeData = this.initializeData;
             }
@@ -182,7 +183,8 @@ if ( Router != null) {
             if (this.route != null) {
                 //we are being called by the iron:router code
                 initializeData = this.route.options.initializeData;
-            } else {
+            }
+            if ( initializeData == null) {
                 // template helper functions are on the template itself
                 initializeData = this.initializeData;
             }
@@ -232,47 +234,45 @@ if ( Router != null) {
             var routeName = route.getName? route.getName(): route.name;
             var templateName = route.options.template || (route.router.toTemplateName?route.router.toTemplateName(routeName):route.router.convertTemplateName(routeName));
             var template = Template[templateName];
-            var initializeDataOnTemplate = template && Blaze._getTemplateHelper(template, 'initializeData') != null;
-            // not all routes have templates...
-            if (template && initializeDataOnTemplate) {
-                _.each(['waitOn', 'data'], function (action) {
-                    // if a route does not have a function use the Template's function
-                    // maybe in future merge Router.xx() and Template.xx() so that the results are
-                    // combined?
-                    if (typeof route.options[action] === 'undefined') {
-                        route.options[action] = Blaze._getTemplateHelper(template, action) || DefaultIronRouterFunctions[action];
-                        console.log(routeName, " is getting a ", action, " and set ", route.options[action]!=null);
-                    } else {
-                        console.log(routeName, ": route already has a ", action);
-                        var templateAction = Blaze._getTemplateHelper(template, action) || DefaultIronRouterFunctions[action];
-
-                        console.log(routeName, "making combined", action);
-                        var routeAction = route.options[action];
-                        var combinedAction;
-                        if (action == 'waitOn') {
-                            if (_.isArray(routeAction)) {
-                                combinedAction = routeAction.concat([templateAction]);
-                            } else if (_.isFunction(routeAction)) {
-                                combinedAction = [routeAction, templateAction];
-                            } else {
-                                throw new Error(routeName, 'waitOn not fn or array');
-                            }
-                        } else {
-                            combinedAction = function() {
-                                var results = {};
-                                _.extend(results, templateAction.call(this));
-                                _.extend(results, routeAction.call(this));
-                                return results;
-                            };
-                        }
-                        route.options[action] = combinedAction;
-                    }
-                });
-            } else if ( template == null ) {
-                console.log(routeName, " has no template");
-            } else {
-                console.log(routeName, " has no initializeData");
+            var initializeData = route.options.initializeData;
+            if (initializeData == null ) {
+                if (template ) {
+                    route.options.initializeData = initializeData = Blaze._getTemplateHelper(template, 'initializeData');
+                }
             }
+            // not all routes have templates...
+            _.each(['initializeData', 'waitOn', 'data'], function (action) {
+                var templateAction = Blaze._getTemplateHelper(template, action) || (initializeData && DefaultIronRouterFunctions[action]);
+                // if a route does not have a function use the Template's function
+                // maybe in future merge Router.xx() and Template.xx() so that the results are
+                // combined?
+                if (route.options[action] != null && templateAction !=null) {
+                    console.log(routeName, ": route already has a ", action);
+                    console.log(routeName, "making combined", action);
+                    var routeAction = route.options[action];
+                    var combinedAction;
+                    if (action == 'waitOn') {
+                        if (_.isArray(routeAction)) {
+                            combinedAction = routeAction.concat([templateAction]);
+                        } else if (_.isFunction(routeAction)) {
+                            combinedAction = [routeAction, templateAction];
+                        } else {
+                            throw new Error(routeName, 'waitOn not fn or array');
+                        }
+                    } else {
+                        combinedAction = function() {
+                            var results = {};
+                            _.extend(results, templateAction.call(this));
+                            _.extend(results, routeAction.call(this));
+                            return results;
+                        };
+                    }
+                    route.options[action] = combinedAction;
+                } else if ( templateAction !=null) {
+                    route.options[action] = templateAction;
+                    console.log(routeName, " is getting a ", action, " and set ", route.options[action] != null);
+                }
+            });
         });
         // HACK Meteor 0.9.4: to avoid warning messages because we have
         // Template.prototype.waitOn/data defined.
