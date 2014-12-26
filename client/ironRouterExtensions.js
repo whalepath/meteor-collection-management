@@ -242,7 +242,13 @@ if ( Router != null) {
             }
             // not all routes have templates...
             _.each(['initializeData', 'waitOn', 'data'], function (action) {
-                var templateAction = Blaze._getTemplateHelper(template, action) || (initializeData && DefaultIronRouterFunctions[action]);
+                var templateAction;
+                if ( template ) {
+                    templateAction = Blaze._getTemplateHelper(template, action);
+                }
+                if ( templateAction == null && initializeData && action != 'initializeData') {
+                    templateAction = DefaultIronRouterFunctions[action];
+                }
                 // if a route does not have a function use the Template's function
                 // maybe in future merge Router.xx() and Template.xx() so that the results are
                 // combined?
