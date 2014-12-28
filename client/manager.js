@@ -13,7 +13,7 @@ Meteor.startup(function() {
          * function(error, results) )
          * @param meteorCallDefinition
          */
-        createMeteorCallMethod : function(meteorCallDefinition, meteorCallNameSuffix) {
+        createMeteorCallMethod : function createMeteorCallMethod(meteorCallDefinition, meteorCallNameSuffix) {
             var thatManager = this.thatManager;
             var trackingEventKey;
             var trackingEventData;
@@ -94,7 +94,7 @@ Meteor.startup(function() {
          *
          * @param meteorTopicSuffix
          */
-        createPublication : function(meteorTopicDefinition, meteorTopicSuffix) {
+        createPublication : function createPublication(meteorTopicDefinition, meteorTopicSuffix) {
             var thatManager = this.thatManager;
             var meteorTopicName = this.getMeteorTopicName(meteorTopicSuffix);
             var meteorTopicCursorFunction = meteorTopicDefinition.cursor;
@@ -135,7 +135,7 @@ Meteor.startup(function() {
             // should be saved on the manager so that we don't have multiple subscribes/unsubscribes
             //
             // creates the stub subscribe method
-            this[meteorTopicSuffix+'Handle'] = function() {
+            this[meteorTopicSuffix+'Handle'] = function publicationHandler() {
                 var args = Array.prototype.slice.call(arguments, 0);
                 args.unshift(meteorTopicName);
                 var subscribeMethod = subscribeTypes[meteorTopicDefinition.type] || 'subscribe';
@@ -188,7 +188,7 @@ Meteor.startup(function() {
                  *  arguments that were passed to the subscribe meteorTopic.
                  * @returns undefined if the handle is not ready.
                  */
-                handle.find = handle.cursor = function() {
+                handle.find = handle.cursor = function handlerFind() {
                     var resultsCursor = void(0);
                     // TODO: deep merge arguments
                     if ( handle.ready() ) {
@@ -196,7 +196,7 @@ Meteor.startup(function() {
                     }
                     return resultsCursor;
                 };
-                handle.findFetch = function() {
+                handle.findFetch = function handlerFindFetch() {
                     var results = void(0);
                     var resultsCursor = this.find();
                     if ( resultsCursor != null ) {
@@ -208,7 +208,7 @@ Meteor.startup(function() {
                  * function that returns only a single result ( if the results are ready)
                  * @returns
                  */
-                handle.findOne = function() {
+                handle.findOne = function handlerFindOne() {
                     var results = this.findFetch();
                     if ( results === undefined) {
                         return void(0);

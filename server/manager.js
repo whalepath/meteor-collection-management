@@ -185,6 +185,7 @@ Meteor.startup(function() {
                     meteorTopicName:meteorTopicName
                 };
                 securedCursorFunction = function () {
+                    var self = this;
                     var permissionCompleteInfo = _.extend({}, permissionInfo, {
                         userId: this.userId,
                         // copy the arguments so that permissionCheck can alter the arguments
@@ -201,7 +202,8 @@ Meteor.startup(function() {
                                 // failed permission check
                                 thatManager.log(
                                     403,
-                                    meteorTopicName+":Current user not permitted to subscribe"
+                                    meteorTopicName+":Current user not permitted to subscribe. userId=",
+                                    self.userId
                                 );
                                 return this.stop();
                             }
@@ -210,7 +212,8 @@ Meteor.startup(function() {
                     } else {
                         thatManager.log(
                             403,
-                            meteorTopicName+":Current user not permitted to subscribe"
+                            meteorTopicName+":Current user not permitted to subscribe. userId=",
+                            self.userId
                         );
                         return this.stop();
                     }
