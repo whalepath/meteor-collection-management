@@ -179,49 +179,50 @@ if ( Router != null) {
                 return result;
             }
         },
-        waitOn: function DefaultIronRouterFunctions_WaitOn() {
-            'use strict';
-            var initializeData;
-            if (this.route != null) {
-                //we are being called by the iron:router code
-                initializeData = this.route.options.initializeData;
-            }
-            if ( initializeData == null) {
-                // template helper functions are on the template itself
-                initializeData = this.initializeData;
-            }
-            if (initializeData) {
-                var initialData;
-                if (typeof initializeData === 'function') {
-                    var router = Router.current(true);
-                    var params;
-                    if (router && router.params) {
-                        params = router.params;
-                    } else {
-                        params = {};
-                    }
-                    initialData = initializeData(params);
-                } else {
-                    initialData = initializeData;
-                }
-                var result = [];
-                _.each(initialData, function (handleObj, key) {
-                    var handle;
-                    if (handleObj) {
-                        if (handleObj && handleObj.handle) {
-                            handle = handleObj.handle;
-                        } else {
-                            handle = handleObj;
-                        }
-                        if (handle && typeof handle.ready === 'function') {
-                            result.push(handle);
-                        }
-                    }
-                });
-                debugger;
-                return result;
-            }
-        }
+        //waitOn: function DefaultIronRouterFunctions_WaitOn() {
+        //    'use strict';
+        //    var result = [];
+        //    var initializeData;
+        //    if (this.route != null) {
+        //        //we are being called by the iron:router code
+        //        initializeData = this.route.options.initializeData;
+        //    }
+        //    if ( initializeData == null) {
+        //        // template helper functions are on the template itself
+        //        initializeData = this.initializeData;
+        //    }
+        //    if (initializeData) {
+        //        var initialData;
+        //        if (typeof initializeData === 'function') {
+        //            var router = Router.current(true);
+        //            var params;
+        //            if (router && router.params) {
+        //                params = router.params;
+        //            } else {
+        //                params = {};
+        //            }
+        //            initialData = initializeData(params);
+        //        } else {
+        //            initialData = initializeData;
+        //        }
+        //
+        //        _.each(initialData, function (handleObj, key) {
+        //            var handle;
+        //            if (handleObj) {
+        //                if (handleObj && handleObj.handle) {
+        //                    handle = handleObj.handle;
+        //                } else {
+        //                    handle = handleObj;
+        //                }
+        //                if (handle && typeof handle.ready === 'function') {
+        //                    result.push(handle);
+        //                }
+        //            }
+        //        });
+        //    }
+        //    debugger;
+        //    return result;
+        //}
     };
     _.extend(Template.prototype, DefaultIronRouterFunctions);
 
@@ -229,7 +230,6 @@ if ( Router != null) {
     // TODO: Be able to use RouteControllers
     Template.prototype._initializeRoutes = function _initializeRoutes() {
         'use strict';
-        return;
         // HACK Meteor 0.9.4: to avoid warning messages because we have
         // Template.prototype.waitOn/data defined.
         Template.prototype._NOWARN_OLDSTYLE_HELPERS =true;
