@@ -175,54 +175,52 @@ if ( Router != null) {
                         result[key] = manyFn.call(recipientObj);
                     }
                 });
-                debugger;
                 return result;
             }
         },
-        //waitOn: function DefaultIronRouterFunctions_WaitOn() {
-        //    'use strict';
-        //    var result = [];
-        //    var initializeData;
-        //    if (this.route != null) {
-        //        //we are being called by the iron:router code
-        //        initializeData = this.route.options.initializeData;
-        //    }
-        //    if ( initializeData == null) {
-        //        // template helper functions are on the template itself
-        //        initializeData = this.initializeData;
-        //    }
-        //    if (initializeData) {
-        //        var initialData;
-        //        if (typeof initializeData === 'function') {
-        //            var router = Router.current(true);
-        //            var params;
-        //            if (router && router.params) {
-        //                params = router.params;
-        //            } else {
-        //                params = {};
-        //            }
-        //            initialData = initializeData(params);
-        //        } else {
-        //            initialData = initializeData;
-        //        }
-        //
-        //        _.each(initialData, function (handleObj, key) {
-        //            var handle;
-        //            if (handleObj) {
-        //                if (handleObj && handleObj.handle) {
-        //                    handle = handleObj.handle;
-        //                } else {
-        //                    handle = handleObj;
-        //                }
-        //                if (handle && typeof handle.ready === 'function') {
-        //                    result.push(handle);
-        //                }
-        //            }
-        //        });
-        //    }
-        //    debugger;
-        //    return result;
-        //}
+        subscriptions: function DefaultIronRouterFunctions_Subscriptions() {
+            'use strict';
+            var result = [];
+            var initializeData;
+            if (this.route != null) {
+                //we are being called by the iron:router code
+                initializeData = this.route.options.initializeData;
+            }
+            if ( initializeData == null) {
+                // template helper functions are on the template itself
+                initializeData = this.initializeData;
+            }
+            if (initializeData) {
+                var initialData;
+                if (typeof initializeData === 'function') {
+                    var router = Router.current(true);
+                    var params;
+                    if (router && router.params) {
+                        params = router.params;
+                    } else {
+                        params = {};
+                    }
+                    initialData = initializeData(params);
+                } else {
+                    initialData = initializeData;
+                }
+
+                _.each(initialData, function (handleObj, key) {
+                    var handle;
+                    if (handleObj) {
+                        if (handleObj && handleObj.handle) {
+                            handle = handleObj.handle;
+                        } else {
+                            handle = handleObj;
+                        }
+                        if (handle && typeof handle.ready === 'function') {
+                            result.push(handle);
+                        }
+                    }
+                });
+            }
+            return result;
+        }
     };
     _.extend(Template.prototype, DefaultIronRouterFunctions);
 
@@ -244,7 +242,7 @@ if ( Router != null) {
                 initializeData = Blaze._getTemplateHelper(template, 'initializeData');
             }
             // not all routes have templates...
-            _.each(['initializeData', 'waitOn', 'data'], function (action) {
+            _.each(['initializeData', 'subscriptions', 'data'], function (action) {
                 var templateAction;
                 if ( template ) {
                     templateAction = Blaze._getTemplateHelper(template, action);

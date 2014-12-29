@@ -205,7 +205,8 @@ Meteor.startup(function() {
                                     meteorTopicName+":Current user not permitted to subscribe. userId=",
                                     self.userId
                                 );
-                                return this.stop();
+                                this.stop();
+                                return;
                             }
                         }
                         return meteorTopicCursorFunction.apply(this, permissionCompleteInfo.args);
@@ -215,7 +216,8 @@ Meteor.startup(function() {
                             meteorTopicName+":Current user not permitted to subscribe. userId=",
                             self.userId
                         );
-                        return this.stop();
+                        this.stop();
+                        return;
                     }
                 };
             }
