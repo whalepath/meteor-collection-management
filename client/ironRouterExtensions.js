@@ -27,7 +27,7 @@ if ( Router != null) {
         return result;
     }
     // Use these methods in initializeData
-    one = function(handle) {
+    one = function one(handle) {
         return {
             handle: handle,
             method: oneFn
@@ -53,13 +53,13 @@ if ( Router != null) {
         return result;
     }
     // Use these methods in initializeData
-    many = function(handle) {
+    many = function many(handle) {
         return {
             handle: handle,
             method: manyFn
         };
     };
-    count = function(handle) {
+    count = function count(handle) {
         return {
             handle: handle,
             method: function() {
@@ -95,7 +95,7 @@ if ( Router != null) {
      *          }
      */
     var DefaultIronRouterFunctions = {
-        data: function () {
+        data: function DefaultIronRouterFunctions_Data() {
             'use strict';
             var initializeData;
             // TO_PAT(2014-11-14): what does this alternative mean? In most cases, we have helper
@@ -123,6 +123,7 @@ if ( Router != null) {
                 } else {
                     initialData = initializeData;
                 }
+
                 var result = {};
                 _.each(initialData, function (handleObj, key) {
                     var isHandleAndMethod;
@@ -174,10 +175,11 @@ if ( Router != null) {
                         result[key] = manyFn.call(recipientObj);
                     }
                 });
+                debugger;
                 return result;
             }
         },
-        waitOn: function () {
+        waitOn: function DefaultIronRouterFunctions_WaitOn() {
             'use strict';
             var initializeData;
             if (this.route != null) {
@@ -216,15 +218,18 @@ if ( Router != null) {
                         }
                     }
                 });
+                debugger;
                 return result;
             }
         }
     };
+    _.extend(Template.prototype, DefaultIronRouterFunctions);
 
     // HACK : Need to put method some place else: different name space?
     // TODO: Be able to use RouteControllers
-    Template.prototype._initializeRoutes = function() {
+    Template.prototype._initializeRoutes = function _initializeRoutes() {
         'use strict';
+        return;
         // HACK Meteor 0.9.4: to avoid warning messages because we have
         // Template.prototype.waitOn/data defined.
         Template.prototype._NOWARN_OLDSTYLE_HELPERS =true;
@@ -235,10 +240,8 @@ if ( Router != null) {
             var templateName = route.options.template || (route.router.toTemplateName?route.router.toTemplateName(routeName):route.router.convertTemplateName(routeName));
             var template = Template[templateName];
             var initializeData = route.options.initializeData;
-            if (initializeData == null ) {
-                if (template ) {
-                    route.options.initializeData = initializeData = Blaze._getTemplateHelper(template, 'initializeData');
-                }
+            if (initializeData == null && template ) {
+                initializeData = Blaze._getTemplateHelper(template, 'initializeData');
             }
             // not all routes have templates...
             _.each(['initializeData', 'waitOn', 'data'], function (action) {
@@ -257,7 +260,8 @@ if ( Router != null) {
                     console.log(routeName, "making combined", action);
                     var routeAction = route.options[action];
                     var combinedAction;
-                    if (action == 'waitOn') {
+                    switch(action) {
+                    case 'waitOn':
                         if (_.isArray(routeAction)) {
                             combinedAction = routeAction.concat([templateAction]);
                         } else if (_.isFunction(routeAction)) {
@@ -265,15 +269,19 @@ if ( Router != null) {
                         } else {
                             throw new Error(routeName, 'waitOn not fn or array');
                         }
-                    } else {
-                        combinedAction = function() {
+                        route.options[action] = combinedAction;
+                        break;
+                    case 'data':
+                        combinedAction = function combinedAction() {
                             var results = {};
-                            _.extend(results, templateAction.call(this));
-                            _.extend(results, routeAction.call(this));
+                            _.extend(results, templateAction.apply(this, arguments));
+                            _.extend(results, routeAction.apply(this, arguments));
                             return results;
                         };
+                        route.options[action] = combinedAction;
+                        break;
                     }
-                    route.options[action] = combinedAction;
+
                 } else if ( templateAction !=null) {
                     route.options[action] = templateAction;
                     console.log(routeName, " is getting a ", action, " and set ", route.options[action] != null);
