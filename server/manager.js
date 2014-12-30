@@ -175,7 +175,7 @@ Meteor.startup(function() {
             var securedCursorFunction;
             var permissionCheck = meteorTopicDefinition.permissionCheck;
             if (permissionCheck == null ) {
-                thatManager.warn("PubSub ", meteorTopicName, ' has no permissionCheck');
+                thatManager.warn("Publication ", meteorTopicName, ' has no permissionCheck');
                 securedCursorFunction = meteorTopicCursorFunction;
             } else if(_.contains(permissionCheck, 'public') || permissionCheck == 'public') {
                 securedCursorFunction = meteorTopicCursorFunction;
@@ -200,24 +200,19 @@ Meteor.startup(function() {
                               || !_.isFunction(permissionCheck[i])
                               || !permissionCheck[i](permissionCompleteInfo)) {
                                 // failed permission check
-                                thatManager.log(
-                                    403,
-                                    meteorTopicName+":Current user not permitted to subscribe. userId=",
+                                return new Meteor.Error(
+                                    "403",
+                                    meteorTopicName+":Current user not permitted to subscribe. userId="+
                                     self.userId
                                 );
-                                this.stop();
-                                return;
                             }
                         }
                         return meteorTopicCursorFunction.apply(this, permissionCompleteInfo.args);
                     } else {
-                        thatManager.log(
-                            403,
-                            meteorTopicName+":Current user not permitted to subscribe. userId=",
-                            self.userId
+                        return new Meteor.Error(
+                            "403",
+                            meteorTopicName+":Current user not permitted to subscribe. userId="+self.userId
                         );
-                        this.stop();
-                        return;
                     }
                 };
             }
@@ -350,6 +345,11 @@ Meteor.startup(function() {
                 } else if ( returnedValue === true ) {
                     // true means we would like to return null *but* the ready method was already
                     // called
+                    returnedValue = void(0);
+                } else if ( returnedValue instanceof Meteor.Error ) {
+                    this.ready();
+                    thatManager.log("stopping subscription with error to client.", returnedValue.message);
+                    this.error(returnedValue);
                     returnedValue = void(0);
                 }
                 return returnedValue;

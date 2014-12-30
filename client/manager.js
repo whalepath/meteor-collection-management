@@ -109,7 +109,7 @@ Meteor.startup(function() {
                 // create the receiving collection on the client side (with a unique name)
                 var meteorTopicTableName = thatManager.getMeteorTopicTableName(meteorTopicSuffix);
                 thatManager.log(
-                    "For publication: ", meteorTopicName+":",
+                    "For publication: ", meteorTopicName, ":",
                     "create client-side-only databaseTable named:", meteorTopicTableName,
                     "to hold the results."
                 );
@@ -139,20 +139,35 @@ Meteor.startup(function() {
                 var args = Array.prototype.slice.call(arguments, 0);
                 args.unshift(meteorTopicName);
                 var subscribeMethod = subscribeTypes[meteorTopicDefinition.type] || 'subscribe';
-                var handle = Meteor[subscribeMethod].apply(Meteor,args);
-
                 var passedArguments = Array.prototype.slice.call(arguments, 0);
                 var lastPassedArgument = passedArguments
-                        && passedArguments.length > 0?passedArguments[passedArguments.length-1]:null;
-                if ( lastPassedArgument
-                     && (typeof lastPassedArgument == 'function'
-                         || typeof lastPassedArgument.onReady === 'function'
-                         || typeof lastPassedArgument.onError === 'function')) {
+                    && passedArguments.length > 0?passedArguments[passedArguments.length-1]:null;
+                var callback = {
+                    onError: function subscriptionOnError() {
+                        debugger;
+                        thatManager.error("server reported a problem with",meteorTopicName);
+                    }
+                };
+                if(typeof lastPassedArgument == 'function') {
+                    _.extend(callback, {
+                        onReady: lastPassedArgument
+                    });
                     // a onready or onError handlers - remove from arguments that will be passed to
                     // the cursor function
                     passedArguments.pop();
+                    args.pop();
+                } else if ( lastPassedArgument != null
+                    && (typeof lastPassedArgument.onReady === 'function'
+                    || typeof lastPassedArgument.onError === 'function')) {
+                    _.extend(callback, _.pick(lastPassedArgument, 'onError', 'onReady'));
+                    // a onready or onError handlers - remove from arguments that will be passed to
+                    // the cursor function
+                    passedArguments.pop();
+                    args.pop();
                 }
+                args.push(callback);
                 thatManager.log("subscribing to "+meteorTopicName);
+                var handle = Meteor[subscribeMethod].apply(Meteor,args);
 
                 Object.defineProperties(handle, {
                     thatManager: {
