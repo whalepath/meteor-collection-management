@@ -280,19 +280,20 @@ Tinytest.add(mcm_dbobj + 'upsertFromUntrusted classmethod error conditions', fun
     //     TestUntrustedType.prototype.upsertFromUntrusted(null, null);
     // }, Meteor.Error);
 
-    try {
-        TestUntrustedType.prototype.upsertFromUntrusted({clientObj:null, lookup:null});
-        test.equal(false, true, 'expected exception to be thrown on TestUntrustedType.prototype.upsertFromUntrusted({clientObj:null, lookup:null})');
-    }catch( e) {
-        test.equal(e instanceof Meteor.Error, true);
-    }
-    try {
-        TestUntrustedType.prototype.upsertFromUntrusted({clientObj:undefined, lookup:undefined});
-        test.equal(false, true,
-            "expected exception to be thrown on TestUntrustedType.prototype.upsertFromUntrusted({clientObj:undefined, lookup:undefined})");
-    }catch( e) {
-        test.equal(e instanceof Meteor.Error, true);
-    }
+    // no longer an error because this happens with lazy clients.
+    //try {
+    //    TestUntrustedType.prototype.upsertFromUntrusted({clientObj:null, lookup:null});
+    //    test.equal(false, true, 'expected exception to be thrown on TestUntrustedType.prototype.upsertFromUntrusted({clientObj:null, lookup:null})');
+    //}catch( e) {
+    //    test.equal(e instanceof Meteor.Error, true);
+    //}
+    //try {
+    //    TestUntrustedType.prototype.upsertFromUntrusted({clientObj:undefined, lookup:undefined});
+    //    test.equal(false, true,
+    //        "expected exception to be thrown on TestUntrustedType.prototype.upsertFromUntrusted({clientObj:undefined, lookup:undefined})");
+    //}catch( e) {
+    //    test.equal(e instanceof Meteor.Error, true);
+    //}
 
     var nothing=
         TestUntrustedType.prototype.upsertFromUntrusted(
@@ -456,7 +457,7 @@ Tinytest.add(mcm_dbobj + 'upsertFromUntrusted instance method', function(test) {
     test.equal(g.normalField0, 'bbqz', msg);
 
     msg = 'instance method updates receiver.';
-    g.upsertFromUntrusted({clientObj:{normalField0: 'xxxx'}});
+    g = g.upsertFromUntrusted({clientObj:{normalField0: 'xxxx'}});
     test.equal('xxxx', g.normalField0, msg);
 });
 
