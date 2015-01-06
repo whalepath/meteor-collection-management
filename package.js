@@ -1,6 +1,6 @@
 Package.describe({
     summary: "Meteor Collection Management",
-    version: "1.5.1",
+    version: "1.5.2",
     git: "https://github.com/whalepath/meteor-collection-management.git"
 });
 
