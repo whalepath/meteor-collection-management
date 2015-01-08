@@ -95,7 +95,7 @@ if ( Router != null) {
      *          }
      */
     var DefaultIronRouterFunctions = {
-        data: function DefaultIronRouterFunctions_Data() {
+        initializeDataWithCache: function DefaultIronRouterFunctions_initializeDataWithCache() {
             'use strict';
             var initializeData;
             // TO_PAT(2014-11-14): what does this alternative mean? In most cases, we have helper
@@ -109,8 +109,8 @@ if ( Router != null) {
                 initializeData = this.initializeData;
             }
 
+            var initialData;
             if (initializeData) {
-                var initialData;
                 if (typeof initializeData === 'function') {
                     var router = Router.current(true);
                     var params;
@@ -123,102 +123,82 @@ if ( Router != null) {
                 } else {
                     initialData = initializeData;
                 }
-
-                var result = {};
-                _.each(initialData, function (handleObj, key) {
-                    var isHandleAndMethod;
-                    try {
-                        isHandleAndMethod = handleObj != null
-                        && 'handle' in handleObj
-                        && 'method' in handleObj;
-                    } catch (e) {
-                        // string or something else
-                        isHandleAndMethod = false;
-                    }
-                    var recipientObj = isHandleAndMethod ? handleObj.handle : handleObj;
-                    var isOneKey = key.length > 3 && key.substring(key.length - 3, key.length) == 'One';
-                    if (recipientObj == null) {
-                        // null or undefined handleObj or handle.handleObj is null or undefined
-                        result[key] = recipientObj;
-                        if (isOneKey) {
-                            result[key.substring(0, key.length - 3)] = recipientObj;
-                        }
-                    } else if (isHandleAndMethod) {
-                        switch (typeof handleObj.method) {
-                        case 'undefined':
-                            throw new Meteor.Error(500, "For key=", key, ": ",
-                                "'method' is undefined in handleObj"
-                            );
-                            break;
-                        case 'string':
-                            if (typeof recipientObj[handleObj.method] === 'function') {
-                                result[key] = recipientObj[handleObj.method]();
-                            } else {
-                                throw new Meteor.Error(500, "For key=", key, ": ",
-                                    "'method'=" + handleObj.method + " is not a function on recipientObj"
-                                );
-                            }
-                            break;
-                        case 'function':
-                            result[key] = handleObj.method.call(recipientObj);
-                            break;
-                        default:
-                            throw new Meteor.Error(500, "For key=", key, ": ",
-                                "'method' is", typeof handleObj.method, "in handleObj",
-                                "should be function or string"
-                            );
-                            break;
-                        }
-                    } else if (isOneKey) {
-                        result[key] = result[key.substring(0, key.length - 3)] = oneFn.call(recipientObj);
-                    } else {
-                        result[key] = manyFn.call(recipientObj);
-                    }
-                });
-                return result;
             }
+            return initialData;
+        },
+        data: function DefaultIronRouterFunctions_Data() {
+            'use strict';
+            var initialData = DefaultIronRouterFunctions.initializeDataWithCache.apply(this);
+            var result = {};
+            _.each(initialData, function (handleObj, key) {
+                var isHandleAndMethod;
+                try {
+                    isHandleAndMethod = handleObj != null
+                    && 'handle' in handleObj
+                    && 'method' in handleObj;
+                } catch (e) {
+                    // string or something else
+                    isHandleAndMethod = false;
+                }
+                var recipientObj = isHandleAndMethod ? handleObj.handle : handleObj;
+                var isOneKey = key.length > 3 && key.substring(key.length - 3, key.length) == 'One';
+                if (recipientObj == null) {
+                    // null or undefined handleObj or handle.handleObj is null or undefined
+                    result[key] = recipientObj;
+                    if (isOneKey) {
+                        result[key.substring(0, key.length - 3)] = recipientObj;
+                    }
+                } else if (isHandleAndMethod) {
+                    switch (typeof handleObj.method) {
+                    case 'undefined':
+                        throw new Meteor.Error(500, "For key=", key, ": ",
+                            "'method' is undefined in handleObj"
+                        );
+                        break;
+                    case 'string':
+                        if (typeof recipientObj[handleObj.method] === 'function') {
+                            result[key] = recipientObj[handleObj.method]();
+                        } else {
+                            throw new Meteor.Error(500, "For key=", key, ": ",
+                                "'method'=" + handleObj.method + " is not a function on recipientObj"
+                            );
+                        }
+                        break;
+                    case 'function':
+                        result[key] = handleObj.method.call(recipientObj);
+                        break;
+                    default:
+                        throw new Meteor.Error(500, "For key=", key, ": ",
+                            "'method' is", typeof handleObj.method, "in handleObj",
+                            "should be function or string"
+                        );
+                        break;
+                    }
+                } else if (isOneKey) {
+                    result[key] = result[key.substring(0, key.length - 3)] = oneFn.call(recipientObj);
+                } else {
+                    result[key] = manyFn.call(recipientObj);
+                }
+            });
+            return result;
         },
         subscriptions: function DefaultIronRouterFunctions_Subscriptions() {
             'use strict';
+            var initialData = DefaultIronRouterFunctions.initializeDataWithCache.apply(this);
             var result = [];
-            var initializeData;
-            if (this.route != null) {
-                //we are being called by the iron:router code
-                initializeData = this.route.options.initializeData;
-            }
-            if ( initializeData == null) {
-                // template helper functions are on the template itself
-                initializeData = this.initializeData;
-            }
-            if (initializeData) {
-                var initialData;
-                if (typeof initializeData === 'function') {
-                    var router = Router.current(true);
-                    var params;
-                    if (router && router.params) {
-                        params = router.params;
+            _.each(initialData, function (handleObj, key) {
+                var handle;
+                if (handleObj) {
+                    if (handleObj && handleObj.handle) {
+                        handle = handleObj.handle;
                     } else {
-                        params = {};
+                        handle = handleObj;
                     }
-                    initialData = initializeData(params);
-                } else {
-                    initialData = initializeData;
+                    if (handle && typeof handle.ready === 'function') {
+                        result.push(handle);
+                    }
                 }
-
-                _.each(initialData, function (handleObj, key) {
-                    var handle;
-                    if (handleObj) {
-                        if (handleObj && handleObj.handle) {
-                            handle = handleObj.handle;
-                        } else {
-                            handle = handleObj;
-                        }
-                        if (handle && typeof handle.ready === 'function') {
-                            result.push(handle);
-                        }
-                    }
-                });
-            }
+            });
             return result;
         }
     };
