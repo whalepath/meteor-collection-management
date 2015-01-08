@@ -143,9 +143,11 @@ Meteor.startup(function() {
                 var lastPassedArgument = passedArguments
                     && passedArguments.length > 0?passedArguments[passedArguments.length-1]:null;
                 var callback = {
-                    onError: function subscriptionOnError() {
-                        debugger;
-                        thatManager.error("server reported a problem with",meteorTopicName);
+                    onError: function subscriptionOnError(error) {
+                        if ( error.error != '403') {
+                            //dont report security rejection.
+                            thatManager.error("server reported a problem with", meteorTopicName);
+                        }
                     }
                 };
                 if(typeof lastPassedArgument == 'function') {
