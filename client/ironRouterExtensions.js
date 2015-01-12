@@ -252,7 +252,7 @@ if ( Router != null) {
                     var routeAction = route.options[action];
                     var combinedAction;
                     switch(action) {
-                    case 'waitOn':
+                    case 'subscriptions':
                         if (_.isArray(routeAction)) {
                             combinedAction = routeAction.concat([templateAction]);
                         } else if (_.isFunction(routeAction)) {
