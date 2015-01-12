@@ -258,7 +258,7 @@ if ( Router != null) {
                         } else if (_.isFunction(routeAction)) {
                             combinedAction = [routeAction, templateAction];
                         } else {
-                            throw new Error(routeName, 'waitOn not fn or array');
+                            throw new Error(routeName, 'subscriptions not fn or array');
                         }
                         route.options[action] = combinedAction;
                         break;
