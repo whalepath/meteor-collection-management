@@ -28,10 +28,15 @@ if ( Router != null) {
     }
     // Use these methods in initializeData
     one = function one(handle) {
-        return {
+        var object = {
             handle: handle,
             method: oneFn
         };
+        if (typeof object.handle.ready ==='function') {
+            object.ready = object.handle.ready.bind(object.handle);
+        }
+        return object;
+
     };
     function manyFn() {
         'use strict';
@@ -54,13 +59,17 @@ if ( Router != null) {
     }
     // Use these methods in initializeData
     many = function many(handle) {
-        return {
+        var object = {
             handle: handle,
             method: manyFn
         };
+        if (typeof object.handle.ready ==='function') {
+            object.ready = object.handle.ready.bind(object.handle);
+        }
+        return object;
     };
     count = function count(handle) {
-        return {
+        var object = {
             handle: handle,
             method: function() {
                 var oneResult = oneFn.apply(this, arguments);
@@ -71,6 +80,10 @@ if ( Router != null) {
                 }
             }
         };
+        if (typeof object.handle.ready ==='function') {
+            object.ready = object.handle.ready.bind(object.handle);
+        }
+        return object;
     };
 
     /**
