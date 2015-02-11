@@ -36,7 +36,6 @@ if ( Router != null) {
             object.ready = object.handle.ready.bind(object.handle);
         }
         return object;
-
     };
     function manyFn() {
         'use strict';
