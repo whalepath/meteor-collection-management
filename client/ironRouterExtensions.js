@@ -226,8 +226,8 @@ if ( Router != null) {
         // TODO: This does not work because no routes are defined at this moment
         // need to see if we can hook the route creation.
         _.each(Router.routes, function (route) {
-            var routeName = route.getName? route.getName(): route.name;
-            var templateName = route.options.template || (route.router.toTemplateName?route.router.toTemplateName(routeName):route.router.convertTemplateName(routeName));
+            var routeName = route.getName();
+            var templateName = route.options.template || route.router.toTemplateName(routeName);
             var template = Template[templateName];
             var initializeData = route.options.initializeData;
             if (initializeData == null && template ) {
