@@ -84,6 +84,12 @@ if ( Router != null) {
         }
         return object;
     };
+    waitForMe = function(object) {
+        if ( object != null && _.isFunction(object.ready)) {
+            object.waitForMe = object.ready;
+        }
+        return object;
+    }
 
     /**
      * A standard data() that will be called by the Router code to get the template's data.
@@ -110,18 +116,20 @@ if ( Router != null) {
         initializeDataWithCache: function DefaultIronRouterFunctions_initializeDataWithCache() {
             'use strict';
             var initializeData;
+            var initialData;
+
             // TO_PAT(2014-11-14): what does this alternative mean? In most cases, we have helper
             // functions on the tmpl itself, but we take the first path.
             if (this.route != null) {
                 //we are being called by the iron:router code
                 initializeData = this.route.options.initializeData;
+                initialData = this.route.options.initialData;
             }
             if ( initializeData == null) {
                 // template helper functions are on the template itself
                 initializeData = this.initializeData;
             }
 
-            var initialData;
             if (initializeData) {
                 if (typeof initializeData === 'function') {
                     var router = Router.current(true);
@@ -134,6 +142,10 @@ if ( Router != null) {
                     initialData = initializeData(params);
                 } else {
                     initialData = initializeData;
+                }
+
+                if (this.route != null) {
+                    this.route.options.initialData =initialData;
                 }
             }
             return initialData;
@@ -212,6 +224,25 @@ if ( Router != null) {
                 }
             });
             return result;
+        },
+        waitOn: function DefaultIronRouterFunctions_Subscriptions() {
+            'use strict';
+            var initialData = DefaultIronRouterFunctions.initializeDataWithCache.apply(this);
+            var result = [];
+            _.each(initialData, function (handleObj, key) {
+                var handle;
+                if (handleObj) {
+                    if (handleObj && handleObj.handle) {
+                        handle = handleObj.handle;
+                    } else {
+                        handle = handleObj;
+                    }
+                    if (handle && typeof handle.ready === 'function') {
+                        result.push(handle);
+                    }
+                }
+            });
+            return result;
         }
     };
     _.extend(Template.prototype, DefaultIronRouterFunctions);
@@ -234,7 +265,7 @@ if ( Router != null) {
                 initializeData = Blaze._getTemplateHelper(template, 'initializeData');
             }
             // not all routes have templates...
-            _.each(['initializeData', 'subscriptions', 'data'], function (action) {
+            _.each(['initializeData', 'subscriptions', 'data', 'waitOn'], function (action) {
                 var templateAction;
                 if ( template ) {
                     templateAction = Blaze._getTemplateHelper(template, action);
