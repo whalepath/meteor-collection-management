@@ -2,6 +2,14 @@
 // this works but can we use a global hook that for a given route does a universal lookup.
 
 if ( Router != null) {
+    function readyFn() {
+        if ( this.handle == null || !_.isFunction(this.handle.ready)) {
+            return true;
+        } else {
+            return this.handle.ready();
+        }
+    }
+
     function oneFn() {
         'use strict';
         var result;
@@ -30,11 +38,9 @@ if ( Router != null) {
     one = function one(handle) {
         var object = {
             handle: handle,
-            method: oneFn
+            method: oneFn,
+            ready: readyFn
         };
-        if (typeof object.handle.ready ==='function') {
-            object.ready = object.handle.ready.bind(object.handle);
-        }
         return object;
     };
     function manyFn() {
@@ -60,11 +66,9 @@ if ( Router != null) {
     many = function many(handle) {
         var object = {
             handle: handle,
-            method: manyFn
+            method: manyFn,
+            ready: readyFn
         };
-        if (typeof object.handle.ready ==='function') {
-            object.ready = object.handle.ready.bind(object.handle);
-        }
         return object;
     };
     count = function count(handle) {
@@ -77,11 +81,9 @@ if ( Router != null) {
                 } else {
                     return void(0);
                 }
-            }
+            },
+            ready: readyFn
         };
-        if (typeof object.handle.ready ==='function') {
-            object.ready = object.handle.ready.bind(object.handle);
-        }
         return object;
     };
     waitForMe = function(object) {
