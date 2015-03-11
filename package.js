@@ -1,6 +1,6 @@
 Package.describe({
     summary: "Meteor Collection Management",
-    version: "1.6.4",
+    version: "1.6.5",
     git: "https://github.com/whalepath/meteor-collection-management.git"
 });
 
@@ -21,7 +21,6 @@ Package.onUse(function (api) {
     api.addFiles('lib/internalutils.js', ['client', 'server']);
     api.addFiles('lib/underscoreExtensions.js', ['client', 'server']);
     api.addFiles('lib/enums.js', ['client', 'server']);
-    api.addFiles('lib/pagination.js', ['client', 'server']);
     api.addFiles('lib/dbobject.js', ['client', 'server']);
     api.addFiles('lib/manager.js', ['client', 'server']);
     api.addFiles('client/ironRouterExtensions.js', ['client']);
