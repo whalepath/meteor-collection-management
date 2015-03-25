@@ -154,12 +154,39 @@ Meteor.startup(function() {
                 },
                 addedObject: {
                     writable: false,
+                    enumerable:false,
                     value: function(id, fields) {
                         return this.added(meteorTopicTableName, id, fields);
                     }
                 },
+                /**
+                 *  Useful for single instance subscriptions.  id is <meteorTopicTableName> ( so only 1 object can ever be in this subscription )
+                 */
+                addedSingletonObjectAndReady: {
+                    writable: false,
+                    enumerable:false,
+                    value: function(fields) {
+                        var value = this.added(meteorTopicTableName, meteorTopicTableName, fields);
+                        this.ready();
+                        return value;
+                    }
+                },
+                /**
+                 * addedObjectAndReady: add object (with custom id) and mark ready.
+                 * multiple objects may reside in the subscription but only 1 at a time is added.
+                 */
+                addedObjectAndReady: {
+                    writable: false,
+                    enumerable:false,
+                    value: function(id, fields) {
+                        var value = this.added(meteorTopicTableName, id, fields);
+                        this.ready();
+                        return value;
+                    }
+                },
                 removeObject: {
                     writable: false,
+                    enumerable:false,
                     value: function(id) {
                         return this.remove(meteorTopicTableName, id);
                     }
