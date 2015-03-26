@@ -230,8 +230,8 @@ Meteor.startup(function() {
                                 // failed permission check
                                 return new Meteor.Error(
                                     "403",
-                                    meteorTopicName+":Current user not permitted to subscribe. userId="+
-                                    self.userId
+                                    meteorTopicName+":Current user not permitted to subscribe.",
+                                    "userId="+self.userId
                                 );
                             }
                         }
@@ -239,7 +239,8 @@ Meteor.startup(function() {
                     } else {
                         return new Meteor.Error(
                             "403",
-                            meteorTopicName+":Current user not permitted to subscribe. userId="+self.userId
+                            meteorTopicName+":Current user not permitted to subscribe.",
+                            "userId="+self.userId
                         );
                     }
                 };
@@ -377,12 +378,15 @@ Meteor.startup(function() {
                 } else if ( returnedValue instanceof Meteor.Error ) {
                     this.ready();
                     // SECURITY: We do not cut the subscription because:
-                    // 1. this causes our existing client code to continually try to recreate the subscription
-                    // 2. which causes our server to behave badly.  (log gets filled with these log messages)
+                    // 1. this causes our existing client code to continually try to recreate the
+                    // subscription
+                    // 2. which causes our server to behave badly.  (log gets filled with these log
+                    // messages)
                     // 3. we need to modify the client code to deal with an onError condition.
                     // 4. we may be in the process of login in so the security issue may be transient
                     // 5. we may not care
-                    //thatManager.log("stopping subscription with error to client.", returnedValue.message);
+                    //thatManager.log("stopping subscription with error to client.",
+                    //returnedValue.message);
                     //this.error(returnedValue);
                     returnedValue = null;
                 }
