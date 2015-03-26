@@ -160,7 +160,8 @@ Meteor.startup(function() {
                     }
                 },
                 /**
-                 *  Useful for single instance subscriptions.  id is <meteorTopicTableName> ( so only 1 object can ever be in this subscription )
+                 *  Useful for single instance subscriptions.  id is <meteorTopicTableName> ( so
+                 *  only 1 object can ever be in this subscription )
                  */
                 addedSingletonObjectAndReady: {
                     writable: false,
