@@ -121,7 +121,7 @@ Meteor.startup(function() {
             //
             //var meteorTopicQueryFunction = meteorTopicDefinition.query | meteorTopicCursorFunction;
             // make the current manager available on cursor when doing publish subscribe.
-            Object.defineProperties(meteorTopicCursorFunction, {
+            var meteorTopicCursorFunctionProperties = {
                 thatManager: {
                     writable: false,
                     enumerable:false,
@@ -163,12 +163,11 @@ Meteor.startup(function() {
                  *  Useful for single instance subscriptions.  id is <meteorTopicTableName> ( so
                  *  only 1 object can ever be in this subscription )
                  */
-                addedSingletonObjectAndReady: {
+                addedSingletonObject: {
                     writable: false,
                     enumerable:false,
                     value: function(fields) {
-                        var value = this.added(meteorTopicTableName, meteorTopicTableName, fields);
-                        this.ready();
+                        var value = this.addedObject(meteorTopicTableName, fields);
                         return value;
                     }
                 },
@@ -198,7 +197,8 @@ Meteor.startup(function() {
                         return this.changed(meteorTopicTableName, id, fields);
                     }
                 }
-            });
+            };
+            Object.defineProperties(meteorTopicCursorFunction, meteorTopicCursorFunctionProperties );
 
             var securedCursorFunction;
             var permissionCheck = meteorTopicDefinition.permissionCheck;
@@ -247,8 +247,9 @@ Meteor.startup(function() {
             }
 
             var wrappedFn = thatManager._createMeteorHandleAugmentationFunction(
-                meteorTopicCursorFunction,
-                securedCursorFunction
+                securedCursorFunction,
+                meteorTopicCursorFunctionProperties,
+                meteorTopicCursorFunction
             );
 
             /**
@@ -326,14 +327,17 @@ Meteor.startup(function() {
             }
         },
         _createMeteorHandleAugmentationFunction: function(
-            meteorTopicCursorFunction,
-            securedCursorFunction
+            securedCursorFunction,
+            meteorTopicCursorFunctionProperties,
+            meteorTopicCursorFunction
+
         ) {
             // TODO: PATM: why can't we just pass securedCursorFunction?
             var thatManager = this.thatManager;
             // insure that this.ready() is called when the no data is returned. (required for
             // spiderable to work)
             var wrappedFn = function() {
+                var self = this;
                 Object.defineProperties(this, {
                     // Question: this should be o.k. because we don't have the cursor (this)
                     // reused. (not certain that the topic cursor is not reused)
@@ -341,30 +345,10 @@ Meteor.startup(function() {
                         enumerable: false,
                         writable: false,
                         value: meteorTopicCursorFunction
-                    },
-                    // so that this.thatManager always return the thatManager on both the client and
-                    // the server.
-                    thatManager: {
-                        enumerable: false,
-                        writable: false,
-                        value: thatManager
-                    },
-                    addedObject: {
-                        enumerable: false,
-                        writable: false,
-                        value: meteorTopicCursorFunction.addedObject
-                    },
-                    removeObject: {
-                        enumerable: false,
-                        writable: false,
-                        value: meteorTopicCursorFunction.removeObject
-                    },
-                    changedObject: {
-                        enumerable: false,
-                        writable: false,
-                        value: meteorTopicCursorFunction.changedObject
                     }
                 });
+                Object.defineProperties(this, meteorTopicCursorFunctionProperties);
+
                 var returnedValue = securedCursorFunction.apply(this, arguments);
                 if ( returnedValue == null || returnedValue === false) {
                     // required for spiderable to work
