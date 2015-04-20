@@ -42,8 +42,9 @@ Tinytest.add('Meteor Collection Management - manager - simple', function(test) {
     });
     Object.defineProperties(TestManagerType.prototype, {
         createMeteorCallMethod: {
-            value: function (definition, definitionName) {
+            value: function (definition) {
                 var fn = definition.method;
+                var definitionName = definition.meteorCallNameSuffix;
                 var thatManager = this.thatManager;
                 test.equal(_.isFunction(fn), true, "no method:" + definitionName);
                 var actual = fn.call(thatManager);
@@ -52,8 +53,9 @@ Tinytest.add('Meteor Collection Management - manager - simple', function(test) {
             }
         },
         createPublication: {
-            value: function (definition, definitionName) {
+            value: function (definition) {
                 var fn = definition.cursor;
+                var definitionName = definition.meteorTopicSuffix;
                 var thatManager = this.thatManager;
                 test.equal(_.isFunction(fn), true, "no cursor:" + definitionName);
                 var actual = fn.call(thatManager);

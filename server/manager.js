@@ -109,19 +109,21 @@ Meteor.startup(function() {
          * @param meteorTopicSuffix
          */
         createPublication: {
-            value: function (meteorTopicDefinition, meteorTopicSuffix) {
+            value: function (meteorTopicDefinition) {
                 var thatManager = this.thatManager;
-                var meteorTopicName = this.getMeteorTopicName(meteorTopicSuffix);
+                var fullMeteorTopicDefinition = thatManager.getFullMeteorTopicDefinition(meteorTopicDefinition);
+                var meteorTopicSuffix = fullMeteorTopicDefinition.meteorTopicSuffix;
+                var meteorTopicName = fullMeteorTopicDefinition.meteorTopicName;
                 var meteorTopicTableName = thatManager.getMeteorTopicTableName(meteorTopicSuffix);
-                var meteorTopicCursorFunction = meteorTopicDefinition.cursor;
+                var meteorTopicCursorFunction = fullMeteorTopicDefinition.cursor;
                 if (!_.isFunction(meteorTopicCursorFunction)) {
                     thatManager.fatal("No cursor function supplied for " + meteorTopicName);
                 }
-                // TODO: idea to handle multiple cursors returned. meteorTopicDefinition.cursor is the
-                // primary cursor meteorTopicDefinition.query is the function called that calls
-                // meteorTopicDefinition.cursor and adds in additional cursors to the publication.
+                // TODO: idea to handle multiple cursors returned. fullMeteorTopicDefinition.cursor is the
+                // primary cursor fullMeteorTopicDefinition.query is the function called that calls
+                // fullMeteorTopicDefinition.cursor and adds in additional cursors to the publication.
                 //
-                //var meteorTopicQueryFunction = meteorTopicDefinition.query | meteorTopicCursorFunction;
+                //var meteorTopicQueryFunction = fullMeteorTopicDefinition.query | meteorTopicCursorFunction;
                 // make the current manager available on cursor when doing publish subscribe.
                 var meteorTopicCursorFunctionProperties = {
                     thatManager: {
@@ -134,7 +136,7 @@ Meteor.startup(function() {
                         writable: false,
                         enumerable: false,
                         configurable: false,
-                        value: meteorTopicDefinition
+                        value: fullMeteorTopicDefinition
                     },
                     meteorTopicName: {
                         writable: false,
@@ -203,7 +205,7 @@ Meteor.startup(function() {
                 Object.defineProperties(meteorTopicCursorFunction, meteorTopicCursorFunctionProperties);
 
                 var securedCursorFunction;
-                var permissionCheck = meteorTopicDefinition.permissionCheck;
+                var permissionCheck = fullMeteorTopicDefinition.permissionCheck;
                 if (permissionCheck == null) {
                     thatManager.warn("Publication ", meteorTopicName, ' has no permissionCheck');
                     securedCursorFunction = meteorTopicCursorFunction;
@@ -264,67 +266,52 @@ Meteor.startup(function() {
                  * 'reactivePublish' so that : https://github.com/Diggsey/meteor-reactive-publish.git
                  * could be used.
                  */
-                var publishMethod = publishTypes[meteorTopicDefinition.type] || 'publish';
+                var publishMethod = publishTypes[fullMeteorTopicDefinition.type] || 'publish';
                 Meteor[publishMethod](meteorTopicName, wrappedFn);
                 thatManager._defineFindFunctionsForSubscription(
                     meteorTopicSuffix,
                     meteorTopicCursorFunction
                 );
+                thatManager._processDerivedCursors(fullMeteorTopicDefinition, function (fullDerivedDefinition) {
+                    var wrappedFunction = fullDerivedDefinition.cursor;
+                    if (wrappedFunction == null) {
+                        if (fullDerivedDefinition.extensionName === 'count') {
+                            wrappedFunction = function (options) {
+                                var thatManager = this.thatManager;
+                                var meteorTopicDefinition = options.meteorTopicDefinition;
+                                var parentCursor = meteorTopicDefinition.parentMeteorTopicDefinition.cursor;
+                                // Note: yes we could use closure here but we want to make sure that if we
+                                // get a user defined function that it has all the need variables.
+                                var cursor = meteorTopicCursorFunction.apply(this, options.arguments);
+                                var meteorTopicName = meteorTopicDefinition.meteorTopicName;
+                                var meteorTopicTableName = meteorTopicDefinition.meteorTopicTableName;
+                                var derivedMeteorTopicSuffix = meteorTopicDefinition.meteorTopicSuffix;
+                                // TODO: create a hash with arguments to add to id string.
+                                var id = meteorTopicName;
+                                var countValue;
 
-                if (meteorTopicDefinition.derived) {
-                    _.each(meteorTopicDefinition.derived, function (derivedDefinition, extensionName) {
-                        // we don't want the meteorTopicDefinition.cursor function
-                        // this allows for different permissionCheck option for example.
-                        var fullDerivedDefinition = _.extend({
-                            parentMeteorTopicDefinition: meteorTopicDefinition
-                        }, _.omit(meteorTopicDefinition, 'cursor', 'derived'), derivedDefinition);
-                        var uppercaseExtensionName = extensionName.charAt(0).toUpperCase()
-                            + extensionName.substring(1);
-                        var derivedMeteorTopicSuffix = meteorTopicSuffix + uppercaseExtensionName;
-
-                        if (extensionName === 'count') {
-                            if (fullDerivedDefinition.cursor == null) {
-                                var meteorTopicTableName = thatManager.getMeteorTopicTableName(
-                                    derivedMeteorTopicSuffix
-                                );
-                                fullDerivedDefinition.cursor = function () {
-                                    var cursor = meteorTopicCursorFunction.apply(this, arguments);
-                                    // TODO: create a hash with arguments to add to id string.
-                                    var id = meteorTopicName + uppercaseExtensionName;
-                                    var countValue;
-                                    if (cursor == null) {
-                                        // cursor() returned a undefined/null.
-                                        // this can happen if the client hasn't yet logged in for example
-                                        // so this is not really an error.
-                                        countValue = void(0);
-                                    } else {
-                                        countValue = cursor.count();
-                                    }
-                                    if (this == null) {
-                                        thatManager.error(
-                                            "no 'this' in count() for",
-                                            derivedMeteorTopicSuffix
-                                        );
-                                        debugger;
-                                    }
-                                    this.added(meteorTopicTableName, id, {count: countValue});
-                                };
-                            }
+                                if (cursor == null) {
+                                    // cursor() returned a undefined/null.
+                                    // this can happen if the client hasn't yet logged in for example
+                                    // so this is not really an error.
+                                    countValue = void(0);
+                                } else {
+                                    countValue = cursor.count();
+                                }
+                                this.addedObject(id, {count: countValue});
+                            };
                         } else {
                             thatManager.error(
                                 "Only know how to handle derived 'count' not",
-                                extensionName,
+                                fullDerivedDefinition.extensionName,
                                 "in",
-                                derivedMeteorTopicSuffix
+                                fullDerivedDefinition.meteorTopicSuffix
                             );
                             debugger;
-                            return;
                         }
-                        var derivedMeteorTopicSuffix = meteorTopicSuffix
-                            + extensionName.charAt(0).toUpperCase() + extensionName.substring(1);
-                        thatManager.createPublication(fullDerivedDefinition, derivedMeteorTopicSuffix);
-                    });
-                }
+                    }
+                    return wrappedFunction;
+                });
             }
         },
         _createMeteorHandleAugmentationFunction: {

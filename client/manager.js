@@ -96,10 +96,12 @@ Meteor.startup(function() {
          * @param meteorTopicSuffix
          */
         createPublication : {
-            value: function createPublication(meteorTopicDefinition, meteorTopicSuffix) {
+            value: function createPublication(meteorTopicDefinition) {
                 var thatManager = this.thatManager;
-                var meteorTopicName = this.getMeteorTopicName(meteorTopicSuffix);
-                var meteorTopicCursorFunction = meteorTopicDefinition.cursor;
+                var fullMeteorTopicDefinition = thatManager.getFullMeteorTopicDefinition(meteorTopicDefinition);
+                var meteorTopicSuffix = fullMeteorTopicDefinition.meteorTopicSuffix;
+                var meteorTopicName = fullMeteorTopicDefinition.meteorTopicName;
+                var meteorTopicCursorFunction = fullMeteorTopicDefinition.cursor;
                 var meteorTopicTableName = null;
                 var _createClientOnlyCollection = function (meteorTopicSuffix) {
                     // This happens when the server side has a
@@ -125,7 +127,7 @@ Meteor.startup(function() {
                     thatManager[meteorTopicSuffix + 'Cursor'] = // fix TODO in
                         // handleStringOrObjectDefinition() so we
                         // don't need this.
-                        meteorTopicDefinition.cursor =
+                        fullMeteorTopicDefinition.cursor =
                             meteorTopicCursorFunction = function () {
                                 // note: no selection criteria because the server will only return the needed
                                 // results.
@@ -140,7 +142,7 @@ Meteor.startup(function() {
                 this[meteorTopicSuffix + 'Handle'] = function publicationHandler() {
                     var args = Array.prototype.slice.call(arguments, 0);
                     args.unshift(meteorTopicName);
-                    var subscribeMethod = subscribeTypes[meteorTopicDefinition.type] || 'subscribe';
+                    var subscribeMethod = subscribeTypes[fullMeteorTopicDefinition.type] || 'subscribe';
                     var passedArguments = Array.prototype.slice.call(arguments, 0);
                     var lastPassedArgument = passedArguments
                     && passedArguments.length > 0 ? passedArguments[passedArguments.length - 1] : null;
@@ -245,43 +247,33 @@ Meteor.startup(function() {
                     meteorTopicSuffix,
                     meteorTopicCursorFunction
                 );
-
-                if (meteorTopicDefinition.derived) {
-                    _.each(meteorTopicDefinition.derived, function (derivedDefinition, extensionName) {
-                        // we don't want the meteorTopicDefinition.cursor function
-                        // this allows for different permissionCheck option for example.
-                        var fullDerivedDefinition = _.extend({},
-                            _.omit(meteorTopicDefinition, 'cursor', 'derived'),
-                            derivedDefinition
-                        );
-                        var uppercaseExtensionName = extensionName.charAt(0).toUpperCase()
-                            + extensionName.substring(1);
-                        var derivedMeteorTopicSuffix = meteorTopicSuffix + uppercaseExtensionName;
-                        if (extensionName === 'count') {
-                            if (fullDerivedDefinition.cursor == null) {
-                                var meteorTopicTableName = _createClientOnlyCollection(
-                                    derivedMeteorTopicSuffix
-                                );
-                                fullDerivedDefinition.cursor = function () {
-                                    // TODO: create a hash with arguments to add to id string.
-                                    var id = meteorTopicName + uppercaseExtensionName;
-                                    var cursor = thatManager[meteorTopicTableName].find(id);
-                                    return cursor;
-                                };
-                            }
+                thatManager._processDerivedCursors(fullMeteorTopicDefinition, function (fullDerivedDefinition) {
+                    var wrappedFunction = fullDerivedDefinition.cursor;
+                    if (wrappedFunction == null) {
+                        if (fullDerivedDefinition.extensionName === 'count') {
+                            var meteorTopicTableName = _createClientOnlyCollection(
+                                fullDerivedDefinition.meteorTopicSuffix
+                            );
+                            wrappedFunction = function (options) {
+                                var thatManager = this.thatManager;
+                                var meteorTopicDefinition = options.meteorTopicDefinition;
+                                // TODO: create a hash with arguments to add to id string.
+                                var id = meteorTopicDefinition.meteorTopicName + meteorTopicDefinition.uppercaseExtensionName;
+                                var cursor = thatManager[meteorTopicDefinition.meteorTopicTableName].find(id);
+                                return cursor;
+                            };
                         } else {
                             thatManager.error(
                                 "Only know how to handle derived 'count' not",
-                                extensionName,
+                                fullDerivedDefinition.extensionName,
                                 "in",
-                                derivedMeteorTopicSuffix
+                                fullDerivedDefinition.meteorTopicSuffix
                             );
                             debugger;
-                            return;
                         }
-                        thatManager.createPublication(fullDerivedDefinition, derivedMeteorTopicSuffix);
-                    });
-                }
+                    }
+                    return wrappedFunction;
+                });
             }
         },
         userId: {
