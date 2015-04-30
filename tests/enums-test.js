@@ -1,15 +1,25 @@
 var EJSON = Package.ejson.EJSON;
 var TestingEnumFake = new Enums.Enum({
-    one: {
-        displayName: 'ONE',
+    typeName: 'testingEnumFake',
+    defs: {
+        one: {
+            displayName: 'ONE',
+        },
+        two: {
+            displayName: 'TWO',
+            dbCode: '_two'
+        },
+        three: {
+            displayName: 'THREE',
+            dbCode: '_three'
+        }
     },
-    two: {
-        displayName: 'TWO',
-        dbCode: '_two'
-    },
-    three: {
-        displayName: 'THREE',
-        dbCode: '_three'
+    properties: {
+        printMe: {
+            get: function() {
+                return 'printMe';
+            }
+        }
     }
 });
 
@@ -58,6 +68,20 @@ Tinytest.add('Meteor Collection Management - enums - toJSONValue/fromJSONValue',
 
 Tinytest.add('Meteor Collection Management - enums - hasOwnProperty', function(test) {
     test.isTrue(TestingEnumFake.one.hasOwnProperty('displayName'));
+});
+
+Tinytest.add('Meteor Collection Management - enums - testExtraProperties', function(test) {
+    test.equal(TestingEnumFake.printMe, 'printMe', 'Problem with adding extra properties on the Enum object.');
+    test.equal(TestingEnumFake.one.printMe, 'printMe', 'Problem with adding extra properties on the Enum.Symbol object.');
+});
+
+Tinytest.add('Meteor Collection Management - enums - EJSON', function(test) {
+    var ejsonStringify = EJSON.stringify(TestingEnumFake.one);
+    var jsonParse = JSON.parse(ejsonStringify);
+    test.equal(TestingEnumFake.one.typeName(), jsonParse["$type"], 'TypeName mismatch');
+    test.equal(TestingEnumFake.one.dbCode, jsonParse["$value"], 'DbCode mismatch');
+    var back = EJSON.parse(ejsonStringify);
+    test.isTrue(TestingEnumFake.one === back);
 });
 
 /**
