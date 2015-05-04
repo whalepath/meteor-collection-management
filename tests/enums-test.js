@@ -99,4 +99,3 @@ Tinytest.add('Meteor Collection Management - enums - accidently serialized', fun
     var testingEnumFakeEnum = TestingEnumFake.fromJSONValue(accidentalClone);
     test.equal(TestingEnumFake.one, testingEnumFakeEnum, 'accidental serialization case was not handled');
 });
-
