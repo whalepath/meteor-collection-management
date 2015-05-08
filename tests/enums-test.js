@@ -99,3 +99,39 @@ Tinytest.add('Meteor Collection Management - enums - accidently serialized', fun
     var testingEnumFakeEnum = TestingEnumFake.fromJSONValue(accidentalClone);
     test.equal(TestingEnumFake.one, testingEnumFakeEnum, 'accidental serialization case was not handled');
 });
+
+
+Tinytest.add('Meteor Collection Management - enums - inMongoDb', function(test) {
+    var i = 0;
+    var mongoDb = TestingEnumFake.one.asMongoDb();
+    test.equal(mongoDb, { testingEnumFake: 'one'}, 'MongoDb mismatch '+(i++));
+
+    mongoDb = TestingEnumFake.inMongoDb(TestingEnumFake.one);
+    test.equal(mongoDb, { testingEnumFake: 'one'}, 'MongoDb mismatch '+(i++));
+
+    mongoDb = TestingEnumFake.ninMongoDb(TestingEnumFake.one);
+    test.equal(mongoDb, { testingEnumFake: {$ne :'one'}}, 'MongoDb mismatch '+(i++));
+
+    mongoDb = TestingEnumFake.inMongoDb(TestingEnumFake.one, TestingEnumFake.two);
+    test.equal(mongoDb, { testingEnumFake: {$in:['one', '_two']}}, 'MongoDb mismatch '+(i++));
+
+    mongoDb = TestingEnumFake.ninMongoDb(TestingEnumFake.one, TestingEnumFake.two);
+    test.equal(mongoDb, { testingEnumFake: {$nin:['one', '_two']}}, 'MongoDb mismatch '+(i++));
+
+    mongoDb = TestingEnumFake.one.ninMongoDb();
+    test.equal(mongoDb, { testingEnumFake: { $ne: 'one'}}, 'MongoDb mismatch '+(i++));
+
+    mongoDb = TestingEnumFake.one.ninMongoDb(TestingEnumFake.two);
+    test.equal(mongoDb, { testingEnumFake: {$nin:['_two', 'one']}}, 'MongoDb mismatch '+(i++));
+
+    // now test with field names
+    mongoDb = TestingEnumFake.one.asMongoDb('fieldName');
+    test.equal(mongoDb, { fieldName: 'one'}, 'MongoDb mismatch '+(i++));
+    mongoDb = TestingEnumFake.inMongoDb('fieldName', TestingEnumFake.one);
+    test.equal(mongoDb, { fieldName: 'one'}, 'MongoDb mismatch '+(i++));
+    mongoDb = TestingEnumFake.one.ninMongoDb('fieldName');
+    test.equal(mongoDb, { fieldName: {$ne: 'one'}}, 'MongoDb mismatch '+(i++));
+    mongoDb = TestingEnumFake.one.ninMongoDb('fieldName',TestingEnumFake.two);
+    test.equal(mongoDb, { fieldName: {$nin:['_two', 'one']}}, 'MongoDb mismatch '+(i++));
+
+});
