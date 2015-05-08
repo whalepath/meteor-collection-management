@@ -133,5 +133,14 @@ Tinytest.add('Meteor Collection Management - enums - inMongoDb', function(test) 
     test.equal(mongoDb, { fieldName: {$ne: 'one'}}, 'MongoDb mismatch '+(i++));
     mongoDb = TestingEnumFake.one.ninMongoDb('fieldName',TestingEnumFake.two);
     test.equal(mongoDb, { fieldName: {$nin:['_two', 'one']}}, 'MongoDb mismatch '+(i++));
+});
 
+Tinytest.add('Meteor Collection Management - enums - createKeyedMap', function(test) {
+    var keyedMap = TestingEnumFake.createKeyedMap();
+    test.equal(keyedMap, { one : [], _two: [], _three: [] }, 'default populated with an array');
+    keyedMap.one.push('onlyInOne');
+    test.equal(keyedMap, { one : ['onlyInOne'], _two: [], _three: [] }, 'ensure that the array is not shared');
+
+    keyedMap = TestingEnumFake.createKeyedMap(function() { return this; });
+    test.equal(keyedMap, { one : TestingEnumFake.one, _two: TestingEnumFake.two, _three: TestingEnumFake.three }, 'custom element generation');
 });
