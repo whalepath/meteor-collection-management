@@ -32,7 +32,8 @@ Meteor.startup(function() {
                     return methodFunction.apply(this, arguments);
                 };
                 if (!_.isFunction(methodFunction)) {
-                    thatManager.fatal("No method supplied for ", callName);
+                    thatManager.fatal("No method supplied for ", callName, "." +
+                    "File loading in meteor requires that managers be in server/lib/managers");
                 }
 
                 var trackingEventKey = meteorCallDefinition.trackingEventKey;
