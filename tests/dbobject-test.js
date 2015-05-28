@@ -701,3 +701,40 @@ Tinytest.add(mcm_dbobj + '_revisionSave', function (test) {
     var latestX = latestCursor.fetch()[0];
     test.equal(latestX.a, 4, 'latest is latest');
 });
+
+
+NonstrictType = DbObjectType.create({
+    typeName: 'nonstrict',
+    properties: [
+        'a',
+        'b'
+    ],
+    databaseTableName: 'nonstrictTableName',
+    nonstrict:  true
+});
+
+Tinytest.add(mcm_dbobj + ' - nonstrict', function (test) {
+    // test insert
+    var non = new NonstrictType({
+        a: 'a',
+        b: 'b',
+        c: 'c value'
+    });
+    non._save();
+    var savedNon = NonstrictType.findOneById(non.id);
+    test.equal(savedNon.c, 'c value');
+
+    // test update
+    non.f = 'f value';
+    non._save();
+    savedNon = NonstrictType.findOneById(non.id);
+    test.equal(savedNon.c, 'c value');
+    test.equal(savedNon.f, 'f value');
+
+    // test if value is already in the db.
+    NonstrictType.updateOneById(non.id, {g:'g value'});
+    savedNon = NonstrictType.findOneById(non.id);
+    test.equal(savedNon.c, 'c value');
+    test.equal(savedNon.f, 'f value');
+    test.equal(savedNon.g, 'g value');
+});
