@@ -28,9 +28,15 @@ Tinytest.add('Meteor Collection Management - underscore-extensions - deep', func
     var result;
     result = _.deep(x, 'key1.0.1.key2');
     // result is null
-    result = _.deep(x, 'key1.0.1.key2', 'value');
+    test.isNull(result);
+    // make sure does not crash and the new deeply set object is returned
+    x =_.deep(x, 'key1.0.1.key2', 'value');
+    test.isNotNull(x);
     // test to make sure the middle things are arrays
     result = _.deep(x, 'key2.0', 'value');
+    test.isNotNull(x);
+
+    _.deep(x, ['key1', '0.1', 'key2']);
 });
 
 Tinytest.add('Meteor Collection Management - underscore-extensions - flattenObj', function(test) {
