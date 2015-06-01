@@ -41,7 +41,7 @@ Tinytest.add('Meteor Collection Management - underscore-extensions - deep', func
 
 Tinytest.add('Meteor Collection Management - underscore-extensions - flattenObj', function(test) {
     var flatten = _.flattenObj({k:{l:{f:{m:1}}}});
-    test.testEqual(Object.keys(flatten)[0], "k.l.f.m");
+    test.equal(Object.keys(flatten)[0], "k.l.f.m");
 });
 
 

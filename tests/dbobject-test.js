@@ -702,7 +702,7 @@ Tinytest.add(mcm_dbobj + '_revisionSave', function (test) {
     test.equal(latestX.a, 4, 'latest is latest');
 });
 
-
+// Test the nonstrict attribute.
 NonstrictType = DbObjectType.create({
     typeName: 'nonstrict',
     properties: [
@@ -721,20 +721,55 @@ Tinytest.add(mcm_dbobj + ' - nonstrict', function (test) {
         c: 'c value'
     });
     non._save();
-    var savedNon = NonstrictType.findOneById(non.id);
-    test.equal(savedNon.c, 'c value');
+    var saved = NonstrictType.findOneById(non.id);
+    test.equal(saved.c, 'c value');
 
     // test update
     non.f = 'f value';
     non._save();
-    savedNon = NonstrictType.findOneById(non.id);
-    test.equal(savedNon.c, 'c value');
-    test.equal(savedNon.f, 'f value');
+    saved = NonstrictType.findOneById(non.id);
+    test.equal(saved.c, 'c value');
+    test.equal(saved.f, 'f value');
 
     // test if value is already in the db.
     NonstrictType.updateOneById(non.id, {g:'g value'});
-    savedNon = NonstrictType.findOneById(non.id);
-    test.equal(savedNon.c, 'c value');
-    test.equal(savedNon.f, 'f value');
-    test.equal(savedNon.g, 'g value');
+    saved = NonstrictType.findOneById(non.id);
+    test.equal(saved.c, 'c value');
+    test.equal(saved.f, 'f value');
+    test.equal(saved.g, 'g value');
+});
+
+StrictType = DbObjectType.create({
+    typeName: 'strict',
+    properties: [
+        'a',
+        'b'
+    ],
+    databaseTableName: 'strictTableName'
+});
+
+Tinytest.add(mcm_dbobj + ' - strict', function (test) {
+    // test insert
+    var strict = new StrictType({
+        a: 'a',
+        b: 'b',
+        c: 'c value'
+    });
+    strict._save();
+    var saved = StrictType.findOneById(strict.id);
+    test.equal(saved.c, undefined);
+
+    // test update
+    strict.f = 'f value';
+    strict._save();
+    saved = StrictType.findOneById(strict.id);
+    test.equal(saved.c, undefined);
+    test.equal(saved.f, undefined);
+
+    // test if value is already in the db.
+    NonstrictType.updateOneById(strict.id, {g:'g value'});
+    saved = NonstrictType.findOneById(strict.id);
+    test.equal(saved.c, undefined);
+    test.equal(saved.f, undefined);
+    test.equal(saved.g, undefined);
 });
