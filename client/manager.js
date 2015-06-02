@@ -150,7 +150,7 @@ Meteor.startup(function() {
                         onError: function subscriptionOnError(error) {
                             if (error.error != '403') {
                                 //dont report security rejection.
-                                thatManager.error("server reported a problem with", meteorTopicName);
+                                thatManager.error("server reported a problem with", meteorTopicName, error);
                             }
                         }
                     };
