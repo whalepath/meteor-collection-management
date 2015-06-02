@@ -291,7 +291,11 @@ TestUntrustedType = DbObjectType.create({
     typeName: 'testUntrusted',
     properties: [
         'normalField0',
-        'normalField1'
+        {
+            normalField1 : {
+                indexed: true
+            }
+        }
     ],
     databaseTableName: 'testUntrustedTableName'
 });
@@ -506,6 +510,19 @@ Tinytest.add(mcm_dbobj + 'required fields', function (test) {
     }
     test.isTrue(failed, 'checkKeys did not fail with unset required property.');
 });
+
+Tinytest.add(mcm_dbobj+ ' - updateBy', function(test) {
+    var object = new TestUntrustedType({normalField0: 'normalField0 value'});
+    object._save();
+    TestUntrustedType.updateOneById(object.id, {normalField1: 'normalField1 value'});
+    var saved = TestUntrustedType.findOneById(object.id);
+    test.equal(saved.normalField1, 'normalField1 value');
+
+    TestUntrustedType.updateOneByNormalField1('normalField1 value', {normalField0: 'altered normalField0 value'});
+    var saved = TestUntrustedType.findOneById(object.id);
+    test.equal(saved.normalField0, 'altered normalField0 value');
+});
+
 
 var TestEnumType = DbObjectType.create({
     typeName: 'testEnumType',
@@ -734,9 +751,9 @@ Tinytest.add(mcm_dbobj + ' - nonstrict', function (test) {
     // test if value is already in the db.
     NonstrictType.updateOneById(non.id, {g:'g value'});
     saved = NonstrictType.findOneById(non.id);
-    test.equal(saved.c, 'c value');
-    test.equal(saved.f, 'f value');
-    test.equal(saved.g, 'g value');
+    test.equal(saved.c, 'c value', "full obj="+JSON.stringify(saved));
+    test.equal(saved.f, 'f value', "full obj="+JSON.stringify(saved));
+    test.equal(saved.g, 'g value', "full obj="+JSON.stringify(saved));
 });
 
 StrictType = DbObjectType.create({
@@ -767,8 +784,8 @@ Tinytest.add(mcm_dbobj + ' - strict', function (test) {
     test.equal(saved.f, undefined);
 
     // test if value is already in the db.
-    NonstrictType.updateOneById(strict.id, {g:'g value'});
-    saved = NonstrictType.findOneById(strict.id);
+    StrictType.updateOneById(strict.id, {g:'g value'});
+    saved = StrictType.findOneById(strict.id);
     test.equal(saved.c, undefined);
     test.equal(saved.f, undefined);
     test.equal(saved.g, undefined);
