@@ -16,12 +16,10 @@ Meteor.startup(function() {
         createMeteorCallMethod : {
             value: function createMeteorCallMethod(meteorCallDefinition, meteorCallNameSuffix) {
                 var thatManager = this.thatManager;
-                var trackingEventKey;
-                var trackingEventData;
+                var trackingEventFn;
                 var meteorCallName = this.getMeteorCallName(meteorCallNameSuffix);
                 if (typeof(meteorCallDefinition) === "object") {
-                    trackingEventKey = meteorCallDefinition.trackingEventKey;
-                    trackingEventData = meteorCallDefinition.trackingEventData;
+                    trackingEventFn = meteorCallDefinition.trackingEventFn;
                 }
                 // Create the client function that will call the server-side function with the same name.
                 // This allows code to be location agnostic: if the outside code is running on the
@@ -41,9 +39,8 @@ Meteor.startup(function() {
                             }
                         }
                         // TODO: provide hook mechanism. Find Meteor existing method hook.
-                        if (trackingEventKey) {
-                            // TODO: make 'TrackingManager' less wp specific : maybe a lookup/property etc.
-                            TrackingManager && TrackingManager.track(trackingEventKey);
+                        if (trackingEventFn) {
+                            trackingEventFn.call(thatManager, meteorCallDefinition, args);
                         }
                         thatManager.log("calling ", meteorCallName);
                         // END TODO: should be in hook.

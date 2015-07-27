@@ -36,7 +36,6 @@ Meteor.startup(function() {
                     "File loading in meteor requires that managers be in server/lib/managers");
                 }
 
-                var trackingEventKey = meteorCallDefinition.trackingEventKey;
                 var permissionCheck = meteorCallDefinition.permissionCheck;
 
                 // HACK : permission check needs to be made generic
