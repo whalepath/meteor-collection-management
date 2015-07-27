@@ -159,7 +159,7 @@ if ( Router != null) {
             _.each(initialData, function (handleObj, key) {
                 var isHandleAndMethod;
                 try {
-                    isHandleAndMethod = handleObj != null
+                    isHandleAndMethod = handleObj != null && _.isObject(handleObj)
                     && 'handle' in handleObj
                     && 'method' in handleObj;
                 } catch (e) {
