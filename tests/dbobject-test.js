@@ -511,18 +511,19 @@ Tinytest.add(mcm_dbobj + 'required fields', function (test) {
     test.isTrue(failed, 'checkKeys did not fail with unset required property.');
 });
 
-Tinytest.add(mcm_dbobj+ ' - updateBy', function(test) {
-    var object = new TestUntrustedType({normalField0: 'normalField0 value'});
-    object._save();
-    TestUntrustedType.updateOneById(object.id, {normalField1: 'normalField1 value'});
-    var saved = TestUntrustedType.findOneById(object.id);
-    test.equal(saved.normalField1, 'normalField1 value');
+if (Meteor.isServer) {
+    Tinytest.add(mcm_dbobj + ' - updateBy', function (test) {
+        var object = new TestUntrustedType({normalField0: 'normalField0 value'});
+        object._save();
+        TestUntrustedType.updateOneById(object.id, {normalField1: 'normalField1 value'});
+        var saved = TestUntrustedType.findOneById(object.id);
+        test.equal(saved.normalField1, 'normalField1 value');
 
-    TestUntrustedType.updateOneByNormalField1('normalField1 value', {normalField0: 'altered normalField0 value'});
-    var saved = TestUntrustedType.findOneById(object.id);
-    test.equal(saved.normalField0, 'altered normalField0 value');
-});
-
+        TestUntrustedType.updateOneByNormalField1('normalField1 value', {normalField0: 'altered normalField0 value'});
+        var saved = TestUntrustedType.findOneById(object.id);
+        test.equal(saved.normalField0, 'altered normalField0 value');
+    });
+}
 
 var TestEnumType = DbObjectType.create({
     typeName: 'testEnumType',
@@ -676,48 +677,50 @@ RevisionType = DbObjectType.create({
     databaseTableName: 'revisionTableName'
 });
 
-Tinytest.add(mcm_dbobj + '_revisionSave', function (test) {
-    if (Meteor.isServer) {
-        RevisionType.databaseTable.remove({});
-    }
+if ( Meteor.isServer ) {
+    Tinytest.add(mcm_dbobj + '_revisionSave', function (test) {
+        if (Meteor.isServer) {
+            RevisionType.databaseTable.remove({});
+        }
 
-    var x = new RevisionType({a: 1, b: 2});
-    x._save();
-    var xId = x.id;
-    x.a = 3;
-    var result0 = x._revisionSave();
-    test.equal(RevisionType.databaseTable.find().count(), 2, 'revision creates new obj');
-    test.notEqual(xId, result0.id, 'revision creates new id');
+        var x = new RevisionType({a: 1, b: 2});
+        x._save();
+        var xId = x.id;
+        x.a = 3;
+        var result0 = x._revisionSave();
+        test.equal(RevisionType.databaseTable.find().count(), 2, 'revision creates new obj');
+        test.notEqual(xId, result0.id, 'revision creates new id');
 
-    var fetchedX = RevisionType.databaseTable.findOne(xId);
-    test.equal(fetchedX.a, 1, 'old rev unchanged');
-    var fetchedNew = RevisionType.databaseTable.findOne(result0.id);
-    test.equal(fetchedNew.a, 3, 'new rev changed');
+        var fetchedX = RevisionType.databaseTable.findOne(xId);
+        test.equal(fetchedX.a, 1, 'old rev unchanged');
+        var fetchedNew = RevisionType.databaseTable.findOne(result0.id);
+        test.equal(fetchedNew.a, 3, 'new rev changed');
 
-    var newXId = fetchedNew.id;
+        var newXId = fetchedNew.id;
 
-    var result1 = fetchedNew.upsertFromUntrusted({
-        clientObj: {a: 4},
-        revision: true
+        var result1 = fetchedNew.upsertFromUntrusted({
+            clientObj: {a: 4},
+            revision: true
+        });
+
+        test.equal(RevisionType.databaseTable.find().count(), 3, 'revision upsert creates new obj');
+        var fetchedX0 = RevisionType.databaseTable.findOne(xId);
+        test.equal(fetchedX0.a, 1, 'rev 0 unchanged');
+        var fetchedX1 = RevisionType.databaseTable.findOne(newXId);
+        test.equal(fetchedX1.a, 3, 'rev 1 unchanged');
+        var fetchedX2 = RevisionType.databaseTable.findOne({_id: {$nin: [xId, newXId]}});
+        // var fetchedX2 = RevisionType.databaseTable.findOne(result1.id);
+        test.equal(fetchedX2.a, 4, 'latest set');
+
+        var query;
+        query = {_nextRevisionId: null};
+        var latestCursor = RevisionType.databaseTable.find(query);
+        test.equal(latestCursor.count(), 1, 'only one latest');
+
+        var latestX = latestCursor.fetch()[0];
+        test.equal(latestX.a, 4, 'latest is latest');
     });
-
-    test.equal(RevisionType.databaseTable.find().count(), 3, 'revision upsert creates new obj');
-    var fetchedX0 = RevisionType.databaseTable.findOne(xId);
-    test.equal(fetchedX0.a, 1, 'rev 0 unchanged');
-    var fetchedX1 = RevisionType.databaseTable.findOne(newXId);
-    test.equal(fetchedX1.a, 3, 'rev 1 unchanged');
-    var fetchedX2 = RevisionType.databaseTable.findOne({_id: {$nin: [xId, newXId]}});
-    // var fetchedX2 = RevisionType.databaseTable.findOne(result1.id);
-    test.equal(fetchedX2.a, 4, 'latest set');
-
-    var query;
-    query = {_nextRevisionId: null};
-    var latestCursor = RevisionType.databaseTable.find(query);
-    test.equal(latestCursor.count(), 1, 'only one latest');
-
-    var latestX = latestCursor.fetch()[0];
-    test.equal(latestX.a, 4, 'latest is latest');
-});
+}
 
 // Test the nonstrict attribute.
 NonstrictType = DbObjectType.create({

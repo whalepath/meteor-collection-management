@@ -144,3 +144,14 @@ Tinytest.add('Meteor Collection Management - enums - createKeyedMap', function(t
     keyedMap = TestingEnumFake.createKeyedMap(function() { return this; });
     test.equal(keyedMap, { one : TestingEnumFake.one, _two: TestingEnumFake.two, _three: TestingEnumFake.three }, 'custom element generation');
 });
+
+Tinytest.add('Meteor Collection Management - enums - immutable', function(test) {
+    TestingEnumFake.badProperty = true;
+    if ( 'badProperty' in TestingEnumFake) {
+        throw new Error('TestingEnumFake is not frozen. Enums should be frozen');
+    }
+    TestingEnumFake.one.badProperty = true;
+    if ( 'badProperty' in TestingEnumFake.one) {
+        throw new Error('TestingEnumFake.one is not frozen. Enum symbols should be frozen');
+    }
+})

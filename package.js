@@ -1,14 +1,12 @@
 Package.describe({
     summary: "Meteor Collection Management",
-    version: "1.8.17",
+    version: "1.8.18",
     git: "https://github.com/whalepath/meteor-collection-management.git"
 });
 
 Package.onUse(function (api) {
     api.use('ejson', ['client', 'server']);
     api.use('underscore', ['client', 'server']);
-    api.use('iron:router', ['client']);
-    api.use('templating', ['client']);
     api.use('mongo', ['client', 'server']);
 
     api.export('DbObjectType');

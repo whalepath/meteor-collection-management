@@ -1,7 +1,7 @@
 // TODO: put in a pull request to iron-router
 // this works but can we use a global hook that for a given route does a universal lookup.
 
-if ( Router != null) {
+if ( typeof Router !== 'undefined' && Router != null) {
     function readyFn() {
         if ( this.handle == null || !_.isFunction(this.handle.ready)) {
             return true;
