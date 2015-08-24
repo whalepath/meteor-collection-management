@@ -15,6 +15,7 @@ Package.onUse(function (api) {
     api.export('one');
     api.export('many');
     api.export('count');
+    api.export('IronRouterExtension');
 
     api.addFiles('lib/internalutils.js', ['client', 'server']);
     api.addFiles('lib/underscoreExtensions.js', ['client', 'server']);
