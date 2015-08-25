@@ -248,7 +248,6 @@ var DefaultIronRouterFunctions = {
 };
 
 IronRouterExtension = {
-// HACK : Need to put method some place else: different name space?
 // TODO: Be able to use RouteControllers
     _initializeRoutes: function _initializeRoutes() {
         'use strict';
