@@ -266,7 +266,7 @@ Meteor.startup(function() {
                  * 'reactivePublish' so that : https://github.com/Diggsey/meteor-reactive-publish.git
                  * could be used.
                  */
-                var publishMethod = publishTypes[fullMeteorTopicDefinition.type] || 'publish';
+                var publishMethod = publishTypes[fullMeteorTopicDefinition.publishMethod] || 'publish';
                 Meteor[publishMethod](meteorTopicName, wrappedFn);
                 thatManager._defineFindFunctionsForSubscription(
                     meteorTopicSuffix,
