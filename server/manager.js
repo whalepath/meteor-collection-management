@@ -38,7 +38,9 @@ Meteor.startup(function() {
 
                 var permissionCheck = meteorCallDefinition.permissionCheck;
 
-                // HACK : permission check needs to be made generic
+                /*
+                permissionCheck({thatManager: , meteorMethodName: , userId: , args: })
+                 */
                 if (permissionCheck == null) {
                     thatManager.warn(callName, ": Method has no permissionCheck defined");
                     // throw new Meteor.Error(500, "Method has no permissionCheck defined for " + callName);
