@@ -1,5 +1,8 @@
+//var packageName = 'patmoore:meteor-collection-management';
+var packageName = 'meteor-collection-management';
+
 Package.describe({
-    name: 'patmoore:meteor-collection-management',
+    name: packageName,
     summary: "Meteor Collection Management",
     version: "1.9.1",
     git: "https://github.com/whalepath/meteor-collection-management.git",
@@ -30,9 +33,7 @@ Package.onUse(function (api) {
 });
 
 Package.onTest(function (api) {
-    // TO_PAT: not sure what this is about, but it breaks the test server
-    api.use(['patmoore:meteor-collection-management', 'tinytest', 'test-helpers']);
-    //api.use(['meteor-collection-management', 'tinytest', 'test-helpers']);
+    api.use([packageName, 'tinytest', 'test-helpers']);
     api.addFiles('tests/dbobject-test.js', ['client', 'server']);
     api.addFiles('tests/enums-test.js', ['client', 'server']);
     api.addFiles('tests/manager-test.js', ['client', 'server']);
