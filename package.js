@@ -4,7 +4,7 @@ var packageName = 'meteor-collection-management';
 Package.describe({
     name: packageName,
     summary: "Meteor Collection Management",
-    version: "1.9.1",
+    version: "1.9.2",
     git: "https://github.com/whalepath/meteor-collection-management.git",
     documentation: 'README.md'
 });
