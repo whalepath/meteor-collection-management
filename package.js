@@ -1,5 +1,5 @@
-var packageName = 'patmoore:meteor-collection-management';
-//var packageName = 'meteor-collection-management';
+//var packageName = 'patmoore:meteor-collection-management';
+var packageName = 'meteor-collection-management';
 
 var  mongo = 'mongo@1.1.2';
 var underscore = 'underscore@1.0.4';
