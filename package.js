@@ -7,7 +7,7 @@ var ejson = 'ejson@1.0.7';
 Package.describe({
     name: packageName,
     summary: "Meteor Collection Management",
-    version: "1.1.10",
+    version: "1.9.2",
     git: "https://github.com/patmoore/meteor-collection-management.git"
 });
 
@@ -36,8 +36,8 @@ Package.onUse(function (api) {
 
 Package.onTest(function (api) {
     api.use([packageName, 'tinytest', 'test-helpers']);
-    api.use('underscore@1.0.3', ['client', 'server']);
-    api.use('mongo@1.1.0', ['client', 'server']);
+    api.use(underscore, ['client', 'server']);
+    api.use(mongo, ['client', 'server']);
     api.addFiles('tests/dbobject-test.js', ['client', 'server']);
     api.addFiles('tests/enums-test.js', ['client', 'server']);
     api.addFiles('tests/manager-test.js', ['client', 'server']);
