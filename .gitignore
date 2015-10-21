@@ -24,3 +24,4 @@ BrowserStackLocal
 /.build
 .build*
 .npm
+.versions
