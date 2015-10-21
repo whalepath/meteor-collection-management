@@ -1,20 +1,45 @@
-Collection manager abstraction for Meteor.
+# Collection manager abstraction for Meteor.
 
 [![Build Status](https://travis-ci.org/whalepath/meteor-collection-management.svg?branch=master)](https://travis-ci.org/whalepath/meteor-collection-management)
 
 Meteor-Collection-Management takes Meteor's concept of javascript code that runs on both the client and the server to 
-the next level.
+the next level when it comes to collection management.
 
-MCM target developers are organizations with some of these problems:
+## Meteor Basics
 
- 1. differing skill levels 
- 2. differing levels of involvement with the code - for example some developers may jump in to fix a few items before 
- working on a different project. A prime example is UX/UI designers - who do not have the time or energy
-    to understand all the intricacies of proper Meteor development
- 3. a medium to large number of developers
- 4. competent Javascript contractors or summer interns who need to be productive quickly with minimal learning of Meteor
- 5. Need to audit and provide provable security mechanisms.
- 
+Meteor ability to offer code that is server/client agnostic is excellent. The MCM package is designed to extend this breakthrough
+concept.
+
+
+### Primary Target audience
+
+MCM is designed to facilitate Meteor project development and improve maintability for professional Meteor projects.
+
+## Challenges with today's reality
+
+Companies are faced with the reality that developers:
+
+ 1. have differing skill levels
+ 1. have differing levels of involvement with the code - for example some developers may jump in to fix a few items before
+ working on other projects. A prime example is UX/UI designers - who may not have the time or motivation to understand all the intricacies of proper Meteor development
+ 1. leave for new opportunities
+
+Furthermore, companies, in particular startups,:
+ 1. have staff turnover,
+ 1. need fast ramp up time for new developers or summer interns. New and temporary staff needs to be reliable productive in the Meteor development the day they start work,
+ 1. Need to builtin data security that prevents new developers from introducing security holes.
+
+The minimized onboarding time is critical. New hires need to be productive the FIRST day of work.
+
+Learning a new framework always has a learning curve. Using MCM companies minimize the possibility, that
+ a new hire will introduce a set of common bugs and security holes such as:
+
+ 1. subscribing to a non-existant publication
+ 1. publishing a publication with an incorrect name
+ 1. on client-side using the wrong query on the client-side collections
+ 1. allowing client code to alter document fields that that are not permitted.
+
+
 MCM focus is on:
 
  1. Further reduction of duplicated code so as to allow even more code reuse between the client and the server
@@ -42,12 +67,11 @@ MCM focus is on:
 Subscription/Publish gaps:
 
  1. Code to populate a subscription on the server is duplicated on the client.
- 2. The client and the server must agree on the same topic name and the same semantics. 
- 3. There is no provision for orthogonally applying security checks
+ 1. The client and the server must agree on the same publication name and the same subscription arguments.
+ 1. There is no provision for orthogonally applying security checks
  
 Method calls face similar issues:
 
- 1. The client
 
 TODO: Namespace the mcm
 
@@ -68,7 +92,7 @@ To run tests locally run following:
 
 ## to understand
 * look in lib/manager.js
-* find ManagerType.createSubClass
+* find ManagerType.create
 
 ## TODO: how to do testing on the client/ server/ manager code?
 

@@ -1,15 +1,25 @@
 var EJSON = Package.ejson.EJSON;
 var TestingEnumFake = new Enums.Enum({
-    one: {
-        displayName: 'ONE',
+    typeName: 'testingEnumFake',
+    defs: {
+        one: {
+            displayName: 'ONE',
+        },
+        two: {
+            displayName: 'TWO',
+            dbCode: '_two'
+        },
+        three: {
+            displayName: 'THREE',
+            dbCode: '_three'
+        }
     },
-    two: {
-        displayName: 'TWO',
-        dbCode: '_two'
-    },
-    three: {
-        displayName: 'THREE',
-        dbCode: '_three'
+    properties: {
+        printMe: {
+            get: function() {
+                return 'printMe';
+            }
+        }
     }
 });
 
@@ -37,7 +47,7 @@ Tinytest.add('Meteor Collection Management - enums - display', function(test) {
 Tinytest.add('Meteor Collection Management - enums - array', function(test) {
     var enumsArray = TestingEnumFake.toArray(['one','three']);
     test.equal(enumsArray, [TestingEnumFake.one, TestingEnumFake.three]);
-    test.equal(enumsArray.toString(), 'ONE,THREE');
+    test.equal(enumsArray.toString(), 'one,_three');
 });
 
 Tinytest.add('Meteor Collection Management - enums - auto dbCode', function(test) {
@@ -60,6 +70,20 @@ Tinytest.add('Meteor Collection Management - enums - hasOwnProperty', function(t
     test.isTrue(TestingEnumFake.one.hasOwnProperty('displayName'));
 });
 
+Tinytest.add('Meteor Collection Management - enums - testExtraProperties', function(test) {
+    test.equal(TestingEnumFake.printMe, 'printMe', 'Problem with adding extra properties on the Enum object.');
+    test.equal(TestingEnumFake.one.printMe, 'printMe', 'Problem with adding extra properties on the Enum.Symbol object.');
+});
+
+Tinytest.add('Meteor Collection Management - enums - EJSON', function(test) {
+    var ejsonStringify = EJSON.stringify(TestingEnumFake.one);
+    var jsonParse = JSON.parse(ejsonStringify);
+    test.equal(TestingEnumFake.one.typeName(), jsonParse["$type"], 'TypeName mismatch');
+    test.equal(TestingEnumFake.one.dbCode, jsonParse["$value"], 'DbCode mismatch');
+    var back = EJSON.parse(ejsonStringify);
+    test.isTrue(TestingEnumFake.one === back);
+});
+
 /**
  * case where the enum was not properly serialized to the dbCode.
  * This happens if the enum was serialized by code that was not aware of how the enum should be serialized.
@@ -76,3 +100,58 @@ Tinytest.add('Meteor Collection Management - enums - accidently serialized', fun
     test.equal(TestingEnumFake.one, testingEnumFakeEnum, 'accidental serialization case was not handled');
 });
 
+
+Tinytest.add('Meteor Collection Management - enums - inMongoDb', function(test) {
+    var i = 0;
+    var mongoDb = TestingEnumFake.one.asMongoDb();
+    test.equal(mongoDb, { testingEnumFake: 'one'}, 'MongoDb mismatch '+(i++));
+
+    mongoDb = TestingEnumFake.inMongoDb(TestingEnumFake.one);
+    test.equal(mongoDb, { testingEnumFake: 'one'}, 'MongoDb mismatch '+(i++));
+
+    mongoDb = TestingEnumFake.ninMongoDb(TestingEnumFake.one);
+    test.equal(mongoDb, { testingEnumFake: {$ne :'one'}}, 'MongoDb mismatch '+(i++));
+
+    mongoDb = TestingEnumFake.inMongoDb(TestingEnumFake.one, TestingEnumFake.two);
+    test.equal(mongoDb, { testingEnumFake: {$in:['one', '_two']}}, 'MongoDb mismatch '+(i++));
+
+    mongoDb = TestingEnumFake.ninMongoDb(TestingEnumFake.one, TestingEnumFake.two);
+    test.equal(mongoDb, { testingEnumFake: {$nin:['one', '_two']}}, 'MongoDb mismatch '+(i++));
+
+    mongoDb = TestingEnumFake.one.ninMongoDb();
+    test.equal(mongoDb, { testingEnumFake: { $ne: 'one'}}, 'MongoDb mismatch '+(i++));
+
+    mongoDb = TestingEnumFake.one.ninMongoDb(TestingEnumFake.two);
+    test.equal(mongoDb, { testingEnumFake: {$nin:['_two', 'one']}}, 'MongoDb mismatch '+(i++));
+
+    // now test with field names
+    mongoDb = TestingEnumFake.one.asMongoDb('fieldName');
+    test.equal(mongoDb, { fieldName: 'one'}, 'MongoDb mismatch '+(i++));
+    mongoDb = TestingEnumFake.inMongoDb('fieldName', TestingEnumFake.one);
+    test.equal(mongoDb, { fieldName: 'one'}, 'MongoDb mismatch '+(i++));
+    mongoDb = TestingEnumFake.one.ninMongoDb('fieldName');
+    test.equal(mongoDb, { fieldName: {$ne: 'one'}}, 'MongoDb mismatch '+(i++));
+    mongoDb = TestingEnumFake.one.ninMongoDb('fieldName',TestingEnumFake.two);
+    test.equal(mongoDb, { fieldName: {$nin:['_two', 'one']}}, 'MongoDb mismatch '+(i++));
+});
+
+Tinytest.add('Meteor Collection Management - enums - createKeyedMap', function(test) {
+    var keyedMap = TestingEnumFake.createKeyedMap();
+    test.equal(keyedMap, { one : [], _two: [], _three: [] }, 'default populated with an array');
+    keyedMap.one.push('onlyInOne');
+    test.equal(keyedMap, { one : ['onlyInOne'], _two: [], _three: [] }, 'ensure that the array is not shared');
+
+    keyedMap = TestingEnumFake.createKeyedMap(function() { return this; });
+    test.equal(keyedMap, { one : TestingEnumFake.one, _two: TestingEnumFake.two, _three: TestingEnumFake.three }, 'custom element generation');
+});
+
+Tinytest.add('Meteor Collection Management - enums - immutable', function(test) {
+    TestingEnumFake.badProperty = true;
+    if ( 'badProperty' in TestingEnumFake) {
+        throw new Error('TestingEnumFake is not frozen. Enums should be frozen');
+    }
+    TestingEnumFake.one.badProperty = true;
+    if ( 'badProperty' in TestingEnumFake.one) {
+        throw new Error('TestingEnumFake.one is not frozen. Enum symbols should be frozen');
+    }
+})
