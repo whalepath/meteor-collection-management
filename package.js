@@ -1,6 +1,9 @@
 //var packageName = 'patmoore:meteor-collection-management';
 var packageName = 'meteor-collection-management';
 
+var  mongo = 'mongo@1.1.2';
+var underscore = 'underscore@1.0.4';
+var ejson = 'ejson@1.0.7';
 Package.describe({
     name: packageName,
     summary: "Meteor Collection Management",
@@ -10,9 +13,9 @@ Package.describe({
 });
 
 Package.onUse(function (api) {
-    api.use('ejson@1.0.6', ['client', 'server']);
-    api.use('underscore@1.0.3', ['client', 'server']);
-    api.use('mongo@1.1.0', ['client', 'server']);
+    api.use(ejson, ['client', 'server']);
+    api.use(underscore, ['client', 'server']);
+    api.use(mongo, ['client', 'server']);
 
     api.export('DbObjectType');
     api.export('ManagerType');
@@ -34,8 +37,8 @@ Package.onUse(function (api) {
 
 Package.onTest(function (api) {
     api.use([packageName, 'tinytest', 'test-helpers']);
-    api.use('underscore@1.0.3', ['client', 'server']);
-    api.use('mongo@1.1.0', ['client', 'server']);
+    api.use(underscore, ['client', 'server']);
+    api.use(mongo, ['client', 'server']);
     api.addFiles('tests/dbobject-test.js', ['client', 'server']);
     api.addFiles('tests/enums-test.js', ['client', 'server']);
     api.addFiles('tests/manager-test.js', ['client', 'server']);
