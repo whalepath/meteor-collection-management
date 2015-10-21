@@ -2,13 +2,11 @@
 
 [![Build Status](https://travis-ci.org/whalepath/meteor-collection-management.svg?branch=master)](https://travis-ci.org/whalepath/meteor-collection-management)
 
-Meteor-Collection-Management takes Meteor's concept of javascript code that runs on both the client and the server to 
-the next level when it comes to collection management.
+Meteor-Collection-Management takes Meteor's concept of javascript code that runs on both the client and the server to the next level when it comes to collection management.
 
 ## Meteor Basics
 
-Meteor ability to offer code that is server/client agnostic is excellent. The MCM package is designed to extend this breakthrough
-concept.
+Meteor ability to offer code that is server/client agnostic is excellent. The MCM package is designed to extend this breakthrough concept.
 
 
 ### Primary Target audience
@@ -89,6 +87,7 @@ TODO add proper description.
 To run tests locally run following: 
 
 ```meteor test-packages ./```
+```./run-test-server.sh```
 
 ## to understand
 * look in lib/manager.js
